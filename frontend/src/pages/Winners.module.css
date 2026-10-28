@@ -1,0 +1,21 @@
+.page {
+  padding-bottom: 2rem;
+}
+
+.noticeWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.6rem;
+}
+
+.note {
+  margin: 1.4rem auto 0;
+  max-width: 60ch;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--vl-text-faint);
+}
+
+.trust {
+  margin-top: 2.75rem;
+}

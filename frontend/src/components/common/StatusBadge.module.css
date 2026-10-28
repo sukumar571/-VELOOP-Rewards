@@ -1,0 +1,65 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: var(--vl-radius-pill);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.8s var(--vl-ease) infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+.active {
+  color: #7bf3b8;
+  background: rgba(41, 196, 126, 0.14);
+  border-color: rgba(41, 196, 126, 0.4);
+}
+
+.urgent {
+  color: var(--vl-gold-400);
+  background: rgba(255, 205, 117, 0.12);
+  border-color: rgba(255, 205, 117, 0.45);
+}
+.urgent .dot {
+  background: var(--vl-green-500);
+}
+
+.upcoming {
+  color: #8fb7ff;
+  background: rgba(1, 69, 194, 0.22);
+  border-color: rgba(92, 140, 255, 0.45);
+}
+
+.ended {
+  color: var(--vl-text-muted);
+  background: rgba(154, 157, 174, 0.1);
+  border-color: rgba(154, 157, 174, 0.3);
+}
+
+.cancelled {
+  color: #ff9aa8;
+  background: rgba(240, 87, 109, 0.12);
+  border-color: rgba(240, 87, 109, 0.4);
+}

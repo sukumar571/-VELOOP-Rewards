@@ -1,0 +1,29 @@
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vl-gold-400);
+}
+
+.strip {
+  justify-content: center;
+  width: 100%;
+  padding: 0.42rem 1rem;
+  background: rgba(255, 205, 117, 0.08);
+  border-bottom: 1px solid rgba(255, 205, 117, 0.22);
+  text-align: center;
+}
+
+.chip {
+  display: inline-flex;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--vl-radius-pill);
+  background: rgba(255, 205, 117, 0.1);
+  border: 1px solid rgba(255, 205, 117, 0.3);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

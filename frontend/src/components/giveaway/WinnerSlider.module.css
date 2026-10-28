@@ -1,0 +1,121 @@
+.root {
+  position: relative;
+}
+
+.viewport {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vl-violet-500) transparent;
+  border-radius: var(--vl-radius-lg);
+  padding-bottom: 0.35rem;
+}
+.viewport::-webkit-scrollbar {
+  height: 6px;
+}
+.viewport::-webkit-scrollbar-thumb {
+  background: rgba(131, 69, 240, 0.5);
+  border-radius: 3px;
+}
+
+.track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 1fr);
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.1rem 0.15rem;
+}
+
+.slide {
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+/* wider cards on desktop show 3 per view via grid auto-columns cap */
+@media (min-width: 1200px) {
+  .track {
+    grid-auto-columns: minmax(320px, calc((100% - 1.8rem) / 3));
+  }
+}
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .track {
+    grid-auto-columns: minmax(300px, calc((100% - 0.9rem) / 2));
+  }
+}
+@media (max-width: 767.98px) {
+  .track {
+    grid-auto-columns: 100%;
+  }
+}
+
+/* ---- controls ---- */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border-strong);
+  color: var(--vl-text);
+  cursor: pointer;
+  transition:
+    background-color var(--vl-speed) var(--vl-ease),
+    transform var(--vl-speed) var(--vl-ease);
+}
+.arrow:hover:not(:disabled) {
+  background: rgba(131, 69, 240, 0.22);
+  transform: translateY(-1px);
+}
+.arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.arrow:focus-visible {
+  outline: 2px solid var(--vl-violet-300);
+  outline-offset: 2px;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(139, 92, 246, 0.3);
+  cursor: pointer;
+  transition: background-color var(--vl-speed) var(--vl-ease);
+}
+.dotActive {
+  background: var(--vl-violet-300);
+}
+
+.motionHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted);
+}
+.motionHint svg {
+  color: var(--vl-gold-400);
+}

@@ -1,0 +1,47 @@
+.card {
+  height: 340px;
+  border-radius: var(--vl-radius-lg);
+  background:
+    linear-gradient(100deg, rgba(200, 88, 250, 0.06) 30%, rgba(200, 88, 250, 0.14) 50%, rgba(200, 88, 250, 0.06) 70%),
+    var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  background-size: 220% 100%;
+  animation: shimmer 1.6s var(--vl-ease) infinite;
+}
+
+.row {
+  height: 16px;
+  width: 100%;
+  border-radius: 8px;
+  background:
+    linear-gradient(100deg, rgba(200, 88, 250, 0.05) 30%, rgba(200, 88, 250, 0.12) 50%, rgba(200, 88, 250, 0.05) 70%);
+  background-size: 220% 100%;
+  animation: shimmer 1.6s var(--vl-ease) infinite;
+}
+
+.blocks {
+  height: 64px;
+  width: 100%;
+  border-radius: var(--vl-radius);
+  background:
+    linear-gradient(100deg, rgba(200, 88, 250, 0.05) 30%, rgba(200, 88, 250, 0.12) 50%, rgba(200, 88, 250, 0.05) 70%);
+  background-size: 220% 100%;
+  animation: shimmer 1.6s var(--vl-ease) infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .row,
+  .blocks {
+    animation: none;
+  }
+}

@@ -1,0 +1,60 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: var(--vl-radius-sm);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+[data-size='lg'] .badge {
+  font-size: 0.92rem;
+  padding: 0.42rem 0.8rem;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  color: var(--vl-text);
+}
+
+.currency {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.68em;
+}
+
+/* Currency tints — gold VE, violet SVE, blue Token (tokens from design system) */
+.ve {
+  background: rgba(255, 205, 117, 0.12);
+  border-color: rgba(255, 205, 117, 0.4);
+}
+.ve .currency {
+  color: var(--vl-gold-400);
+}
+
+.sve {
+  background: rgba(200, 88, 250, 0.12);
+  border-color: rgba(200, 88, 250, 0.4);
+}
+.sve .currency {
+  color: var(--vl-violet-300);
+}
+
+.token {
+  background: rgba(68, 75, 251, 0.14);
+  border-color: rgba(92, 140, 255, 0.45);
+}
+.token .currency {
+  color: #8fb7ff;
+}

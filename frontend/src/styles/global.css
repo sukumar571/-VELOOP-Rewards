@@ -1,0 +1,218 @@
+/* ============================================================================
+   VELOOP Rewards — Global base styles & shared utility classes (vl-*)
+   Component styling lives in *.module.css files; this sheet only holds the
+   truly global resets, typography scale, focus behaviour and shared atoms.
+   ==========================================================================*/
+
+body {
+  margin: 0;
+  font-family: var(--vl-font);
+  background:
+    var(--vl-grad-glow),
+    radial-gradient(45% 45% at 12% 108%, rgba(68, 75, 251, 0.1) 0%, transparent 70%),
+    var(--vl-bg);
+  background-color: var(--vl-bg);
+  color: var(--vl-text-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(131, 69, 240, 0.45);
+  color: #fff;
+}
+
+/* ---- Links ------------------------------------------------------------- */
+a {
+  color: var(--vl-violet-300);
+  text-decoration: none;
+  transition: color var(--vl-speed) var(--vl-ease);
+}
+a:hover {
+  color: var(--vl-gold-500);
+}
+
+/* ---- Accessible focus states ------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--vl-violet-300);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---- Skip link ---------------------------------------------------------- */
+.vl-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  padding: 0.65rem 1.1rem;
+  background: var(--vl-grad-cta);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0 0 var(--vl-radius-sm) var(--vl-radius-sm);
+}
+.vl-skip-link:focus {
+  left: 1rem;
+  color: #fff;
+}
+
+/* ---- Typography ---------------------------------------------------------- */
+.vl-display {
+  font-weight: 800;
+  letter-spacing: var(--vl-tracking-tight);
+  line-height: 1.08;
+  color: var(--vl-text);
+  font-size: clamp(2.1rem, 4.6vw + 0.6rem, 4.3rem);
+}
+.vl-h2 {
+  font-weight: 750;
+  letter-spacing: var(--vl-tracking-tight);
+  line-height: 1.15;
+  color: var(--vl-text);
+  font-size: clamp(1.55rem, 1.8vw + 0.7rem, 2.4rem);
+}
+.vl-lead {
+  font-size: clamp(1rem, 0.6vw + 0.8rem, 1.15rem);
+  color: var(--vl-text-body);
+  line-height: 1.65;
+}
+.vl-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: var(--vl-tracking-wide);
+  text-transform: uppercase;
+  color: var(--vl-violet-300);
+}
+.vl-gradient-text {
+  background: var(--vl-grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.vl-muted {
+  color: var(--vl-text-muted);
+}
+
+/* ---- Shared surfaces ----------------------------------------------------- */
+.vl-card {
+  background: linear-gradient(180deg, var(--vl-surface-2) 0%, var(--vl-surface) 100%);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+}
+.vl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--vl-radius-pill);
+  border: 1px solid var(--vl-border);
+  background: rgba(131, 69, 240, 0.12);
+  color: var(--vl-text-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ---- Buttons -------------------------------------------------------------- */
+.vl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.72rem 1.5rem;
+  border: 0;
+  border-radius: var(--vl-radius-pill);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--vl-speed) var(--vl-ease),
+    box-shadow var(--vl-speed) var(--vl-ease),
+    filter var(--vl-speed) var(--vl-ease),
+    background-color var(--vl-speed) var(--vl-ease),
+    border-color var(--vl-speed) var(--vl-ease);
+}
+.vl-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.vl-btn:disabled,
+.vl-btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.vl-btn-lg {
+  padding: 0.95rem 2rem;
+  font-size: 1.05rem;
+}
+
+.vl-btn-primary {
+  background: var(--vl-grad-primary);
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(99, 20, 209, 0.35);
+}
+.vl-btn-primary:hover:not(:disabled) {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(99, 20, 209, 0.48);
+  filter: brightness(1.12);
+}
+
+.vl-btn-cta {
+  background: var(--vl-grad-cta);
+  color: #fff;
+  box-shadow: var(--vl-shadow-glow);
+}
+.vl-btn-cta:hover:not(:disabled) {
+  color: #fff;
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.vl-btn-outline {
+  background: transparent;
+  color: var(--vl-text);
+  border: 1px solid var(--vl-border-strong);
+}
+.vl-btn-outline:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(131, 69, 240, 0.14);
+  border-color: var(--vl-violet-300);
+  transform: translateY(-1px);
+}
+
+.vl-btn-ghost {
+  background: transparent;
+  color: var(--vl-text-body);
+  padding-inline: 0.9rem;
+}
+.vl-btn-ghost:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(131, 69, 240, 0.12);
+}
+
+/* ---- Section rhythm -------------------------------------------------------- */
+.vl-section {
+  padding-block: var(--vl-section-gap);
+}
+.vl-anchor-offset {
+  scroll-margin-top: calc(var(--vl-nav-h) + 1.5rem);
+}
+
+/* ---- Restrained motion ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

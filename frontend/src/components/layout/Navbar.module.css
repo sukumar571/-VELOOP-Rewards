@@ -1,0 +1,219 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  height: var(--vl-nav-h);
+  background: rgba(3, 6, 21, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--vl-border);
+}
+
+.inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ---- Brand ---- */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--vl-text);
+}
+.brand:hover {
+  color: var(--vl-text);
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--vl-grad-gold);
+  color: #241300;
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(236, 177, 59, 0.35);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  font-size: 1.06rem;
+  background: var(--vl-grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.brandSub {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  -webkit-text-fill-color: var(--vl-text-muted);
+  color: var(--vl-text-muted);
+  background: none;
+}
+
+/* ---- Links ---- */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.link {
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--vl-radius-pill);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--vl-text-body);
+  transition:
+    color var(--vl-speed) var(--vl-ease),
+    background-color var(--vl-speed) var(--vl-ease);
+}
+.link:hover {
+  color: #fff;
+  background: rgba(131, 69, 240, 0.14);
+}
+.linkActive {
+  color: var(--vl-violet-300);
+  background: rgba(131, 69, 240, 0.16);
+}
+
+.cta {
+  margin-left: 0.6rem;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.88rem;
+}
+
+.burger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: 10px;
+  color: var(--vl-text);
+  padding: 0.4rem 0.55rem;
+  cursor: pointer;
+  transition: border-color var(--vl-speed) var(--vl-ease);
+}
+.burger:hover {
+  border-color: var(--vl-violet-300);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 991.98px) {
+  .burger {
+    display: inline-flex;
+  }
+
+  .nav {
+    position: absolute;
+    top: var(--vl-nav-h);
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    padding: 0.9rem clamp(0.75rem, 4vw, 1.25rem) 1.2rem;
+    background: rgba(6, 8, 28, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--vl-border);
+    box-shadow: var(--vl-shadow);
+  }
+  .nav[data-open] {
+    display: flex;
+  }
+
+  .link {
+    padding: 0.8rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  .cta {
+    margin: 0.5rem 0.2rem 0;
+    justify-content: center;
+  }
+}
+
+/* ---- Account / wallet cluster ---- */
+.account {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-left: 0.6rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.7rem;
+  border-radius: var(--vl-radius-pill);
+  border: 1px solid var(--vl-border);
+  background: rgba(13, 4, 47, 0.6);
+}
+
+.walletIcon {
+  display: grid;
+  place-items: center;
+  color: var(--vl-gold-400);
+}
+
+.balances {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.balance {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.balanceCur {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.ve .balanceValue,
+.ve .balanceCur {
+  color: var(--vl-gold-400);
+}
+.sve .balanceValue,
+.sve .balanceCur {
+  color: var(--vl-violet-300);
+}
+.token .balanceValue,
+.token .balanceCur {
+  color: #8fb7ff;
+}
+
+.authBtn {
+  padding: 0.5rem 0.95rem;
+  font-size: 0.84rem;
+}
+
+@media (max-width: 991.98px) {
+  .account {
+    margin: 0.5rem 0.2rem 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .authBtn {
+    justify-content: center;
+  }
+}

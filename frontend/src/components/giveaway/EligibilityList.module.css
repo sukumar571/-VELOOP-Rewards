@@ -1,0 +1,45 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--vl-text-body);
+}
+
+.bullet {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.5rem;
+  border-radius: 50%;
+  background: var(--vl-green-500);
+}
+
+.pendingIcon {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--vl-gold-500);
+}
+
+.text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.pendingTag {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--vl-gold-500);
+}

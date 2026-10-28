@@ -1,0 +1,8 @@
+/* HomePage keeps only section spacing — every block styles itself. */
+.how {
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.winners {
+  padding-top: 0;
+}

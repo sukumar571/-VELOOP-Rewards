@@ -1,0 +1,75 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- chip ---- */
+.chip {
+  padding: 0.34rem 0.7rem;
+  border-radius: var(--vl-radius-pill);
+  background: rgba(131, 69, 240, 0.16);
+  border: 1px solid var(--vl-border-strong);
+  color: var(--vl-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.chip svg {
+  color: var(--vl-violet-300);
+  flex: none;
+}
+.sec {
+  color: var(--vl-violet-300);
+}
+
+/* ---- blocks ---- */
+.blocks {
+  gap: 0.5rem;
+}
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  padding: 0.7rem 0.55rem 0.6rem;
+  border-radius: var(--vl-radius);
+  background: linear-gradient(180deg, var(--vl-surface-2), var(--vl-surface));
+  border: 1px solid var(--vl-border-strong);
+  box-shadow: var(--vl-shadow-sm);
+}
+.value {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--vl-text);
+}
+.label {
+  margin-top: 0.35rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: var(--vl-tracking-wide);
+  text-transform: uppercase;
+  color: var(--vl-text-muted);
+}
+.sep {
+  color: var(--vl-violet-300);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.ended {
+  color: var(--vl-text-muted);
+  background: rgba(154, 157, 174, 0.1);
+  border-color: rgba(154, 157, 174, 0.3);
+}
+
+@media (max-width: 575.98px) {
+  .unit {
+    min-width: 56px;
+    padding: 0.55rem 0.4rem 0.45rem;
+  }
+  .sep {
+    font-size: 1rem;
+  }
+}

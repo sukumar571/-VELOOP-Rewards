@@ -1,0 +1,114 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.05rem 1.15rem 1.1rem;
+  height: 100%;
+  transition: border-color var(--vl-speed) var(--vl-ease);
+}
+.card:hover {
+  border-color: var(--vl-border-strong);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--vl-text);
+  min-width: 0;
+}
+
+.giveaway {
+  color: var(--vl-violet-300);
+  text-decoration: none;
+}
+.giveaway:hover {
+  text-decoration: underline;
+}
+
+.giveawayArchived {
+  color: var(--vl-text);
+}
+
+.date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--vl-text-muted);
+  white-space: nowrap;
+}
+
+.rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.row dt {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted);
+}
+.row dt svg {
+  color: var(--vl-gold-400);
+}
+
+.row dd {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--vl-text);
+  line-height: 1.45;
+}
+
+.alias {
+  font-weight: 700;
+}
+
+.maskedId {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--vl-radius-pill);
+  background: rgba(131, 69, 240, 0.14);
+  border: 1px solid var(--vl-border);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--vl-violet-300);
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+}
+
+.delivery {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--vl-radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7bf3b8;
+  background: rgba(41, 196, 126, 0.13);
+  border: 1px solid rgba(41, 196, 126, 0.35);
+}

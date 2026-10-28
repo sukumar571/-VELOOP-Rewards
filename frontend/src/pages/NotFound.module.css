@@ -1,0 +1,33 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: clamp(4rem, 12vh, 8rem) 1rem 5rem;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: rgba(131, 69, 240, 0.15);
+  border: 1px solid var(--vl-border-strong);
+  color: var(--vl-violet-300);
+  margin-bottom: 0.5rem;
+}
+
+.text {
+  max-width: 48ch;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}

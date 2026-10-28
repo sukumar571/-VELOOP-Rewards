@@ -1,0 +1,86 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tablist {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: var(--vl-radius-pill);
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+}
+
+.tab {
+  padding: 0.55rem 1.25rem;
+  border: 0;
+  border-radius: var(--vl-radius-pill);
+  background: transparent;
+  color: var(--vl-text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--vl-speed) var(--vl-ease),
+    color var(--vl-speed) var(--vl-ease);
+}
+.tab:hover {
+  color: var(--vl-text);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--vl-violet-300);
+  outline-offset: 2px;
+}
+
+.tabActive {
+  background: var(--vl-grad-cta);
+  color: #fff;
+  box-shadow: var(--vl-shadow-glow);
+}
+.tabActive:hover {
+  color: #fff;
+}
+
+/* ---- previous winners grid ---- */
+.prevGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prevItem {
+  min-width: 0;
+}
+
+@media (max-width: 1199.98px) {
+  .prevGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .prevGrid {
+    grid-template-columns: 1fr;
+  }
+  .tablist {
+    width: 100%;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding-inline: 0.6rem;
+  }
+}

@@ -1,0 +1,108 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.05rem 1.2rem;
+  transition:
+    border-color var(--vl-speed) var(--vl-ease),
+    transform var(--vl-speed) var(--vl-ease);
+}
+.card:hover {
+  border-color: var(--vl-border-strong);
+  transform: translateY(-2px);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--vl-grad-cta);
+  box-shadow: var(--vl-shadow-glow);
+}
+[data-compact='true'] .avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 0.9rem;
+}
+
+.info {
+  min-width: 0;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--vl-text);
+}
+
+.verified {
+  color: var(--vl-green-500);
+  flex: none;
+}
+
+.userId {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.3rem 0 0;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--vl-radius-pill);
+  background: rgba(131, 69, 240, 0.14);
+  border: 1px solid var(--vl-border);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--vl-violet-300);
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+}
+
+.prize {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.88rem;
+  color: var(--vl-gold-400);
+  font-weight: 600;
+}
+.prize svg {
+  flex: none;
+}
+
+.meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--vl-text-muted);
+}
+
+.giveawayLink {
+  color: var(--vl-violet-300);
+  font-weight: 600;
+}
+.giveawayLink:hover {
+  color: var(--vl-gold-500);
+}
+
+.status {
+  display: inline-block;
+  margin-top: 0.45rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--vl-radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7bf3b8;
+  background: rgba(41, 196, 126, 0.13);
+  border: 1px solid rgba(41, 196, 126, 0.35);
+}

@@ -1,0 +1,24 @@
+{
+  "name": "veloop-giveaway-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "VELOOP Rewards Giveaway — premium responsive giveaway frontend (Phase 1)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "bootstrap": "^5.3.8",
+    "lucide-react": "^1.63.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.5"
+  }
+}

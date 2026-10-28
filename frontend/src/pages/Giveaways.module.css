@@ -1,0 +1,45 @@
+.page {
+  padding-bottom: 2rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2.25rem;
+}
+
+.chip {
+  padding: 0.45rem 1.05rem;
+  border-radius: var(--vl-radius-pill);
+  border: 1px solid var(--vl-border-strong);
+  background: transparent;
+  color: var(--vl-text-body);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--vl-speed) var(--vl-ease),
+    color var(--vl-speed) var(--vl-ease),
+    border-color var(--vl-speed) var(--vl-ease);
+}
+.chip:hover {
+  border-color: var(--vl-violet-300);
+  color: #fff;
+}
+.chipActive {
+  background: var(--vl-grad-primary);
+  border-color: transparent;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  gap: 1.25rem;
+}
+
+.gridItem {
+  min-width: 0;
+}
