@@ -1,0 +1,58 @@
+{
+  "name": "veloop-giveaway-backend",
+  "version": "0.2.0",
+  "private": true,
+  "description": "VELOOP Rewards Giveaway — Node/Express/MongoDB API (backend core + data model).",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node src/server.js",
+    "dev": "cross-env NODE_ENV=development node --watch src/server.js",
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand",
+    "test:models": "cross-env NODE_ENV=test jest --runInBand tests/unit tests/integration/models.indexes.test.js",
+    "token:dev": "cross-env NODE_ENV=development node src/utils/mintDevToken.js",
+    "db:migrate": "cross-env NODE_ENV=development node scripts/migrate.js",
+    "db:migrate:dry": "cross-env NODE_ENV=development node scripts/migrate.js --dry-run",
+    "db:migrate:check": "cross-env NODE_ENV=development node scripts/migrate.js --check",
+    "seed:dev": "cross-env NODE_ENV=development node scripts/seed/seed.dev.js",
+    "seed:dev:force": "cross-env NODE_ENV=development node scripts/seed/seed.dev.js --force",
+    "seed:reset": "cross-env NODE_ENV=development node scripts/seed/reset.dev.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0",
+    "pino": "^9.3.2",
+    "pino-http": "^10.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.4.3",
+    "pino-pretty": "^11.2.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/setupEnv.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
+    ],
+    "testTimeout": 15000
+  }
+}
