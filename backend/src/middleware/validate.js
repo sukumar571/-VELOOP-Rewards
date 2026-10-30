@@ -23,7 +23,7 @@ function validate(schemas = {}) {
   return function run(req, res, next) {
     req.valid = {};
     try {
-      for (const part of ['body', 'query', 'params']) {
+      for (const part of ['body', 'query', 'params', 'headers']) {
         const schema = schemas[part];
         if (!schema) continue;
         const parsed = schema.parse(req[part] ?? {});

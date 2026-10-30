@@ -16,15 +16,18 @@ import {
   getWinnersForGiveaway,
   IS_DEMO,
 } from '../services/giveawayService.js';
+import { getClaimContext } from '../services/claimService.js';
 import { getHowItWorksSteps } from '../config/howItWorks.js';
 import { formatCount, formatDate } from '../utils/format.js';
 import PrizeVisual from '../components/common/PrizeVisual.jsx';
 import StatusBadge from '../components/common/StatusBadge.jsx';
 import Countdown from '../components/common/Countdown.jsx';
 import Skeleton from '../components/common/Skeleton.jsx';
+import GiveawayLoader from '../components/common/GiveawayLoader.jsx';
 import ErrorState from '../components/common/ErrorState.jsx';
 import DemoNotice from '../components/common/DemoNotice.jsx';
 import WinnerCard from '../components/giveaway/WinnerCard.jsx';
+import WinnerClaimCard from '../components/giveaway/WinnerClaimCard.jsx';
 import EntryPanel from '../components/giveaway/EntryPanel.jsx';
 import EligibilityList from '../components/giveaway/EligibilityList.jsx';
 import HowItWorksTimeline from '../components/giveaway/HowItWorksTimeline.jsx';
@@ -62,19 +65,17 @@ export default function GiveawayDetailPage() {
     [ended, giveaway?.id],
   );
 
+  // Personalized claim for the CURRENT user — the service only marks isWinner
+  // true when the authenticated account owns this published draw's claim.
+  const { data: claimCtx, reload: reloadClaim } = useAsync(
+    () => (ended ? getClaimContext(giveaway.id) : Promise.resolve(null)),
+    [ended, giveaway?.id],
+  );
+
   if (loading) {
     return (
       <div className={`container ${styles.page}`} aria-busy="true">
-        <Skeleton variant="row" />
-        <div className={styles.layout}>
-          <div className={styles.colVisual}>
-            <Skeleton variant="card" />
-            <Skeleton variant="blocks" count={3} />
-          </div>
-          <div className={styles.colFacts}>
-            <Skeleton variant="blocks" count={4} />
-          </div>
-        </div>
+        <GiveawayLoader label={`Loading “${slug}”…`} />
       </div>
     );
   }
@@ -220,6 +221,13 @@ export default function GiveawayDetailPage() {
               <h2 id="draw-winners-h" className={styles.entryTitle}>
                 Draw result
               </h2>
+              {/* Personalized claim — rendered ONLY when the server confirms this
+                  account is the winner. Non-winners see just the masked public list. */}
+              {claimCtx?.isWinner ? (
+                <div className={styles.claimBlock}>
+                  <WinnerClaimCard record={claimCtx} onUpdated={reloadClaim} />
+                </div>
+              ) : null}
               {winnersLoading ? (
                 <div aria-busy="true">
                   <Skeleton variant="blocks" count={2} />

@@ -84,15 +84,17 @@ function declaredIndex(Model, key) {
 }
 
 describe('model registry', () => {
-  it('registers the ten specified models on the shared connection', () => {
+  it('registers the specified models on the shared connection', () => {
     expect(Object.keys(models).sort()).toEqual(
       [
         'AuditLog',
+        'DevWalletBalance',
         'FraudEvent',
         'Giveaway',
         'GiveawayEntryTransaction',
         'GiveawayParticipation',
         'GiveawayWinner',
+        'IdempotencyKey',
         'Prize',
         'PrizeClaim',
         'User',

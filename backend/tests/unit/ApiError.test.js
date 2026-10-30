@@ -12,7 +12,7 @@ describe('ApiError', () => {
   });
 
   it('maps static helpers to the documented status/code pairs', () => {
-    expect(ApiError.unauthorized()).toMatchObject({ statusCode: 401, code: 'UNAUTHENTICATED' });
+    expect(ApiError.unauthorized()).toMatchObject({ statusCode: 401, code: 'LOGIN_REQUIRED' });
     expect(ApiError.forbidden()).toMatchObject({ statusCode: 403, code: 'FORBIDDEN' });
     expect(ApiError.notFound()).toMatchObject({ statusCode: 404, code: 'NOT_FOUND' });
     expect(ApiError.badRequest()).toMatchObject({ statusCode: 400, code: 'BAD_REQUEST' });

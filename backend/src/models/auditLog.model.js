@@ -136,6 +136,8 @@ auditLogSchema.index({ actorId: 1, createdAt: -1 });
 /**
  * The only sanctioned way to write an audit entry. Snapshots are scrubbed here so
  * leaking PII into the trail requires deliberately bypassing this helper.
+ * `session` lets the entry join the caller's MongoDB transaction, so a state change
+ * and its audit record commit (or roll back) together.
  */
 auditLogSchema.statics.record = function record({
   actorId = 'system',
@@ -150,11 +152,15 @@ auditLogSchema.statics.record = function record({
   requestId,
   country,
   metadata,
+  session,
 } = {}) {
   if (!action || !entityType || entityId === undefined || entityId === null) {
     throw new Error('AUDIT_INCOMPLETE: action, entityType and entityId are required.');
   }
-  return this.create({
+  // Build a document and save it, so `session` is honoured. Mongoose cannot attach
+  // a session to `Model.create(singleDoc, { session })` (it needs the array form),
+  // and `save({ session })` returns the one document callers expect.
+  const doc = new this({
     actorId: String(actorId),
     actorRole,
     action,
@@ -168,6 +174,7 @@ auditLogSchema.statics.record = function record({
     country,
     metadata: scrub(metadata),
   });
+  return doc.save(session ? { session } : undefined);
 };
 
 auditLogSchema.statics.scrub = scrub;

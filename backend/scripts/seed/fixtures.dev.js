@@ -126,6 +126,27 @@ function buildFixtures(now = new Date()) {
       participation: { entryCurrencies: ['VE'] },
       prizeConfig: { drawMethod: 'RANDOM' },
     },
+    {
+      // The demo FEE TABLE. The six tiers below carry the authoritative entry fees
+      // supplied for this deployment; they are Prize data, resolved by Prize.resolveFee,
+      // never hard-coded `if` branches in the entry path. All three currencies are
+      // enabled so a paid entry can be priced in VE, SVE or TOKEN (no cross-currency
+      // substitution: a tier is only enterable in a currency it actually prices).
+      _id: oid(P.giveaway, 6),
+      title: 'VELOOP Rewards Demo Draw (fee table)',
+      slug: 'dev-fee-table',
+      tagline: 'Fictional multi-currency entry draw',
+      description: 'FICTIONAL dev fixture exercising the transactional paid-entry path.',
+      status: 'ACTIVE',
+      published: true,
+      publishedAt: at(-1),
+      startAt: at(-1),
+      endAt: at(30),
+      rules: { summary: 'One participation per account per tier. FICTIONAL.', version: 'v1' },
+      eligibility: { countries: ['IN'], minKycLevel: 'BASIC' },
+      participation: { entryCurrencies: ['VE', 'SVE', 'TOKEN'], freeEntryCount: 0, maxEntriesPerUser: 5 },
+      prizeConfig: { drawMethod: 'WEIGHTED_BY_ENTRIES', claimWindowDays: 7 },
+    },
   ];
 
   const prizes = [
@@ -191,6 +212,86 @@ function buildFixtures(now = new Date()) {
       entryCurrency: 'VE',
       entryAmount: 10,
       claim: { windowDays: 10 },
+    },
+    // ----- the demo fee table: six tiers on giveaway 6 ----------------------
+    // iPhone 15 Pro — 250 VE
+    {
+      _id: oid(P.prize, 6),
+      giveawayId: oid(P.giveaway, 6),
+      name: 'iPhone 15 Pro (fee-table demo)',
+      description: 'FICTIONAL physical prize. Entry fee is authoritative Prize data.',
+      position: 1,
+      winnerCount: 1,
+      prizeType: 'PHYSICAL',
+      claimType: 'FORM',
+      entryCurrency: 'VE',
+      entryAmount: 250,
+      claim: { windowDays: 7, physical: { shipToCountries: ['IN'] } },
+    },
+    // Apple Watch — 200 VE
+    {
+      _id: oid(P.prize, 7),
+      giveawayId: oid(P.giveaway, 6),
+      name: 'Apple Watch (fee-table demo)',
+      position: 2,
+      winnerCount: 1,
+      prizeType: 'PHYSICAL',
+      claimType: 'FORM',
+      entryCurrency: 'VE',
+      entryAmount: 200,
+      claim: { windowDays: 7, physical: { shipToCountries: ['IN'] } },
+    },
+    // AirPods — 500 SVE (an SVE-priced tier, so a VE balance cannot enter it)
+    {
+      _id: oid(P.prize, 8),
+      giveawayId: oid(P.giveaway, 6),
+      name: 'AirPods (fee-table demo)',
+      position: 3,
+      winnerCount: 2,
+      prizeType: 'DIGITAL',
+      claimType: 'DIGITAL_DELIVERY',
+      entryCurrency: 'SVE',
+      entryAmount: 500,
+      claim: { windowDays: 7, digital: { channel: 'IN_APP' } },
+    },
+    // Amazon voucher Rs.2000 — 500 VE
+    {
+      _id: oid(P.prize, 9),
+      giveawayId: oid(P.giveaway, 6),
+      name: 'Amazon Voucher ₹2,000 (fee-table demo)',
+      position: 4,
+      winnerCount: 3,
+      prizeType: 'GIFT_CARD',
+      claimType: 'DIGITAL_DELIVERY',
+      entryCurrency: 'VE',
+      entryAmount: 500,
+      claim: { windowDays: 7, digital: { channel: 'EMAIL' } },
+    },
+    // Amazon voucher Rs.500 — 300 VE
+    {
+      _id: oid(P.prize, 10),
+      giveawayId: oid(P.giveaway, 6),
+      name: 'Amazon Voucher ₹500 (fee-table demo)',
+      position: 5,
+      winnerCount: 5,
+      prizeType: 'GIFT_CARD',
+      claimType: 'DIGITAL_DELIVERY',
+      entryCurrency: 'VE',
+      entryAmount: 300,
+      claim: { windowDays: 7, digital: { channel: 'EMAIL' } },
+    },
+    // Rs.20 voucher — 2000 TOKEN
+    {
+      _id: oid(P.prize, 11),
+      giveawayId: oid(P.giveaway, 6),
+      name: '₹20 Voucher (fee-table demo)',
+      position: 6,
+      winnerCount: 10,
+      prizeType: 'GIFT_CARD',
+      claimType: 'DIGITAL_DELIVERY',
+      entryCurrency: 'TOKEN',
+      entryAmount: 2000,
+      claim: { windowDays: 7, digital: { channel: 'IN_APP' } },
     },
   ];
 
@@ -558,6 +659,22 @@ function buildFixtures(now = new Date()) {
     { userId: oid(P.user, 3), currency: 'VE', balance: null, source: 'SEED_FIXTURE', observedAt: null, stale: true, lastErrorCode: 'WALLET_NOT_CONFIGURED' },
   ];
 
+  // ----- DEV WALLET BALANCES (the in-DB `dev` adapter's authoritative truth) ---
+  // These are the FICTIONAL balances the `WALLET_MODE=dev` adapter debits inside a
+  // real MongoDB transaction. They are NEVER the WalletReference cache and are never
+  // presented as real VELOOP funds. One user is deliberately WELL-FUNDED in every
+  // currency (paid joins succeed) and one is deliberately SHORT everywhere (the same
+  // join returns 402 INSUFFICIENT_BALANCE) so the money path is exercised end to end.
+  const devWalletBalances = [
+    { userId: oid(P.user, 1), currency: 'VE', balance: 100000 },
+    { userId: oid(P.user, 1), currency: 'SVE', balance: 100000 },
+    { userId: oid(P.user, 1), currency: 'TOKEN', balance: 100000 },
+    // Intentionally below the smallest demo fee (250 VE) so a paid entry fails closed.
+    { userId: oid(P.user, 2), currency: 'VE', balance: 100 },
+    { userId: oid(P.user, 2), currency: 'SVE', balance: 100 },
+    { userId: oid(P.user, 2), currency: 'TOKEN', balance: 100 },
+  ];
+
   const auditLogs = [
     {
       action: 'giveaway.status.update',
@@ -593,6 +710,7 @@ function buildFixtures(now = new Date()) {
     claims,
     fraudEvents,
     walletReferences,
+    devWalletBalances,
     auditLogs,
   };
 }

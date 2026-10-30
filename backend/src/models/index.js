@@ -24,6 +24,8 @@ const GiveawayWinner = require('./giveawayWinner.model.js');
 const PrizeClaim = require('./prizeClaim.model.js');
 const FraudEvent = require('./fraudEvent.model.js');
 const WalletReference = require('./walletReference.model.js');
+const DevWalletBalance = require('./devWalletBalance.model.js');
+const IdempotencyKey = require('./idempotencyKey.model.js');
 const AuditLog = require('./auditLog.model.js');
 
 module.exports = {
@@ -36,5 +38,7 @@ module.exports = {
   PrizeClaim,
   FraudEvent,
   WalletReference,
+  DevWalletBalance,
+  IdempotencyKey,
   AuditLog,
 };

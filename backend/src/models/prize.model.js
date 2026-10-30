@@ -145,6 +145,30 @@ prizeSchema.statics.assertMatchesGiveaway = function assertMatchesGiveaway(givea
   return true;
 };
 
+/**
+ * Resolves the entry fee a participant would be charged, purely from
+ * configuration: the tier's own currency/amount, or the matching entry in
+ * `feeOverrides`. Nothing in the entry path needs an `if (currency === 'VE')`.
+ * DB-free, so it is unit-testable without MongoDB.
+ *
+ * @returns {{currency: string, amount: number, source: 'base'|'override'}}
+ * @throws {Error} `code: 'ENTRY_CURRENCY_NOT_ALLOWED'` when the tier has no such price
+ */
+prizeSchema.statics.resolveFee = function resolveFee(prize, currency) {
+  const want = currency || prize.entryCurrency;
+  if (want === prize.entryCurrency) {
+    return { currency: want, amount: prize.entryAmount, source: 'base' };
+  }
+  const override = (prize.feeOverrides || []).find((f) => f.currency === want);
+  if (!override) {
+    const err = new Error(`ENTRY_CURRENCY_NOT_ALLOWED: prize "${prize.name}" has no fee configured for ${want}.`);
+    err.code = 'ENTRY_CURRENCY_NOT_ALLOWED';
+    err.currency = want;
+    throw err;
+  }
+  return { currency: want, amount: override.amount, source: 'override' };
+};
+
 /** Total winner slots across the active prizes of a giveaway. */
 prizeSchema.statics.sumWinnerCounts = function sumWinnerCounts(prizes) {
   return prizes.reduce((sum, p) => sum + (p.winnerCount || 0), 0);

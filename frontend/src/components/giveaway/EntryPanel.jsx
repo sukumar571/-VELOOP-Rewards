@@ -100,11 +100,15 @@ export default function EntryPanel({ giveaway }) {
 
   const currency = getCurrency(entry.entry?.currency);
   const feeLabel = formatAmount(entry.entry?.currency, entry.entry?.amount);
+  // A balance is only trusted when the server actually reported a number for it.
+  // An unknown balance (wallet unconfigured/unreachable) is shown as "—" and is
+  // NEVER coerced to 0, so we never imply the user can or cannot afford an entry.
+  const balanceKnown = typeof entry.balance === 'number';
   // The "amount remaining after joining" preview only makes sense when joining
   // is actually a valid next action — a live draw, eligible, sufficient balance
   // and not already entered. Otherwise a negative/stale figure would mislead.
   const canPreviewRemaining =
-    entry.status === 'active' && entry.eligible && entry.sufficient && !entry.hasJoined;
+    entry.status === 'active' && entry.eligible && balanceKnown && entry.sufficient && !entry.hasJoined;
 
   return (
     <section className={styles.panel} aria-label="Entry and participation">
@@ -135,7 +139,9 @@ export default function EntryPanel({ giveaway }) {
           {/* ---- Balance for the matching currency ---- */}
           <div className={styles.balanceRow}>
             <span className={styles.balanceLabel}>Your {currency.label} balance</span>
-            <span className={styles.balanceValue}>{formatAmount(entry.entry?.currency, entry.balance)}</span>
+            <span className={styles.balanceValue}>
+              {balanceKnown ? formatAmount(entry.entry?.currency, entry.balance) : '—'}
+            </span>
           </div>
           {canPreviewRemaining ? (
             <div className={styles.remainingRow}>
@@ -150,8 +156,13 @@ export default function EntryPanel({ giveaway }) {
           {justJoined && entry.hasJoined ? (
             <p className={`${styles.banner} ${styles.bannerSuccess}`} role="status">
               <Check size={16} aria-hidden="true" />
-              You&apos;re entered. {formatAmount(entry.entry?.currency, justJoined.fee)} was
-              deducted — new balance {formatAmount(entry.entry?.currency, justJoined.balanceAfter)}.
+              You&apos;re entered.
+              {typeof justJoined.fee === 'number'
+                ? ` ${formatAmount(entry.entry?.currency, justJoined.fee)} was deducted`
+                : ''}
+              {typeof justJoined.balanceAfter === 'number'
+                ? ` — new balance ${formatAmount(entry.entry?.currency, justJoined.balanceAfter)}.`
+                : '. Your updated balance is shown above once verified.'}
             </p>
           ) : null}
 
@@ -180,6 +191,12 @@ export default function EntryPanel({ giveaway }) {
               tone="warn"
               text="This account isn't eligible to enter this giveaway."
             />
+          ) : !balanceKnown ? (
+            <StateNote
+              icon={<AlertTriangle size={15} aria-hidden="true" />}
+              tone="warn"
+              text="We couldn't verify your balance right now, so joining is temporarily unavailable. Please try again shortly."
+            />
           ) : !entry.sufficient ? (
             <StateNote
               icon={<AlertTriangle size={15} aria-hidden="true" />}
@@ -197,6 +214,7 @@ export default function EntryPanel({ giveaway }) {
             hasJoined={entry.hasJoined}
             eligible={entry.eligible}
             sufficient={entry.sufficient}
+            balanceKnown={balanceKnown}
             onJoin={openConfirm}
           />
 
@@ -249,11 +267,15 @@ export default function EntryPanel({ giveaway }) {
               </div>
               <div className={styles.summaryRow}>
                 <dt>Current balance</dt>
-                <dd>{formatAmount(entry.entry?.currency, entry.balance)}</dd>
+                <dd>{balanceKnown ? formatAmount(entry.entry?.currency, entry.balance) : '—'}</dd>
               </div>
               <div className={`${styles.summaryRow} ${styles.projRow}`}>
                 <dt>Balance after joining</dt>
-                <dd>{formatAmount(entry.entry?.currency, entry.projectedAfter)}</dd>
+                <dd>
+                  {entry.projectedAfter == null
+                    ? '—'
+                    : formatAmount(entry.entry?.currency, entry.projectedAfter)}
+                </dd>
               </div>
             </dl>
             <p className={styles.modalNote}>
@@ -275,7 +297,7 @@ export default function EntryPanel({ giveaway }) {
 
 /* -------------------------------------------------------------------------- */
 
-function JoinAction({ status, hasJoined, eligible, sufficient, onJoin }) {
+function JoinAction({ status, hasJoined, eligible, sufficient, balanceKnown, onJoin }) {
   if (status !== 'active') {
     return (
       <button type="button" className="vl-btn vl-btn-outline" disabled>
@@ -302,7 +324,7 @@ function JoinAction({ status, hasJoined, eligible, sufficient, onJoin }) {
       {blocked ? (
         <>
           <Lock size={16} aria-hidden="true" />
-          {!eligible ? 'Not eligible' : 'Insufficient balance'}
+          {!eligible ? 'Not eligible' : !balanceKnown ? 'Balance unavailable' : 'Insufficient balance'}
         </>
       ) : (
         'Join Now'

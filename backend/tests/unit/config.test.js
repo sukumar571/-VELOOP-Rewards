@@ -16,8 +16,10 @@ function prodCfg(over = {}) {
     security: {
       corsOrigins: ['https://giveaway.veloop.example'],
       jsonBodyLimit: '100kb',
-      rateLimit: { windowMs: 60000, max: 300, authMax: 10 },
+      rateLimit: { windowMs: 60000, max: 300, authMax: 10, entryMax: 20 },
+      eligibility: { geoSource: 'none', geoHeader: 'x-country-code' },
     },
+    server: { trustProxy: false },
     // The wallet seam must be present in any production config: 'disabled' is a
     // valid (honest) choice, 'http' must be fully configured.
     wallet: { mode: 'disabled', baseUrl: '', apiKey: '', balancePath: '', debitPath: '', snapshotMaxAgeSeconds: 120 },
@@ -74,11 +76,40 @@ describe('validateRuntimeConfig: production hard gate', () => {
 
   it('rejects an unknown WALLET_MODE', () => {
     const cfg = prodCfg({ wallet: { mode: 'magic' } });
-    expect(() => validateRuntimeConfig(cfg)).toThrow(/WALLET_MODE must be 'disabled' or 'http'/i);
+    expect(() => validateRuntimeConfig(cfg)).toThrow(/WALLET_MODE must be/i);
+  });
+
+  it('refuses the fictional in-DB dev wallet in production', () => {
+    const cfg = prodCfg({ wallet: { mode: 'dev', baseUrl: '', apiKey: '', balancePath: '', debitPath: '' } });
+    expect(() => validateRuntimeConfig(cfg)).toThrow(/WALLET_MODE=dev is forbidden in production/i);
+  });
+
+  it('defaults the transaction requirement to fail-closed (true)', () => {
+    // A paid join must not silently fall back to unsafe sequential writes.
+    expect(config.wallet.requireTransactionSupport).toBe(true);
   });
 
   it('accepts the honest default: wallet disabled until the real contract exists', () => {
     expect(config.wallet.mode).toBe('disabled');
     expect(validateRuntimeConfig(prodCfg())).toBe(true);
+  });
+
+  it('rejects an unknown geo-evidence mode instead of guessing a country', () => {
+    const cfg = prodCfg({
+      security: { ...prodCfg().security, eligibility: { geoSource: 'guess' } },
+    });
+    expect(() => validateRuntimeConfig(cfg)).toThrow(/ELIGIBILITY_GEO_SOURCE must be/i);
+  });
+
+  it('refuses header-based geo evidence on an app that trusts no proxy', () => {
+    const cfg = prodCfg({
+      security: { ...prodCfg().security, eligibility: { geoSource: 'header', geoHeader: 'x-country-code' } },
+      server: { trustProxy: false },
+    });
+    expect(() => validateRuntimeConfig(cfg)).toThrow(/requires TRUST_PROXY/i);
+  });
+
+  it('keeps entry writes throttled below the general read budget', () => {
+    expect(config.security.rateLimit.entryMax).toBeLessThanOrEqual(config.security.rateLimit.max);
   });
 });

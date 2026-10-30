@@ -27,6 +27,11 @@ const ACTIONS = Object.freeze([
   'ENTRY_HELD', // participation kept but not counted until review
   'ACCOUNT_FLAGGED',
   'MANUAL_REVIEW',
+  // Risk-engine outcomes. FLAGGED lets the action proceed but queues evidence;
+  // ENTRY_BLOCKED is only ever recorded on a paid/free join the engine REJECTED
+  // (a generic 403 to the caller, detection logic never disclosed).
+  'FLAGGED',
+  'ENTRY_BLOCKED',
 ]);
 
 const fraudEventSchema = new mongoose.Schema(

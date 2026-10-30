@@ -6,11 +6,11 @@
  * endpoints must be wrapped in requireRole('admin'); anything unauthenticated is
  * rejected first.
  *
- * NOTE (plan G1): when the User/roles collection is connected, admin checks
- * SHOULD additionally confirm the role server-side rather than trusting the token
- * claim alone. That enrichment is intentionally behind the auth adapter / a
- * service seam and is not stubbed here, because the identity provider is not yet
- * connected in this workspace.
+ * NOTE: this reads `req.auth.roles`, which is the token claim until
+ * `resolveIdentity` has confirmed the roles stored server-side for that account
+ * (the plan G1 enrichment, now implemented). Administrative routes therefore run
+ * `authenticate -> requireAdmin -> resolveIdentity -> requireAdmin`: the token is
+ * denied first (cheap, no I/O), then the store gets the final say.
  */
 const { ApiError } = require('../utils/ApiError.js');
 

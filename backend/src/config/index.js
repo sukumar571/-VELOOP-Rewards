@@ -114,11 +114,15 @@ const config = {
   /**
    * VELOOP wallet integration. There is NO wallet system, contract or credential
    * in this repository, so the default mode is 'disabled' — every call then fails
-   * loudly instead of inventing a balance. 'http' is the seam to configure once
-   * the real contract is supplied (paths use {userId}/{currency} placeholders).
+   * loudly instead of inventing a balance. 'dev' is an ISOLATED development adapter
+   * whose authoritative (FICTIONAL) balances live in the `DevWalletBalance`
+   * collection of this same MongoDB, so the paid join can run inside a real MongoDB
+   * transaction; it is forbidden in production. 'http' is the seam to the real
+   * external wallet (paths use {userId}/{currency} placeholders) and is deliberately
+   * NOT covered by a local database transaction (see docs/API.md).
    */
   wallet: {
-    mode: process.env.WALLET_MODE || 'disabled', // 'disabled' | 'http'
+    mode: process.env.WALLET_MODE || 'disabled', // 'disabled' | 'dev' | 'http'
     baseUrl: process.env.WALLET_BASE_URL || '',
     apiKey: process.env.WALLET_API_KEY || '',
     balancePath: process.env.WALLET_BALANCE_PATH || '',
@@ -128,6 +132,11 @@ const config = {
     timeoutMs: toInt(process.env.WALLET_TIMEOUT_MS, 5000),
     /** How long a cached balance snapshot may be trusted for eligibility checks. */
     snapshotMaxAgeSeconds: toInt(process.env.WALLET_SNAPSHOT_MAX_AGE_SECONDS, 120),
+    /** When true (default), a paid join FAILS CLOSED (503) if the deployment does
+     *  not support transactions, rather than doing unsafe sequential writes. Only
+     *  meaningful for the in-DB 'dev' path; the external 'http' path relies on
+     *  provider idempotency + a compensating reversal instead. */
+    requireTransactionSupport: toBool(process.env.MONGODB_REQUIRE_TRANSACTIONS, true),
   },
 
   security: {
@@ -140,6 +149,74 @@ const config = {
       windowMs: toInt(process.env.RATE_LIMIT_WINDOW_MS, 60 * 1000),
       max: toInt(process.env.RATE_LIMIT_MAX, 300),
       authMax: toInt(process.env.RATE_LIMIT_AUTH_MAX, 10),
+      // Entry/join is the only endpoint that can move money, so it gets its own
+      // tighter budget than ordinary reads.
+      entryMax: toInt(process.env.RATE_LIMIT_ENTRY_MAX, 20),
+      // Claim submission and sensitive admin writes get dedicated budgets. The
+      // defaults are intentionally generous so ordinary operator workflows are
+      // never throttled; a burst past them is recorded as a non-blocking signal.
+      claimMax: toInt(process.env.RATE_LIMIT_CLAIM_MAX, 30),
+      adminMax: toInt(process.env.RATE_LIMIT_ADMIN_MAX, 120),
+    },
+
+    /**
+     * Risk engine (anti-fraud). These are HEURISTIC, CORROBORATED controls, not a
+     * fraud guarantee. Every threshold below is a PROVISIONAL engineering default
+     * pending VELOOP business approval (see README "Anti-fraud controls"). Key
+     * invariant encoded in code, not config: a single device/IP velocity signal
+     * can NEVER REJECT on its own (see VELOCITY_FRAUD_TYPES in constants).
+     * `enabled=false` is an instant kill switch: assessment returns ALLOW and
+     * records nothing, leaving the request pipeline exactly as it was.
+     */
+    fraud: {
+      enabled: toBool(process.env.FRAUD_ENGINE_ENABLED, true),
+      // Distinct signal CATEGORIES needed to reach a REJECT (>=2 by design).
+      rejectMinSignals: toInt(process.env.FRAUD_REJECT_MIN_SIGNALS, 2),
+      deviceVelocity: {
+        enabled: toBool(process.env.FRAUD_DEVICE_VELOCITY_ENABLED, true),
+        threshold: toInt(process.env.FRAUD_DEVICE_VELOCITY_THRESHOLD, 3),
+        severity: process.env.FRAUD_DEVICE_VELOCITY_SEVERITY || 'HIGH',
+      },
+      ipVelocity: {
+        enabled: toBool(process.env.FRAUD_IP_VELOCITY_ENABLED, true),
+        threshold: toInt(process.env.FRAUD_IP_VELOCITY_THRESHOLD, 5),
+        severity: process.env.FRAUD_IP_VELOCITY_SEVERITY || 'MEDIUM',
+      },
+      duplicateAttempts: {
+        enabled: toBool(process.env.FRAUD_DUPLICATE_ENABLED, true),
+        windowSec: toInt(process.env.FRAUD_DUPLICATE_WINDOW_SEC, 300),
+        threshold: toInt(process.env.FRAUD_DUPLICATE_THRESHOLD, 5),
+        severity: process.env.FRAUD_DUPLICATE_SEVERITY || 'MEDIUM',
+      },
+      participationVelocity: {
+        enabled: toBool(process.env.FRAUD_PARTICIPATION_VELOCITY_ENABLED, true),
+        windowSec: toInt(process.env.FRAUD_PARTICIPATION_VELOCITY_WINDOW_SEC, 3600),
+        threshold: toInt(process.env.FRAUD_PARTICIPATION_VELOCITY_THRESHOLD, 8),
+        severity: process.env.FRAUD_PARTICIPATION_VELOCITY_SEVERITY || 'MEDIUM',
+      },
+      requestFrequency: {
+        enabled: toBool(process.env.FRAUD_REQUEST_FREQUENCY_ENABLED, true),
+        windowSec: toInt(process.env.FRAUD_REQUEST_FREQUENCY_WINDOW_SEC, 60),
+        threshold: toInt(process.env.FRAUD_REQUEST_FREQUENCY_THRESHOLD, 20),
+        severity: process.env.FRAUD_REQUEST_FREQUENCY_SEVERITY || 'MEDIUM',
+      },
+      // Account age is OFF by default (0) and, when on, is only a LOW corroborator.
+      accountAge: {
+        enabled: toBool(process.env.FRAUD_ACCOUNT_AGE_ENABLED, true),
+        minAgeSec: toInt(process.env.FRAUD_MIN_ACCOUNT_AGE_SECONDS, 0),
+        severity: process.env.FRAUD_ACCOUNT_AGE_SEVERITY || 'LOW',
+      },
+    },
+
+    /**
+     * Eligibility evidence. No geolocation provider or KYC service exists in this
+     * repository, so geo defaults to 'none': a geo-restricted draw then FAILS
+     * CLOSED instead of guessing a country. 'header' trusts a reverse-proxy header
+     * (only valid when your own proxy sets it — see docs/API.md).
+     */
+    eligibility: {
+      geoSource: process.env.ELIGIBILITY_GEO_SOURCE || 'none', // 'none' | 'header'
+      geoHeader: process.env.ELIGIBILITY_GEO_HEADER || 'x-country-code',
     },
   },
 };
@@ -160,6 +237,15 @@ function validateRuntimeConfig(cfg = config) {
     if (cfg.auth.mode === 'jwt' && !cfg.auth.jwtSecret && !cfg.auth.jwtPublicKey) {
       problems.push('AUTH_MODE=jwt requires JWT_SECRET (HMAC) or JWT_PUBLIC_KEY (RSA/EC).');
     }
+    // Trusting a client-settable header for geo policy would let anyone buy their
+    // way into a country-restricted draw.
+    const eligibility = (cfg.security || {}).eligibility || {};
+    if (!['none', 'header'].includes(eligibility.geoSource || 'none')) {
+      problems.push(`ELIGIBILITY_GEO_SOURCE must be 'none' or 'header' (got "${eligibility.geoSource}").`);
+    }
+    if (eligibility.geoSource === 'header' && (cfg.server || {}).trustProxy === false) {
+      problems.push('ELIGIBILITY_GEO_SOURCE=header requires TRUST_PROXY to be configured.');
+    }
     if (cfg.auth.devSecret === 'change-me-local-dev-only') {
       problems.push('DEV_JWT_SECRET must be changed away from its default value.');
     }
@@ -172,6 +258,12 @@ function validateRuntimeConfig(cfg = config) {
     // A half-configured wallet seam is worse than an absent one: it would look
     // connected while silently failing every debit. Require complete config.
     const wallet = cfg.wallet || {};
+    // The 'dev' adapter holds FICTIONAL balances in this app's own database; it is
+    // never a real wallet and is refused outright in production (same posture as the
+    // dev-mock auth mode).
+    if (wallet.mode === 'dev') {
+      problems.push("WALLET_MODE=dev is forbidden in production (fictional in-database balances).");
+    }
     if (wallet.mode === 'http') {
       if (!wallet.baseUrl || !wallet.apiKey) {
         problems.push('WALLET_MODE=http requires WALLET_BASE_URL and WALLET_API_KEY.');
@@ -179,8 +271,8 @@ function validateRuntimeConfig(cfg = config) {
       if (!wallet.balancePath || !wallet.debitPath) {
         problems.push('WALLET_MODE=http requires WALLET_BALANCE_PATH and WALLET_DEBIT_PATH.');
       }
-    } else if (!['disabled', 'http'].includes(wallet.mode)) {
-      problems.push(`WALLET_MODE must be 'disabled' or 'http' (got "${wallet.mode}").`);
+    } else if (!['disabled', 'dev', 'http'].includes(wallet.mode)) {
+      problems.push(`WALLET_MODE must be 'disabled', 'dev' or 'http' (got "${wallet.mode}").`);
     }
   }
 

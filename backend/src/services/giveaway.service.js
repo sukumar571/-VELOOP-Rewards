@@ -67,6 +67,51 @@ async function listPrizes(giveawayId) {
   return Prize.find({ giveawayId, active: true }).sort({ position: 1 }).lean();
 }
 
+/**
+ * The draw that is open RIGHT NOW (spec: GET /giveaways/current).
+ * `isOpenForEntries()` is the model's own rule; this is the same rule expressed
+ * as a query so the database does the filtering: published + ACTIVE + inside the
+ * window. The one closing soonest wins, because that is the draw a user should be
+ * shown. When nothing matches, `NO_CURRENT_GIVEAWAY` is a real 404 — an empty
+ * object would be indistinguishable from "there is a draw with no fields".
+ */
+async function getCurrent(query = {}) {
+  const now = new Date();
+  const filter = {
+    published: true,
+    status: 'ACTIVE',
+    startAt: { $lte: now },
+    endAt: { $gte: now },
+  };
+  if (query.featured !== undefined) filter.featured = query.featured;
+  const doc = await Giveaway.find(filter).sort({ endAt: 1 }).limit(1).select(PUBLIC_PROJECTION).lean();
+  const { domain } = require('../utils/domainErrors.js');
+  if (!doc.length) throw domain('NO_CURRENT_GIVEAWAY');
+  return doc[0];
+}
+
+/** Recently finished draws, newest first, paginated (spec: GET /giveaways/previous). */
+async function getPrevious(query = {}) {
+  const now = new Date();
+  const page = query.page || 1;
+  const limit = query.limit || 10;
+  const filter = { published: true, status: { $in: ['ENDED', 'ARCHIVED'] }, endAt: { $lte: now } };
+  const skip = (page - 1) * limit;
+  const [items, total] = await Promise.all([
+    Giveaway.find(filter).sort({ endAt: -1 }).skip(skip).limit(limit).select(PUBLIC_PROJECTION).lean(),
+    Giveaway.countDocuments(filter),
+  ]);
+  return { items, meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+}
+
+/** Stable human key lookup. An unpublished slug is invisible to the public. */
+async function getBySlug(slug, { isAdmin = false } = {}) {
+  const doc = await Giveaway.findOne({ slug }).select(PUBLIC_PROJECTION).lean();
+  const { domain } = require('../utils/domainErrors.js');
+  if (!doc || (!isAdmin && !doc.published)) throw domain('GIVEAWAY_NOT_FOUND');
+  return doc;
+}
+
 /** Admin KPI counts — real aggregate count queries over the collections. */
 async function getCollectionStats() {
   const GiveawayParticipation = require('../models/giveawayParticipation.model.js');
@@ -86,6 +131,9 @@ module.exports = {
   listGiveaways,
   getGiveawayById,
   listPrizes,
+  getCurrent,
+  getPrevious,
+  getBySlug,
   getCollectionStats,
   buildFilter,
   buildSort,

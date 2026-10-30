@@ -1,0 +1,130 @@
+/* ============================================================================
+   VELOOP Giveaway Loader — branded orbit ring + shimmering wordmark.
+   Uses only design tokens (variables.css) so it re-themes with the brand.
+   ==========================================================================*/
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 1rem;
+  width: 100%;
+}
+
+/* Orbit wrapper — fixed square that hosts the spinning ring + pulsing core. */
+.orbit {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+/* Faint full-circle track so the ring has context while it rotates. */
+.track {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--vl-border);
+}
+
+/* The animated arc: a masked conic gradient using the brand CTA colours. */
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--vl-violet-300) 90deg,
+    var(--vl-blue-600) 200deg,
+    transparent 300deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  animation: vl-orbit-spin 0.95s linear infinite;
+}
+
+/* Gold brand core that breathes beneath the ring. */
+.core {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  background: var(--vl-grad-gold);
+  box-shadow: var(--vl-shadow-glow);
+  animation: vl-orbit-pulse 1.4s var(--vl-ease) infinite;
+}
+
+/* VELOOP wordmark with a sweeping gold highlight. */
+.wordmark {
+  font-weight: 800;
+  letter-spacing: var(--vl-tracking-wide);
+  font-size: 0.85rem;
+  background: linear-gradient(
+    90deg,
+    var(--vl-text-muted) 0%,
+    var(--vl-gold-400) 50%,
+    var(--vl-text-muted) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: vl-wordmark-shimmer 1.6s linear infinite;
+}
+
+.label {
+  color: var(--vl-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Compact variant for inline/secondary loading regions. */
+.compact .orbit {
+  width: 40px;
+  height: 40px;
+}
+.compact .core {
+  inset: 14px;
+}
+.compact .wordmark {
+  display: none;
+}
+
+@keyframes vl-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vl-orbit-pulse {
+  0%,
+  100% {
+    transform: scale(0.82);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes vl-wordmark-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Honour reduced-motion: keep a static, still-legible state. */
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    animation-duration: 2.4s;
+  }
+  .core,
+  .wordmark {
+    animation: none;
+  }
+  .wordmark {
+    color: var(--vl-gold-400);
+    background: none;
+  }
+}

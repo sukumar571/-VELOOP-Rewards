@@ -122,6 +122,13 @@ const TRANSACTION_TERMINAL_STATUSES = Object.freeze([
   TRANSACTION_STATUS.REVERSED,
 ]);
 
+/**
+ * KYC levels an eligibility rule can require, in increasing order of evidence.
+ * `minKycLevel` on a giveaway compares against this order.
+ */
+const KYC_LEVEL = Object.freeze({ NONE: 'NONE', BASIC: 'BASIC', FULL: 'FULL' });
+const KYC_LEVELS = Object.freeze(Object.values(KYC_LEVEL));
+
 const USER_STATUS = Object.freeze({ ACTIVE: 'ACTIVE', BLOCKED: 'BLOCKED', SUSPENDED: 'SUSPENDED' });
 const USER_STATUSES = Object.freeze(Object.values(USER_STATUS));
 
@@ -159,8 +166,33 @@ const FRAUD_EVENT_TYPE = Object.freeze({
   BOT_PATTERN: 'BOT_PATTERN',
   IDENTITY_MISMATCH: 'IDENTITY_MISMATCH',
   MANUAL_REVIEW: 'MANUAL_REVIEW',
+  // Added by the risk engine: corroborating signals that, unlike a lone
+  // device/IP hit, can combine with another category to justify a REJECT.
+  REPEATED_FAILURE: 'REPEATED_FAILURE',
+  PARTICIPATION_VELOCITY: 'PARTICIPATION_VELOCITY',
+  ACCOUNT_AGE: 'ACCOUNT_AGE',
 });
 const FRAUD_EVENT_TYPES = Object.freeze(Object.values(FRAUD_EVENT_TYPE));
+
+/**
+ * Risk-decision outcomes produced by the fraud engine. These are internal
+ * control states, never surfaced verbatim to a public caller (REJECT maps to a
+ * single generic 403 code so the detection logic is not disclosed).
+ */
+const RISK_DECISION = Object.freeze({
+  ALLOW: 'ALLOW',
+  FLAG_FOR_REVIEW: 'FLAG_FOR_REVIEW',
+  REJECT: 'REJECT',
+});
+const RISK_DECISIONS = Object.freeze(Object.values(RISK_DECISION));
+
+/**
+ * Signal categories that are NEVER conclusive on their own. A shared device or a
+ * shared IP has legitimate explanations (family Wi-Fi, corporate NAT, a mobile
+ * carrier's few egress addresses), so these can only FLAG unless corroborated by
+ * a distinct, non-velocity category crossing its own threshold.
+ */
+const VELOCITY_FRAUD_TYPES = Object.freeze([FRAUD_EVENT_TYPE.DEVICE_VELOCITY, FRAUD_EVENT_TYPE.IP_VELOCITY]);
 
 const FRAUD_SEVERITY = Object.freeze({ LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' });
 const FRAUD_SEVERITIES = Object.freeze(Object.values(FRAUD_SEVERITY));
@@ -202,6 +234,8 @@ module.exports = {
   TRANSACTION_TERMINAL_STATUSES,
   USER_STATUS,
   USER_STATUSES,
+  KYC_LEVEL,
+  KYC_LEVELS,
   ROLE,
   WINNER_ANNOUNCEMENT_STATUS,
   WINNER_ANNOUNCEMENT_STATUSES,
@@ -210,6 +244,9 @@ module.exports = {
   CLAIM_STATUSES,
   FRAUD_EVENT_TYPE,
   FRAUD_EVENT_TYPES,
+  RISK_DECISION,
+  RISK_DECISIONS,
+  VELOCITY_FRAUD_TYPES,
   FRAUD_SEVERITY,
   FRAUD_SEVERITIES,
   FRAUD_EVENT_STATUS,

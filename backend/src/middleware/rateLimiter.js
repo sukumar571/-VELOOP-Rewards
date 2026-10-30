@@ -9,6 +9,7 @@
  */
 const rateLimit = require('express-rate-limit');
 const { config } = require('../config/index.js');
+const fraud = require('../services/fraud.service.js');
 
 const factory = rateLimit.default || rateLimit;
 
@@ -26,6 +27,20 @@ function respond(req, res) {
   });
 }
 
+/**
+ * The 429 response is identical for every tier, but on the SENSITIVE tiers a burst
+ * is also a (non-blocking) fraud signal for the review queue. Recording is
+ * fire-and-forget and best-effort — it must never change the client's outcome.
+ */
+function respondAndSignal(req, res) {
+  respond(req, res);
+  Promise.resolve(fraud.assessNonBlocking({
+    surface: 'rate_limit',
+    userId: (req.auth && req.auth.userId) || null,
+    requestId: req.id,
+  })).catch(() => null);
+}
+
 /** Build a limiter; `overrides` lets callers/tests tune window & max. */
 function createLimiter(overrides = {}) {
   return factory({
@@ -35,12 +50,22 @@ function createLimiter(overrides = {}) {
     legacyHeaders: false,
     keyGenerator: overrides.keyGenerator ?? keyGenerator,
     handler: overrides.handler ?? respond,
-    // Health checks must never be throttled away.
-    skip: overrides.skip ?? ((req) => req.url === '/health' || req.url === '/health/ready'),
+    // Health probes are never throttled. Under the test environment the mounted
+    // app limiters stand down (the integration suites hammer these routes far past
+    // production budgets); enforcement itself is proven by the dedicated
+    // rateLimiter test, which passes its own `skip: () => false`.
+    skip: overrides.skip ?? ((req) => process.env.NODE_ENV === 'test' || req.url === '/health' || req.url === '/health/ready'),
   });
 }
 
 const globalLimiter = createLimiter();
-const authLimiter = createLimiter({ limit: config.security.rateLimit.authMax });
+const authLimiter = createLimiter({ limit: config.security.rateLimit.authMax, handler: respondAndSignal });
+// Entry writes move money, so they get their own budget. Authenticated requests
+// are keyed by subject (see keyGenerator), so one user cannot multiply their
+// quota by switching networks.
+const entryLimiter = createLimiter({ limit: config.security.rateLimit.entryMax, handler: respondAndSignal });
+// Claim submission and sensitive admin writes get dedicated, generous budgets.
+const claimLimiter = createLimiter({ limit: config.security.rateLimit.claimMax, handler: respondAndSignal });
+const adminLimiter = createLimiter({ limit: config.security.rateLimit.adminMax, handler: respondAndSignal });
 
-module.exports = { createLimiter, globalLimiter, authLimiter };
+module.exports = { createLimiter, respondAndSignal, globalLimiter, authLimiter, entryLimiter, claimLimiter, adminLimiter };

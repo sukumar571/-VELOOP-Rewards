@@ -18,8 +18,11 @@ class ApiError extends Error {
   static badRequest(message = 'Bad request', details) {
     return new ApiError(400, 'BAD_REQUEST', message, details);
   }
-  static unauthorized(message = 'Authentication required', details) {
-    return new ApiError(401, 'UNAUTHENTICATED', message, details);
+  // LOGIN_REQUIRED is the client-facing contract for "no usable credentials on
+  // this request" (the spec names this code explicitly); it replaces the earlier
+  // generic UNAUTHENTICATED label.
+  static unauthorized(message = 'A valid access token is required.', details) {
+    return new ApiError(401, 'LOGIN_REQUIRED', message, details);
   }
   static forbidden(message = 'You do not have access to this resource', details) {
     return new ApiError(403, 'FORBIDDEN', message, details);

@@ -5,6 +5,7 @@
 const { asyncHandler } = require('../utils/asyncHandler.js');
 const { ApiError } = require('../utils/ApiError.js');
 const service = require('../services/giveaway.service.js');
+const { ok } = require('../utils/respond.js');
 
 function isAdmin(req) {
   return !!(req.auth && req.auth.roles && req.auth.roles.includes('admin'));
@@ -12,7 +13,9 @@ function isAdmin(req) {
 
 const list = asyncHandler(async (req, res) => {
   const { items, meta } = await service.listGiveaways(req.valid.query);
-  return res.status(200).json({ data: items, meta });
+  // `ok` runs every row through toPublic(), so `_id`/`__v` never reach a client
+  // even though the lean() query returned them.
+  return ok(res, items, meta);
 });
 
 /** An unpublished draw does not exist for non-admin callers (404, not 403). */
@@ -26,7 +29,7 @@ async function loadVisible(id, req) {
 
 const getById = asyncHandler(async (req, res) => {
   const giveaway = await loadVisible(req.valid.params.id, req);
-  return res.status(200).json({ data: giveaway });
+  return ok(res, giveaway);
 });
 
 /** Prize tiers, including their fee configuration — public once published. */
@@ -51,4 +54,17 @@ const listPrizes = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { list, getById, listPrizes };
+/** GET /api/v1/giveaways/current — the single draw open right now (404 if none). */
+const current = asyncHandler(async (req, res) => ok(res, await service.getCurrent(req.valid.query || {})));
+
+/** GET /api/v1/giveaways/previous — recently finished draws, newest first. */
+const previous = asyncHandler(async (req, res) => {
+  const { items, meta } = await service.getPrevious(req.valid.query || {});
+  return ok(res, items, meta);
+});
+
+/** GET /api/v1/giveaways/by-slug/:slug — stable human key; unpublished is a 404 publicly. */
+const bySlug = asyncHandler(async (req, res) =>
+  ok(res, await service.getBySlug(req.valid.params.slug, { isAdmin: isAdmin(req) })));
+
+module.exports = { list, getById, listPrizes, current, previous, bySlug };

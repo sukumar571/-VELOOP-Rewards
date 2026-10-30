@@ -48,7 +48,7 @@ describe('CORS (restricted allow-list)', () => {
 describe('authentication & authorization', () => {
   it('rejects /auth/me with no token (401)', async () => {
     const res = await request(app).get('/api/v1/auth/me').expect(401);
-    expect(res.body.error.code).toBe('UNAUTHENTICATED');
+    expect(res.body.error.code).toBe('LOGIN_REQUIRED');
     expect(res.body.requestId).toBeDefined();
   });
 

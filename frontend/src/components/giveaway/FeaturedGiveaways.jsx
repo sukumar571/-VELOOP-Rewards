@@ -1,7 +1,7 @@
 import { useAsync } from '../../hooks/useAsync.js';
 import { getFeaturedGiveaways } from '../../services/giveawayService.js';
 import SectionHeading from '../common/SectionHeading.jsx';
-import Skeleton from '../common/Skeleton.jsx';
+import GiveawayLoader from '../common/GiveawayLoader.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import ErrorState from '../common/ErrorState.jsx';
 import PrizeCard from './PrizeCard.jsx';
@@ -29,13 +29,9 @@ export default function FeaturedGiveaways() {
 
         <div className={styles.grid} aria-busy={loading || undefined}>
           {loading ? (
-            <>
-              {Array.from({ length: 4 }, (_, i) => (
-                <div key={i} className={styles.gridItem}>
-                  <Skeleton variant="card" />
-                </div>
-              ))}
-            </>
+            <div className={styles.state}>
+              <GiveawayLoader />
+            </div>
           ) : error ? (
             <div className={styles.state}>
               <ErrorState

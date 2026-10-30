@@ -1,5 +1,6 @@
 import PageHeader from '../components/common/PageHeader.jsx';
 import WinnersTabs from '../components/giveaway/WinnersTabs.jsx';
+import MyClaims from '../components/giveaway/MyClaims.jsx';
 import TrustSection from '../components/giveaway/TrustSection.jsx';
 import DemoNotice from '../components/common/DemoNotice.jsx';
 import styles from './Winners.module.css';
@@ -27,6 +28,8 @@ export default function WinnersPage() {
       </div>
 
       <WinnersTabs />
+
+      <MyClaims />
 
       <p className={styles.note} role="note">
         Privacy by design: winner identities are published in masked form only.

@@ -43,3 +43,10 @@
 .gridItem {
   min-width: 0;
 }
+
+/* Branded initial-loading region for the giveaway grid. */
+.loadingWrap {
+  display: flex;
+  justify-content: center;
+  min-height: 280px;
+}

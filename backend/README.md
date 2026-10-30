@@ -1,34 +1,39 @@
 # VELOOP Rewards Giveaway — Backend
 
 Node.js + Express + MongoDB (Mongoose) API for the VELOOP Rewards Giveaway.
-This is the **backend core plus the data model** (Phases 0–3 of
+This is the **backend core, the data model and the REST API** (Phases 0–4 of
 [`docs/PLAN.md`](../docs/PLAN.md)): the runnable application skeleton
 (configuration, DB lifecycle, security, logging, validation, authentication,
-error handling, health probes, graceful shutdown, tests) **and** the complete
-Mongoose model layer for the giveaway domain — 10 collections with the indexes,
+error handling, health probes, graceful shutdown, tests), the complete Mongoose
+model layer for the giveaway domain — 10 collections with the indexes,
 references, validation, deletion policies and privacy rules the specification
-requires, plus the migration and versioned-seed tooling around them.
+requires — **and** the `/api/v1` REST surface that drives them: public reads,
+the authenticated entry/claim paths and the admin lifecycle, draw and review
+operations. The full endpoint reference lives in [`docs/API.md`](docs/API.md).
 
 > **Honesty notice — what is NOT connected.**
 > - There is **no live MongoDB** required to boot or to serve `/health`. Data
->   routes (`/api/v1/giveaways*`, `/api/v1/admin/stats`) perform **real** Mongoose
->   queries; with no database they return an honest **`503 SERVICE_UNAVAILABLE`**,
->   never a fabricated success.
-> - **The model layer is not yet driven by write endpoints.** Giving an entry,
->   charging a fee, running the draw, announcing winners and submitting a claim are
->   model + database capabilities with tests, not HTTP endpoints — no route
->   pretends to perform an operation it does not do (see
->   [Endpoints](#endpoints-implemented)).
+>   routes perform **real** Mongoose queries; with no database they return an
+>   honest **`503 SERVICE_UNAVAILABLE`**, never a fabricated success.
+> - The REST API is **implemented and exercised against a real (in-memory)
+>   MongoDB in the test suite** — entry/join, fee charge, the CSPRNG draw,
+>   publication and the claim lifecycle all run for real. What remains an
+>   **integration task** is the two external systems this repo does not own:
+>   the VELOOP **auth issuer** and the VELOOP **wallet** API (see the next bullet,
+>   and the `[INTEGRATION REQUIRED]` markers in [`docs/API.md`](docs/API.md)).
 > - This backend is **NOT connected to any real VELOOP account/auth or wallet
 >   system**. No such system, credentials, endpoints or issuer metadata were
 >   provided. Authentication runs in a clearly-labelled **`dev-mock`** mode for
->   local use and tests; the wallet adapter defaults to **`disabled`** and fails
->   with `503 WALLET_NOT_CONFIGURED` instead of inventing a balance. The
->   `WalletReference` collection is an explicitly-labelled **cache of an external
->   system**, never a second source of truth.
+>   local use and tests (forbidden in `production`); the wallet adapter defaults
+>   to **`disabled`** and fails with `503 WALLET_NOT_CONFIGURED` instead of
+>   inventing a balance. The `WalletReference` collection is an
+>   explicitly-labelled **cache of an external system**, never a second source
+>   of truth. `userId` is always taken from the **verified** token, never the
+>   request body, and every admin action is role-gated on the server.
 > - Numbers the specification does not fix (fee amounts, claim windows, exact
 >   eligibility rules) are **not invented**: those fields are configuration with no
->   default value and are tagged `[PDF]` / `[ASSUMPTION]` in the code.
+>   default value and are tagged `[PDF]` / `[ASSUMPTION]` in the code. A
+>   country-restricted draw **fails closed** when no trusted geo source is set.
 
 ---
 
@@ -142,10 +147,12 @@ production, inject secrets from your secret manager / orchestrator.
 `validateRuntimeConfig()` (called by `server.js` before it binds a port) **refuses
 to start in production** if any of the following is true: missing `MONGODB_URI`;
 `AUTH_MODE=dev-mock`; `AUTH_MODE=jwt` without a key; the default `DEV_JWT_SECRET`
-left unchanged; an empty/`*` CORS allow-list; `WALLET_MODE` set to anything other
-than `disabled`/`http`; or `WALLET_MODE=http` with a half-configured provider (no
-base URL, key, balance path or debit path) — a wallet that looks connected while
-silently failing every debit is worse than an absent one.
+left unchanged; an empty/`*` CORS allow-list; `WALLET_MODE=dev` (the fictional
+in-database dev wallet — refused in production exactly like `dev-mock` auth);
+`WALLET_MODE` set to anything other than `disabled`/`dev`/`http`; or
+`WALLET_MODE=http` with a half-configured provider (no base URL, key, balance path
+or debit path) — a wallet that looks connected while silently failing every debit
+is worse than an absent one.
 
 `DEVICE_HASH_SALT` is the salt behind the pseudonymous device/session references;
 treat it as a long-lived secret (rotating it breaks correlation of stored hashes).
@@ -162,34 +169,66 @@ events are kept indefinitely and no TTL index is declared.
 Base URL `/api/v1`. Error bodies are uniform:
 `{ "error": { "code", "message", "details?" }, "requestId" }`.
 
-| Method | Path | Auth | Notes |
-|---|---|---|---|
-| GET | `/health` | public | Liveness — process is up (never rate-limited, never touches DB) |
-| GET | `/health/ready` | public | Readiness — reflects real MongoDB state (`503` when down) |
-| GET | `/api/v1` | public | Truthful index of what this version implements |
-| GET | `/api/v1/auth/me` | USER | Identity from the **verified** access token (`authProvider` shown) |
-| GET | `/api/v1/giveaways` | public | List **published** draws. Query: `status, featured, sort, order, page, limit` |
-| GET | `/api/v1/giveaways/:id` | public | Fetch one draw (unpublished draws are `404` to non-admins) |
-| GET | `/api/v1/giveaways/:id/prizes` | public | The draw's prize tiers **including fee configuration** (`claim` internals and `codePoolId` are not served) |
-| GET | `/api/v1/admin/stats` | ADMIN | Real aggregate counts over the collections |
+`GET /api/v1` returns a **live self-index built from the actual registered
+router** (via route introspection in `src/utils/listRoutes.js`), and
+`tests/integration/api.docs.test.js` asserts that every endpoint documented in
+[`docs/API.md`](docs/API.md) equals that registered set — so the docs cannot
+list a phantom route or omit a real one. **`docs/API.md` is the exhaustive,
+per-endpoint reference** (42 `/api/v1` routes + 2 health probes). By category:
 
-`GET /api/v1/giveaways*` and `admin/stats` run **real Mongoose queries**.
-Point `MONGODB_URI` at a running MongoDB and they return data; leave it offline and
-they return `503 SERVICE_UNAVAILABLE` (by design — see Honesty notice). Visibility
-is enforced in the route layer: a non-admin caller's query is pinned to
-`published: true`, and an unpublished draw answers `404` (not `403`) so its
-existence is not leaked.
+| Group | Representative routes | Auth |
+|---|---|---|
+| Health | `GET /health`, `GET /health/ready` | public |
+| Index / identity | `GET /api/v1`, `GET /api/v1/auth/me` | public / USER |
+| Public reads | `GET /giveaways`, `/giveaways/current`, `/giveaways/previous`, `/giveaways/by-slug/:slug`, `/giveaways/:id`, `/giveaways/:id/{prizes,winners}` | public |
+| User entry & claims | `GET /giveaways/my-status`, `GET /giveaways/:id/my-status`, `POST /giveaways/:id/join`, `GET /wallet/balances`, `GET /claims`, `GET /claims/:id`, `POST /claims/:id/submit` | USER |
+| Admin lifecycle | `POST /admin/giveaways`, `PATCH /admin/giveaways/:id`, `POST /admin/giveaways/:id/{prizes,publish,transition}`, `PATCH /admin/prizes/:id`, `POST /admin/participations/:id/void` | ADMIN |
+| Admin draw & winners | `POST /admin/giveaways/:id/winners/{draw,notify,publish}`, `PATCH /admin/winners/:id`, `GET /admin/giveaways/:id/winners` | ADMIN |
+| Admin claims & review | `GET /admin/claims`, `POST /admin/claims/:id/{review,extend}`, `POST /admin/claims/expire`, `GET /admin/{fraud-events,fraud-events/:id}`, `POST /admin/fraud-events/:id/{review,decision}`, `GET /admin/{participations,ledger,audit-logs,audit-logs/:entityType/:entityId,stats}` | ADMIN |
 
-### Deliberately NOT implemented yet (later phases, gated on the PDF + externals)
+Reads run **real Mongoose queries**. Point `MONGODB_URI` at a running MongoDB
+and they return data; leave it offline and they return `503 SERVICE_UNAVAILABLE`
+(by design — see Honesty notice). Visibility is enforced in the route layer: a
+non-admin caller's query is pinned to `published: true`, and an unpublished draw
+answers `404` (not `403`) so its existence is not leaked. Winner responses are
+**masked** (a stable `Member #NNN` alias) and never carry private user detail.
 
-The entry/money path (`POST /giveaways/:id/entries`), wallet debit, refunds, the
-winner draw, announcement, and claim submit/update endpoints are **not stubbed with
-fake responses**. They depend on the unconnected VELOOP wallet/auth APIs and on
-business rules in the project PDF. The **models and database rules for all of that
-already exist and are tested against a real MongoDB** — `GiveawayParticipation`,
-`GiveawayEntryTransaction` (with its compensating-reversal path), `GiveawayWinner`
-and `PrizeClaim` — so the services can be built on top of them. No endpoint
-pretends to perform an operation it does not do.
+### Production integration required (gated on the externals)
+
+Every operation the API exposes is **implemented and tested** — none returns a
+hard-coded "success". The only things that cannot be exercised here are the two
+**external systems this repository does not own**, and both fail loudly rather
+than faking a result:
+
+- **Auth issuer** — `AUTH_MODE=jwt` needs the real VELOOP signing key/algorithm
+  (and issuer/audience if used). The `dev-mock` verifier is local/test only and
+  is refused in `production`. See `src/integrations/veloopAuth.js`.
+- **Wallet** — the entry path supports three `WALLET_MODE`s:
+  - `http` (the production seam) needs the real base URL, API key and
+    balance/debit path templates. It runs **outside** any local transaction, so a
+    paid join is made consistent by the **idempotency key sent to the provider**
+    plus a compensating `REVERSAL` — never by pretending a Mongo transaction covers
+    the external call.
+  - `dev` is an **isolated, non-production** adapter whose **fictional** authoritative
+    balances live in the `DevWalletBalance` collection of this same database, so a
+    paid join commits balance-debit + participation + ledger + audit as **one real
+    MongoDB transaction**. Its observations are tagged `SEED_FIXTURE` and are never
+    presented as real VELOOP funds; `WALLET_MODE=dev` is refused in `production`.
+  - `disabled` (default) returns `503 WALLET_NOT_CONFIGURED` on a paid entry and
+    **no debit or ledger row is fabricated**. See `src/integrations/veloopWallet.js`.
+- **Transactions / replica set** — paid `dev` entries require a MongoDB that can
+  run transactions (a replica set or sharded cluster). When transactions are
+  unavailable the paid join **fails closed** with `503
+  TRANSACTION_INFRASTRUCTURE_REQUIRED` rather than doing unsafe sequential writes
+  (controlled by `MONGODB_REQUIRE_TRANSACTIONS`, default `true`). Free entries and
+  all reads work on a standalone.
+- **Geo / KYC evidence** — with no trusted provider configured, eligibility for
+  a country- or KYC-restricted draw **fails closed** (`503`/`403`), never a guess.
+
+The models, database rules and services for the entry/money path, the draw and
+the claims are all real and tested against a live MongoDB (`GiveawayParticipation`,
+`GiveawayEntryTransaction` with its compensating-reversal path, `GiveawayWinner`
+and `PrizeClaim`). No endpoint pretends to perform an operation it does not do.
 
 ---
 
@@ -214,9 +253,12 @@ Identity is resolved by a single adapter: **[`src/integrations/veloopAuth.js`](s
   endpoint (rather than a static key), that is the one place to extend the adapter.
 
 A token's roles never come from a client-supplied field — they come only from the
-verified claims. Admin authorization is deny-by-default
-([`requireRole`](src/middleware/requireRole.js)); the code notes the intended
-server-side role re-confirmation once the identity/roles store is connected.
+verified claims, and are then **re-confirmed against the server-side account store**
+by `resolveIdentity` (`src/middleware/identity.js`) before the second `requireAdmin`
+grants access. Admin authorization is therefore deny-by-default and confirmed
+server-side: a token that merely *claims* `admin` for an account the store says is a
+plain user is refused (`403`). Roles are seeded only on an account's first sight
+(`$setOnInsert`), so no token claim can upgrade an existing row.
 
 ---
 
@@ -227,9 +269,11 @@ server-side role re-confirmation once the identity/roles store is connected.
   allow header; `*` disables credentials per the Fetch spec.
 - **Payload limits** — `express.json`/`urlencoded` capped at `JSON_BODY_LIMIT`
   (default `100kb`); oversize → `413`, malformed JSON → `400 INVALID_JSON`.
-- **Rate limiting** — global limiter + a tighter `auth` limit; key is the
-  authenticated subject when present, else the client IP; `429` returns the same
-  error envelope. In-memory store with a documented Redis/Mongo upgrade path.
+- **Rate limiting** — global limiter plus dedicated `auth`, `entry`, `claim` and
+  `admin` tiers; the key is the authenticated subject when present, else the client
+  IP; every `429` returns the same error envelope. On the sensitive tiers a burst
+  also records a best-effort **non-blocking** fraud signal for the review queue.
+  In-memory store with a documented Redis/Mongo upgrade path.
 - **Structured logging** — `pino`, one JSON line per event, with **sensitive-data
   redaction** (`Authorization`, `Cookie`, and credential/PII keys such as
   `password`, `token`, `pin`, `cardNumber`) enforced centrally
@@ -245,6 +289,56 @@ server-side role re-confirmation once the identity/roles store is connected.
 
 ---
 
+## Anti-fraud controls — and their limitations
+
+> **This system is NOT fraud-proof.** The controls below are *heuristic,
+> configurable and corroborated*. They raise the cost of abuse and produce an
+> auditable review queue; they are not a guarantee, and they are deliberately
+> designed so that **no single signal is ever treated as proof**.
+
+[`src/services/fraud.service.js`](src/services/fraud.service.js) is a dedicated
+risk engine that runs on the entry path (`POST /giveaways/:id/join`) **before any
+participation row is written or any money moves**. It evaluates configurable rules
+and returns one of three decisions:
+
+- **ALLOW** — no signal; the join proceeds unchanged.
+- **FLAG_FOR_REVIEW** — evidence is queued for an operator (one merged
+  `FraudEvent` per signal, action `FLAGGED`) and the join still proceeds.
+- **REJECT** — only when `FRAUD_REJECT_MIN_SIGNALS` **distinct categories** fire AND
+  at least one of them is **not** a device/IP velocity hit. The join is refused with
+  a generic `403 ENTRY_BLOCKED` and the events are recorded with action
+  `ENTRY_BLOCKED` — before any charge, so a blocked join leaves no row and moves no
+  money on the `dev`, `http` and free paths alike.
+
+Rules cover device/IP velocity, duplicate/failed attempts, participation velocity,
+request frequency and (optionally) account age. **A lone shared IP or device can
+only FLAG, never REJECT** — correlation on a shared network is not evidence of
+fraud. Detection logic is never exposed to end users: the client only ever sees the
+generic message, while the rule, metric and threshold detail stays server-side.
+
+Honest limitations to design around, not ignore:
+
+- **Thresholds are provisional.** Every default in `config.security.fraud` is an
+  engineering placeholder **pending VELOOP business approval** — none is lifted
+  from an authoritative specification (no such document is present in this
+  workspace). Tune them to your risk appetite and re-test.
+- **Kill switch.** `FRAUD_ENGINE_ENABLED=false` makes the engine always ALLOW and
+  write nothing, so an operator can disable it instantly without a deploy.
+- **Correlation is pseudonymous only.** `FraudEvent` stores **salted hashes and
+  coarse buckets** — never a raw IP, user-agent, name, email or phone. Records
+  merge on repeat, carry an optional TTL (`FRAUD_RETENTION_DAYS`), and are
+  append-only (application code never deletes fraud history).
+- **Claims and admin are never auto-rejected by the engine.** For those surfaces
+  abuse is *recorded* and *rate-limited*; only the join path can be hard-blocked.
+- **Rate limits are in-memory / single-instance.** Counters do not share across
+  replicas; a Redis or Mongo store is the documented upgrade path for horizontal
+  scaling (the middleware interface is unchanged when swapped).
+- **Heuristics miss what they were not told to look for.** The engine complements —
+  does not replace — the eligibility fail-closed rules, the server-side admin
+  authorization and the manual review queue.
+
+---
+
 ## Database & lifecycle
 
 [`src/config/db.js`](src/config/db.js) owns the Mongoose connection. `bufferCommands`
@@ -255,15 +349,20 @@ performs a **graceful shutdown**: stop accepting connections, drain in-flight on
 (+ close idle/keep-alive), disconnect Mongo, exit — with a watchdog for stuck drains.
 `unhandledRejection`/`uncaughtException` are handled.
 
-MongoDB is expected to run as a **replica set** for the multi-document transactions
-the later money path needs. The app connects to a standalone for the read endpoints
-implemented here.
+**Operations — MongoDB deployment.** The paid-entry `dev` wallet runs its
+balance-debit + participation + ledger + audit as one multi-document transaction,
+which exists only on a **replica set** (or a sharded cluster via mongos). Run a
+replica set in every environment where paid joins must succeed. On a **standalone**
+`mongod` the transaction capability probe returns false, so a paid `dev` join
+**fails closed** with `503 TRANSACTION_INFRASTRUCTURE_REQUIRED` and moves no money
+(default `MONGODB_REQUIRE_TRANSACTIONS=true`); free joins and every read endpoint
+still work against a standalone.
 
 ---
 
 ## Data model (Phase 3)
 
-Ten Mongoose models in [`src/models/`](src/models), all exported from the
+Twelve Mongoose models in [`src/models/`](src/models), all exported from the
 [`index.js`](src/models/index.js) barrel. MongoDB stays MongoDB — the invariants
 are expressed as **database-level indexes plus schema hooks**, not as a SQL schema.
 Every enum lives in [`src/config/constants.js`](src/config/constants.js) so a model,
@@ -508,8 +607,28 @@ fixtures go in), validates each row through the model layer, and rebuilds
   full `seedDev` → re-seed → `resetDev` cycle (which leaves non-fixture rows alone).
   The memory server downloads a MongoDB binary into its cache on first use, so that
   one run needs network access; afterwards it is local.
+- **Phase 4 API tests** build on the same two tiers:
+  - `tests/unit/{policy,respond,listRoutes}.test.js` — the pure decision layer
+    with no database: eligibility evaluation, `Prize.resolveFee`, the CSPRNG
+    winner-selection/masking rules, the claim-fulfilment validator, the response
+    serializer's `_id`-hiding/allow-list behaviour, and route introspection.
+  - `tests/integration/api.contract.test.js` — the HTTP surface **without** a
+    database: the `GET /api/v1` index equals the registered router, every user
+    route answers `LOGIN_REQUIRED`, bad/expired tokens are `401`, an injected
+    `userId` is rejected, admin actions are role-gated, and every data read is an
+    honest `503` (no internals leaked) rather than a fake success.
+  - `tests/integration/api.flows.test.js` — the end-to-end paths against a **real
+    (in-memory) MongoDB**, with only the external wallet seam mocked: paginated
+    public reads (no `_id` leak), the free/paid entry flows (`ALREADY_JOINED`,
+    `GIVEAWAY_ENDED`, `INSUFFICIENT_BALANCE`, and an unconfigured wallet staying a
+    `503` with **no** debit), and the whole admin flow — create → publish →
+    transition → join → draw → notify → publish → masked winners → claim submit →
+    review to completion → audit — plus the fraud double-decision guard.
+  - `tests/integration/api.docs.test.js` — the **drift guard**: the endpoints
+    documented in `docs/API.md` are asserted to equal the routes actually
+    registered, so documentation cannot claim an unimplemented operation.
 
-Current result: **11 suites / 188 tests passing** (`npm test`).
+Current result: **17 suites / 268 tests passing** (`npm test`).
 
 ```bash
 npm test              # single run

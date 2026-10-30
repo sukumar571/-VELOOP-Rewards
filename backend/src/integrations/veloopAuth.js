@@ -83,7 +83,7 @@ function verifyAccessToken(token) {
   assertDevMockAllowed(mode);
 
   if (!token) {
-    throw new ApiError(401, 'UNAUTHENTICATED', 'Missing access token.');
+    throw new ApiError(401, 'LOGIN_REQUIRED', 'Missing access token.');
   }
 
   const key = keyForMode(mode);

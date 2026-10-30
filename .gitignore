@@ -1,0 +1,19 @@
+# --- Repo-wide ignores -------------------------------------------------------
+node_modules/
+coverage/
+
+# Secrets / environment — never commit real credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/

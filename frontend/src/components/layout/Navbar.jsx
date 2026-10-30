@@ -66,12 +66,18 @@ export default function Navbar() {
                 <Wallet size={15} />
               </span>
               <ul className={styles.balances}>
-                {Object.values(CURRENCIES).map((c) => (
-                  <li key={c.code} className={`${styles.balance} ${styles[c.accent]}`}>
-                    <span className={styles.balanceValue}>{formatAmountValue(c.code, balances?.[c.code] ?? 0)}</span>
-                    <span className={styles.balanceCur}>{c.label}</span>
-                  </li>
-                ))}
+                  {Object.values(CURRENCIES).map((c) => {
+                  const value = balances ? balances[c.code] : undefined;
+                  const known = typeof value === 'number';
+                  return (
+                    <li key={c.code} className={`${styles.balance} ${styles[c.accent]}`}>
+                      <span className={styles.balanceValue}>
+                        {known ? formatAmountValue(c.code, value) : '—'}
+                      </span>
+                      <span className={styles.balanceCur}>{c.label}</span>
+                    </li>
+                  );
+                })}
               </ul>
               <button
                 type="button"

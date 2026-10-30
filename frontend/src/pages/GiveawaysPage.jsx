@@ -4,7 +4,7 @@ import { useAsync } from '../hooks/useAsync.js';
 import { getGiveaways } from '../services/giveawayService.js';
 import PageHeader from '../components/common/PageHeader.jsx';
 import PrizeCard from '../components/giveaway/PrizeCard.jsx';
-import Skeleton from '../components/common/Skeleton.jsx';
+import GiveawayLoader from '../components/common/GiveawayLoader.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import ErrorState from '../components/common/ErrorState.jsx';
 import DemoNotice from '../components/common/DemoNotice.jsx';
@@ -74,12 +74,8 @@ export default function GiveawaysPage() {
       </div>
 
       {loading ? (
-        <div className={styles.grid} aria-busy="true">
-          {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} className={styles.gridItem}>
-              <Skeleton variant="card" />
-            </div>
-          ))}
+        <div className={styles.loadingWrap} aria-busy="true">
+          <GiveawayLoader />
         </div>
       ) : error ? (
         <ErrorState

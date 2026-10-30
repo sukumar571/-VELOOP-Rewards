@@ -63,7 +63,12 @@ export function AuthProvider({ children }) {
       loading,
       authenticated: !!user,
       balances,
-      balanceOf: (currency) => (balances ? balances[currency] ?? 0 : null),
+      // Honest lookup: a currency the wallet never reported is null (rendered
+      // as "—"), NOT a fabricated 0. A real 0 balance is still returned as 0.
+      balanceOf: (currency) =>
+        balances && Object.prototype.hasOwnProperty.call(balances, currency)
+          ? balances[currency]
+          : null,
       login,
       logout,
       refresh,

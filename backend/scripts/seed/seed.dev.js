@@ -29,6 +29,7 @@ const INSERT_ORDER = [
   ['GiveawayWinner', 'winners'],
   ['PrizeClaim', 'claims'],
   ['FraudEvent', 'fraudEvents'],
+  ['DevWalletBalance', 'devWalletBalances'],
 ];
 
 async function seedDev({ force = false, log = console.log, runMigrationFn } = {}) {

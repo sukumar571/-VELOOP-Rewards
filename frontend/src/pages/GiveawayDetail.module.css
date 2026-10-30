@@ -192,6 +192,10 @@
   gap: 0.8rem;
 }
 
+.claimBlock {
+  margin-bottom: 1.1rem;
+}
+
 .back {
   align-self: flex-start;
   font-weight: 700;

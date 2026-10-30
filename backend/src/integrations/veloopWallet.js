@@ -8,9 +8,17 @@
  *
  *   mode 'disabled' (default) — every method throws WALLET_NOT_CONFIGURED.
  *       Nothing here ever returns a made-up balance or a fake "debit ok".
+ *   mode 'dev' — an ISOLATED development/test adapter. FICTIONAL authoritative
+ *       balances live in the `DevWalletBalance` collection of THIS database, so a
+ *       paid join can debit + record + audit inside ONE real MongoDB transaction.
+ *       Every observation is tagged SEED_FIXTURE (never VELOOP_API) and the config
+ *       gate refuses this mode in production — it is NOT a connection to VELOOP.
  *   mode 'http'  — a real, thin REST client. You supply the base URL, the key
  *       and the path templates (with {userId}/{currency} placeholders) that match
  *       YOUR wallet service; the balance is read from `WALLET_BALANCE_FIELD`.
+ *       This transport runs OUTSIDE any local transaction; a debit is coordinated
+ *       by the idempotency key sent to the provider plus a compensating reversal
+ *       on later failure — never by pretending a Mongo transaction covers it.
  *       Tests cover this client against a local test server, which proves the
  *       client works — it is NOT evidence of a connection to VELOOP.
  *
@@ -20,6 +28,8 @@
 const { config } = require('../config/index.js');
 const { ApiError } = require('../utils/ApiError.js');
 const { WALLET_SOURCE } = require('../config/constants.js');
+const crypto = require('crypto');
+const DevWalletBalance = require('../models/devWalletBalance.model.js');
 
 /** Stable machine-coded failure that the error handler passes through as-is. */
 function fail(status, code, message, details) {
@@ -98,8 +108,20 @@ function pickNumber(payload, field) {
 }
 
 /** Reads the authoritative balance for one user + currency. */
-async function getBalance({ userId, currency }) {
+async function getBalance({ userId, currency, session } = {}) {
   const cfg = config.wallet;
+  if (cfg.mode === 'dev') {
+    // Fictional but authoritative for this app; an absent row is a real 0 balance.
+    const row = await DevWalletBalance.readBalance({ userId, currency, session });
+    return {
+      userId: String(userId),
+      currency,
+      balance: row ? row.balance : 0,
+      externalWalletId: null,
+      observedAt: new Date(),
+      source: WALLET_SOURCE.SEED_FIXTURE,
+    };
+  }
   if (cfg.mode !== 'http') throw notConfigured();
   requireHttp(cfg, { needBalance: true });
 
@@ -124,8 +146,25 @@ async function getBalance({ userId, currency }) {
  * Debits an entry fee. The caller MUST supply an idempotency key; it is sent to
  * the provider AND stored on our ledger row, so a retry cannot double-charge.
  */
-async function debit({ userId, currency, amount, idempotencyKey, reference }) {
+async function debit({ userId, currency, amount, idempotencyKey, reference, session } = {}) {
   const cfg = config.wallet;
+  if (cfg.mode === 'dev') {
+    if (!idempotencyKey) {
+      throw fail(400, 'IDEMPOTENCY_KEY_REQUIRED', 'A wallet debit requires an idempotency key.');
+    }
+    const res = await DevWalletBalance.debit({ userId, currency, amount, session });
+    if (!res) {
+      throw fail(402, 'INSUFFICIENT_BALANCE', 'The wallet balance is too low for this entry.', {
+        currency, required: amount,
+      });
+    }
+    return {
+      status: 'SUCCESS',
+      externalTransactionId: `dev_${crypto.randomUUID()}`,
+      balanceBefore: res.balanceBefore,
+      balanceAfter: res.balanceAfter,
+    };
+  }
   if (cfg.mode !== 'http') throw notConfigured();
   requireHttp(cfg, { needDebit: true });
   if (!idempotencyKey) {
@@ -147,8 +186,19 @@ async function debit({ userId, currency, amount, idempotencyKey, reference }) {
 }
 
 /** Credits a previously debited amount back (the compensating wallet action). */
-async function reverse({ userId, currency, amount, idempotencyKey, reference, externalTransactionId }) {
+async function reverse({ userId, currency, amount, idempotencyKey, reference, externalTransactionId, session } = {}) {
   const cfg = config.wallet;
+  if (cfg.mode === 'dev') {
+    if (!idempotencyKey) {
+      throw fail(400, 'IDEMPOTENCY_KEY_REQUIRED', 'A wallet reversal requires an idempotency key.');
+    }
+    const res = await DevWalletBalance.credit({ userId, currency, amount, session });
+    return {
+      status: 'SUCCESS',
+      externalTransactionId: `devrev_${crypto.randomUUID()}`,
+      balanceAfter: res ? res.balanceAfter : null,
+    };
+  }
   if (cfg.mode !== 'http') throw notConfigured();
   requireHttp(cfg, { needDebit: true });
   if (!idempotencyKey) {
@@ -169,9 +219,10 @@ async function reverse({ userId, currency, amount, idempotencyKey, reference, ex
   };
 }
 
-/** True only when a real provider call could actually be made right now. */
+/** True only when a balance/charge call could actually be made right now. */
 function isConfigured() {
   const cfg = config.wallet;
+  if (cfg.mode === 'dev') return true; // in-database dev adapter is always ready
   return cfg.mode === 'http' && Boolean(cfg.baseUrl && cfg.apiKey && cfg.balancePath && cfg.debitPath);
 }
 

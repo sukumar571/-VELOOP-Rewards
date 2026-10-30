@@ -17,9 +17,9 @@ describe('veloopAuth — dev-mock mode (default in tests)', () => {
     expect(principal.provider).toBe('dev-mock');
   });
 
-  it('rejects a missing token as UNAUTHENTICATED', () => {
+  it('rejects a missing token as LOGIN_REQUIRED', () => {
     expect(() => verifyAccessToken(undefined)).toThrow(
-      expect.objectContaining({ code: 'UNAUTHENTICATED', statusCode: 401 }),
+      expect.objectContaining({ code: 'LOGIN_REQUIRED', statusCode: 401 }),
     );
   });
 
