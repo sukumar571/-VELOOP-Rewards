@@ -64,9 +64,9 @@ describe('authentication & authorization', () => {
       .get('/api/v1/auth/me')
       .set('Authorization', bearer({ sub: 'usr-42', roles: ['user'], name: 'Zoe' }))
       .expect(200);
-    expect(res.body.id).toBe('usr-42');
-    expect(res.body.roles).toContain('user');
-    expect(res.body.authProvider).toBe('dev-mock');
+    expect(res.body.data.id).toBe('usr-42');
+    expect(res.body.data.roles).toContain('user');
+    expect(res.body.data.authProvider).toBe('dev-mock');
   });
 
   it('denies admin endpoints to a normal user (403)', async () => {

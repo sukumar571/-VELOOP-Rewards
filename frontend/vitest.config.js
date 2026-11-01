@@ -11,5 +11,8 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.js',
     css: false,
+    // userEvent typing across six form fields can exceed the 5s default when
+    // files run in parallel on slower machines (seen as flaky timeouts).
+    testTimeout: 15000,
   },
 });

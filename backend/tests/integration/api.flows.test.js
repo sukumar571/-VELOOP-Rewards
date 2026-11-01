@@ -18,7 +18,7 @@ jest.mock('../../src/integrations/veloopWallet.js', () => ({
   getBalance: jest.fn(async ({ userId, currency }) => ({
     userId: String(userId), currency, balance: 1_000_000, observedAt: new Date(), source: 'VELOOP_API',
   })),
-  debit: jest.fn(async () => ({ status: 'SUCCESS', externalTransactionId: 'ext-1', balanceBefore: 1000, balanceAfter: 950 })),
+  debit: jest.fn(async () => ({ status: 'SUCCESS', externalTransactionId: `ext-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, balanceBefore: 1000, balanceAfter: 950 })),
   reverse: jest.fn(async () => ({ status: 'SUCCESS', externalTransactionId: 'rev-1', balanceAfter: 1000 })),
 }));
 
@@ -71,7 +71,7 @@ async function createGiveaway(opts = {}) {
 
 beforeAll(async () => {
   mongoose.set('autoIndex', false);
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 60000 } }); // cold mongod start on Windows can exceed the 10s default
   await mongoose.connect(mongod.getUri('veloop_flow_test'), { serverSelectionTimeoutMS: 10000 });
   // Real indexes so the database — not just application code — enforces the
   // unique participation and prize-position invariants the flows rely on.
@@ -95,7 +95,7 @@ beforeEach(async () => {
   wallet.getBalance.mockImplementation(async ({ userId, currency }) => ({
     userId: String(userId), currency, balance: 1_000_000, observedAt: new Date(), source: 'VELOOP_API',
   }));
-  wallet.debit.mockResolvedValue({ status: 'SUCCESS', externalTransactionId: 'ext-1', balanceBefore: 1000, balanceAfter: 950 });
+  wallet.debit.mockImplementation(async () => ({ status: 'SUCCESS', externalTransactionId: `ext-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, balanceBefore: 1000, balanceAfter: 950 }));
 });
 
 // ---------------------------------------------------------------------------
@@ -140,6 +140,37 @@ describe('public reads against real data', () => {
     expect(res.body.data._id).toBeUndefined();
     expect(res.body.data.id).toBe(String(giveaway._id));
     expect(JSON.stringify(res.body)).not.toMatch(/__v|seedBatch/);
+  });
+
+  // Regression: the single-detail endpoint once bypassed PUBLIC_PROJECTION (a bare
+  // findById().lean() skipped the model transform), so the fee/eligibility config
+  // and the operator statusHistory (with admin `by` ids + `reason`) reached the
+  // public. Every sibling read projects these away; the detail endpoint must too.
+  it('does not leak config/audit fields on the public detail endpoint', async () => {
+    const { giveaway } = await createGiveaway();
+    const res = await request(app).get(`/api/v1/giveaways/${giveaway._id}`).expect(200);
+    const body = JSON.stringify(res.body);
+    expect(res.body.data.prizeConfig).toBeUndefined();
+    expect(res.body.data.eligibility).toBeUndefined();
+    expect(res.body.data.statusHistory).toBeUndefined();
+    expect(res.body.data.createdBy).toBeUndefined();
+    expect(res.body.data.updatedBy).toBeUndefined();
+    expect(res.body.data.participation?.entryCurrencies).toBeUndefined();
+    expect(body).not.toMatch(/entryCurrencies|prizeConfig|statusHistory|"eligibility"|createdBy|updatedBy/);
+    // `published` is deliberately retained so the controller can still hide drafts.
+    expect(res.body.data.published).toBe(true);
+  });
+
+  it('still exposes the full config to an admin via the dedicated config route', async () => {
+    const { giveaway } = await createGiveaway();
+    const res = await request(app)
+      .get(`/api/v1/admin/giveaways/${giveaway._id}/config`)
+      .set('Authorization', adminHeader)
+      .expect(200);
+    // Proves the projected fields exist in the document — the public detail is
+    // genuinely narrowed, not simply observing absent data.
+    expect(res.body.data.giveaway.prizeConfig).toBeDefined();
+    expect(res.body.data.giveaway.participation.entryCurrencies).toEqual(['VE']);
   });
 });
 
@@ -280,10 +311,58 @@ describe('admin lifecycle → draw → publish → claim', () => {
     expect(JSON.stringify(audit.body)).not.toMatch(/winner@example\.com/);
   });
 
-  it('refuses a second decision on a terminal fraud event', async () => {
+  it('refuses a second decision on a terminal fraud event', async () => {       
     const event = await models.FraudEvent.create({ type: 'DEVICE_VELOCITY', deviceHash: hashReference('device-abc') });
     await request(app).post(`/api/v1/admin/fraud-events/${event._id}/decision`).set('Authorization', adminHeader).send({ decision: 'CONFIRMED', note: 'confirmed' }).expect(200);
     const res = await request(app).post(`/api/v1/admin/fraud-events/${event._id}/decision`).set('Authorization', adminHeader).send({ decision: 'DISMISSED', note: 'again' }).expect(409);
     expect(res.body.error.code).toBe('FRAUD_EVENT_DECIDED');
+  });
+});
+
+describe('GET /wallet/transactions — own entry-fee history (backend spec §67)', () => {
+  it('shows the caller’s own debit rows, newest first, without internal fields', async () => {
+    // Two draws, two accounts: the same-device protection deliberately lets one
+    // device enter a given draw only once, so scoping is proven across separate draws.
+    const { giveaway: mine } = await createGiveaway({ entryAmount: 250 });
+    const { giveaway: theirs } = await createGiveaway({ entryAmount: 300 });
+    const me = `tx-me-${rid()}`;
+    const other = `tx-other-${rid()}`;
+
+    // Distinct device references — exactly what real clients send — because the
+    // same-device multi-account guard (§25) would otherwise flag one fingerprint.
+    await request(app).post(`/api/v1/giveaways/${mine._id}/join`)
+      .set('Authorization', userHeaderFor(me))
+      .send({ deviceReference: `tx-dev-me-${rid()}`, sessionReference: `tx-sess-me-${rid()}` })
+      .expect(201);
+    await request(app).post(`/api/v1/giveaways/${theirs._id}/join`)
+      .set('Authorization', userHeaderFor(other))
+      .send({ deviceReference: `tx-dev-other-${rid()}`, sessionReference: `tx-sess-other-${rid()}` })
+      .expect(201);
+
+    const res = await request(app).get('/api/v1/wallet/transactions')
+      .set('Authorization', userHeaderFor(me)).expect(200);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.meta).toMatchObject({ page: 1, limit: 20, total: res.body.data.length });
+    expect(res.body.data.length).toBeGreaterThanOrEqual(1);
+
+    const row = res.body.data[0];
+    expect(row).toMatchObject({ direction: 'DEBIT', currency: 'VE', amount: 250, status: 'SUCCESS' });
+    expect(row.giveaway && row.giveaway.id).toBe(String(mine._id));
+    expect(row.transactionId).toBeTruthy();
+
+    // Ownership + privacy: another account never sees this row, and internal
+    // columns (idempotency key, device class, raw userId, request context) leak never.
+    const otherRes = await request(app).get('/api/v1/wallet/transactions')
+      .set('Authorization', userHeaderFor(other)).expect(200);
+    expect(otherRes.body.data.every((r) => r.transactionId !== row.transactionId)).toBe(true);
+    expect(otherRes.body.data.every((r) => !r.giveaway || r.giveaway.id !== String(mine._id))).toBe(true);
+    expect(JSON.stringify(res.body.data)).not.toMatch(/idempotencyKey|clientClass|sourceEndpoint|"userId"/);
+  });
+
+  it('validates pagination before the database is touched', async () => {
+    await request(app).get('/api/v1/wallet/transactions?page=0')
+      .set('Authorization', userHeaderFor(`tx-paging-${rid()}`)).expect(400);
+    await request(app).get('/api/v1/wallet/transactions?limit=500')
+      .set('Authorization', userHeaderFor(`tx-paging-${rid()}`)).expect(400);
   });
 });

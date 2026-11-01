@@ -69,10 +69,10 @@ backend/
 │   ├── config/             # index.js (env+validation), db.js (lifecycle), logger.js, constants.js (every enum)
 │   ├── middleware/         # requestLogger, security, rateLimiter, validate, auth, requireRole, errorHandler
 │   ├── models/             # 10 collections + index.js barrel (see Data model below)
-│   ├── routes/             # health.routes.js, v1/{index,auth,giveaway,admin}.routes.js
-│   ├── controllers/        # health, auth, giveaway, admin
-│   ├── services/           # giveaway.service.js (real DB read path)
-│   ├── validators/         # zod schemas (common, giveaway)
+│   ├── routes/             # health.routes.js, v1/{index,auth,giveaway,wallet,claims,admin}.routes.js
+│   ├── controllers/        # health, auth, giveaway, participation, wallet, claim, winner, review, admin
+│   ├── services/           # giveaway, participation, wallet, eligibility, claim, winner, adminGiveaway, fraud, review
+│   ├── validators/         # zod schemas (common, giveaway, entry, wallet, claim, winner, admin, review)
 │   ├── integrations/       # veloopAuth.js (auth seam), veloopWallet.js (wallet seam)
 │   └── utils/              # ApiError, asyncHandler, schema.js (shared model rules), mintDevToken
 ├── scripts/
@@ -628,7 +628,7 @@ fixtures go in), validates each row through the model layer, and rebuilds
     documented in `docs/API.md` are asserted to equal the routes actually
     registered, so documentation cannot claim an unimplemented operation.
 
-Current result: **17 suites / 268 tests passing** (`npm test`).
+Current result: **24 suites / 336 tests passing** (`npm test`).
 
 ```bash
 npm test              # single run
@@ -661,15 +661,23 @@ npm run test:coverage # coverage report
 
 ## Remaining work
 
-1. Provide the **project specification PDF** to confirm the numbers deliberately
-   left unset: fee amounts, claim window days, eligibility policy, masking format,
-   winner-selection rules and retention periods.
+1. Confirm with VELOOP the operational numbers the fixtures demonstrate but the
+   business has not signed off: fraud thresholds, claim windows and retention
+   periods are configuration placeholders pending approval (fee amounts and the
+   six prize/currency entry configs follow the project specification, seeded as
+   the `dev-fee-table` fixtures).
 2. Supply **VELOOP auth** details (issuer, JWKS/keys, claims, admin-role source) to
    move `AUTH_MODE=jwt` to the real issuer.
 3. Supply the **VELOOP wallet** API contract to configure `WALLET_MODE=http`
-   (base URL, key, path templates, balance field) and then build the atomic,
-   idempotent entry-charge + refund services on the existing ledger model.
-4. Build the write paths on these models: giveaway CRUD/publish, entry + fee
-   charging, the draw job, announcement, the claim pipeline, fraud rule evaluation —
-   each as a service that the model layer already constrains.
-5. Add a persistent/Redis rate-limit store and monitoring for multi-instance deploys.
+   (base URL, key, path templates, balance field); the ledger, idempotency and
+   compensating-reversal machinery it needs already exists and is tested.
+4. Add a persistent/Redis rate-limit store and monitoring for multi-instance deploys.
+
+## Deployment
+
+A `Procfile` is included (`web: node src/server.js`); the app honors `PORT`,
+serves `/health` + `/health/ready` for platform probes and shuts down
+gracefully on SIGTERM. The full runbook (host settings, production env matrix,
+MongoDB Atlas replica-set/transaction requirements, index application, CORS
+allow-list wiring, post-deploy verification) lives in
+[`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md).

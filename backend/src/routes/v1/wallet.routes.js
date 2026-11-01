@@ -22,4 +22,14 @@ router.get(
   wallet.balances,
 );
 
+// GET /api/v1/wallet/transactions?page=&limit= — own ledger history (read-only).
+router.get(
+  '/transactions',
+  authenticate,
+  validate({ query: schemas.transactionsQuery }),
+  resolveIdentity,
+  requireResolvedIdentity,
+  wallet.transactions,
+);
+
 module.exports = router;

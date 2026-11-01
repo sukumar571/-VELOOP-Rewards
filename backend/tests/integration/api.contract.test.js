@@ -56,6 +56,7 @@ describe('authentication is enforced (LOGIN_REQUIRED) on every user route', () =
   const protectedRoutes = [
     ['get', '/api/v1/giveaways/my-status'],
     ['get', '/api/v1/wallet/balances'],
+    ['get', '/api/v1/wallet/transactions'],
     ['get', '/api/v1/claims'],
     ['post', `/api/v1/giveaways/${OBJECT_ID}/join`],
     ['post', `/api/v1/claims/${OBJECT_ID}/submit`],

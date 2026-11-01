@@ -3,11 +3,22 @@
 }
 
 .chips {
+  /* Pin the filter bar just below the sticky header so a chip is never
+     hidden under it (the header sits at z-index 1030 and would otherwise
+     swallow clicks on a scrolled-up chip). */
+  position: sticky;
+  top: var(--vl-nav-h);
+  z-index: 20;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  margin-bottom: 2.25rem;
+  padding: 0.7rem 0.75rem;
+  margin-bottom: 1.75rem;
+  background: rgba(3, 6, 21, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--vl-radius-pill);
 }
 
 .chip {

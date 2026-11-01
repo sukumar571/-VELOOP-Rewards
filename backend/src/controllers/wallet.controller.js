@@ -18,4 +18,15 @@ const balances = asyncHandler(async (req, res) => {
   return ok(res, data);
 });
 
-module.exports = { balances };
+// GET /api/v1/wallet/transactions?page=&limit= — the caller's own entry-fee
+// ledger history. Scoped strictly to the token identity; never another account.
+const transactions = asyncHandler(async (req, res) => {
+  const { items, meta } = await service.transactionHistory({
+    userId: req.auth.userId,
+    page: req.valid.query.page,
+    limit: req.valid.query.limit,
+  });
+  return ok(res, items, meta);
+});
+
+module.exports = { balances, transactions };

@@ -228,3 +228,17 @@
     animation: none;
   }
 }
+
+/* Spec §17 "Notify Me" (upcoming state) — button + honest demo note. */
+.notifyWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.notifyNote {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--vl-text-muted, #6c757d);
+}

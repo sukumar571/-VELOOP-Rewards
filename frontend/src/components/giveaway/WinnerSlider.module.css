@@ -29,6 +29,7 @@
 }
 
 .slide {
+  display: flex;
   scroll-snap-align: start;
   min-width: 0;
 }

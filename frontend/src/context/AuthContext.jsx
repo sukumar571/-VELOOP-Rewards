@@ -6,6 +6,7 @@ import {
   logout as sessionLogout,
   setEligibleForDemo,
 } from '../services/sessionService.js';
+import { redeemCode } from '../services/earnService.js';
 
 const AuthContext = createContext(null);
 
@@ -34,8 +35,8 @@ export function AuthProvider({ children }) {
     };
   }, [hydrate]);
 
-  const login = useCallback(async () => {
-    const s = await sessionLogin();
+  const login = useCallback(async (profile) => {
+    const s = await sessionLogin(profile);
     const w = await getWallet();
     setUser(s.user);
     setBalances(w ? w.balances : null);
@@ -57,6 +58,17 @@ export function AuthProvider({ children }) {
     await setEligibleForDemo(eligible);
   }, []);
 
+  // DEMO-only: redeem a code to credit the fictional wallet, then re-read it so
+  // the navbar/entry panels reflect the new balance. No real funds move.
+  const redeem = useCallback(async (code) => {
+    const res = await redeemCode(code);
+    if (res.ok) {
+      const w = await getWallet();
+      setBalances(w ? w.balances : null);
+    }
+    return res;
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -73,8 +85,9 @@ export function AuthProvider({ children }) {
       logout,
       refresh,
       setEligible,
+      redeem,
     }),
-    [user, loading, balances, login, logout, refresh, setEligible],
+    [user, loading, balances, login, logout, refresh, setEligible, redeem],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

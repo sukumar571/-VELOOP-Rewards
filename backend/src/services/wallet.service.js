@@ -16,6 +16,7 @@
  * ========================================================================= */
 const WalletReference = require('../models/walletReference.model.js');
 const Giveaway = require('../models/giveaway.model.js');
+const GiveawayEntryTransaction = require('../models/giveawayEntryTransaction.model.js');
 const wallet = require('../integrations/veloopWallet.js');
 const { config } = require('../config/index.js');
 const { domain } = require('../utils/domainErrors.js');
@@ -113,4 +114,50 @@ async function balances({ userId, currencies } = {}) {
   };
 }
 
-module.exports = { balances, relevantCurrencies, shape };
+/**
+ * GET /wallet/transactions — the caller's OWN entry-fee ledger history
+ * (spec Part 2 §67: every deduction must be visible in a transaction history).
+ * Read-only and ownership-scoped from the token userId — there is no userId
+ * parameter. Only account-holder-safe fields are selected: idempotency keys,
+ * device classes and internal request context are deliberately excluded.
+ */
+async function transactionHistory({ userId, page = 1, limit = 20 }) {
+  const filter = { userId };
+  const skip = (page - 1) * limit;
+
+  const [rows, total] = await Promise.all([
+    GiveawayEntryTransaction.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('transactionId type direction currency amount status balanceBefore balanceAfter giveawayId prizeId createdAt completedAt')
+      .populate({ path: 'giveawayId', select: 'title slug' })
+      .populate({ path: 'prizeId', select: 'name' })
+      .lean(),
+    GiveawayEntryTransaction.countDocuments(filter),
+  ]);
+
+  const items = rows.map((row) => ({
+    id: String(row._id),
+    transactionId: row.transactionId,
+    type: row.type,
+    direction: row.direction,
+    currency: row.currency,
+    amount: row.amount,
+    status: row.status,
+    balanceBefore: row.balanceBefore ?? null,
+    balanceAfter: row.balanceAfter ?? null,
+    giveaway: row.giveawayId && row.giveawayId._id
+      ? { id: String(row.giveawayId._id), title: row.giveawayId.title ?? null, slug: row.giveawayId.slug ?? null }
+      : null,
+    prize: row.prizeId && row.prizeId._id
+      ? { id: String(row.prizeId._id), name: row.prizeId.name ?? null }
+      : null,
+    createdAt: row.createdAt,
+    completedAt: row.completedAt ?? null,
+  }));
+
+  return { items, meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+}
+
+module.exports = { balances, relevantCurrencies, shape, transactionHistory };

@@ -79,7 +79,10 @@ beforeAll(async () => {
   mongoose.set('autoIndex', false);
   // `launchTimeout` is 10s by default; a cold wiredTiger + replica-set bootstrap on
   // Windows (Defender scanning the 64 MB mongod.exe) can exceed that, so give it 60s.
-  replset = await MongoMemoryReplSet.create({ replSet: { count: 1, storageEngine: 'wiredTiger', launchTimeout: 60000 } });
+  // NOTE: it must be passed via `instanceOpts` — the replSet sub-object is NOT read
+  // for this key by mongodb-memory-server v10 (getInstanceOpts copies from each
+  // instanceOpts entry only).
+  replset = await MongoMemoryReplSet.create({ instanceOpts: [{ launchTimeout: 60000 }], replSet: { count: 1, storageEngine: 'wiredTiger' } });
   await mongoose.connect(replset.getUri('veloop_txn_test'), { serverSelectionTimeoutMS: 15000 });
   await Promise.all(Object.values(models).map((m) => m.syncIndexes()));
 
@@ -92,7 +95,7 @@ beforeAll(async () => {
 afterAll(async () => {
   config.wallet.mode = process.env.WALLET_MODE || 'disabled';
   await mongoose.disconnect();
-  await replset.stop();
+  if (replset) await replset.stop();
 });
 
 beforeEach(async () => {

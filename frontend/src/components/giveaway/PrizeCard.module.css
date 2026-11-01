@@ -10,10 +10,14 @@
   position: relative;
 }
 
+/* The decorative PRIZE ribbon (PrizeVisual) owns the top-LEFT corner, so the
+   functional status badge sits top-RIGHT to avoid overlapping it. The countdown
+   chip anchors bottom-right, keeping the header balanced and legible. */
 .badge {
   position: absolute;
   top: 0.8rem;
-  left: 0.8rem;
+  right: 0.8rem;
+  z-index: 1;
 }
 
 .countdown {

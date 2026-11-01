@@ -95,7 +95,7 @@ const participationFor = (user, giveaway, extra = {}) => ({
 
 beforeAll(async () => {
   mongoose.set('autoIndex', false); // indexes must arrive only through the migration
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 60000 } }); // cold mongod start on Windows can exceed the 10s default
   dbUri = mongod.getUri('veloop_model_test');
   await mongoose.connect(dbUri, { serverSelectionTimeoutMS: 10000 });
 });

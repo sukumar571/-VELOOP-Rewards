@@ -6,7 +6,7 @@
  * 400 rather than a silent empty row.
  */
 const { z } = require('zod');
-const { currency } = require('./common.js');
+const { currency, pagination } = require('./common.js');
 
 /** GET /wallet/balances?currencies=VE,TOKEN */
 const balancesQuery = z.object({
@@ -17,4 +17,7 @@ const balancesQuery = z.object({
     ),
 });
 
-module.exports = { balancesQuery };
+/** GET /wallet/transactions?page=&limit= — the caller's own ledger history. */
+const transactionsQuery = z.object({ ...pagination });
+
+module.exports = { balancesQuery, transactionsQuery };

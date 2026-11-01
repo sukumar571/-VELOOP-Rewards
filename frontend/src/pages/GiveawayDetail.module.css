@@ -42,8 +42,11 @@
 }
 
 .visual {
-  position: sticky;
-  top: calc(var(--vl-nav-h) + 1rem);
+  /* Must stay positioned (relative) so the decorative glow inside PrizeVisual
+     is clipped by its overflow:hidden — a static box lets the glow escape and
+     widens the page (horizontal scrollbar). Not sticky either: a sticky visual
+     would overlap the "About this prize" content that follows it in the column. */
+  position: relative;
 }
 
 .panel {
@@ -229,9 +232,6 @@
 @media (max-width: 991.98px) {
   .layout {
     grid-template-columns: 1fr;
-  }
-  .visual {
-    position: static;
   }
 }
 

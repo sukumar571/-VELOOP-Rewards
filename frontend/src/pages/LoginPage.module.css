@@ -13,6 +13,45 @@
   gap: 1rem;
 }
 
+/* ---- segmented mode switch ---- */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: var(--vl-radius-pill);
+  border: 1px solid var(--vl-border);
+  background: rgba(131, 69, 240, 0.08);
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: var(--vl-radius-pill);
+  background: transparent;
+  color: var(--vl-text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color var(--vl-speed) var(--vl-ease),
+    color var(--vl-speed) var(--vl-ease);
+}
+.tab:hover {
+  color: var(--vl-text);
+}
+.tabActive {
+  background: var(--vl-grad-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(99, 20, 209, 0.35);
+}
+.tabActive:hover {
+  color: #fff;
+}
+
 .lead {
   margin: 0;
   color: var(--vl-text-body);
@@ -21,6 +60,103 @@
 
 .noticeWrap {
   display: flex;
+}
+
+/* ---- form ---- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--vl-text-body);
+}
+.label svg {
+  color: var(--vl-violet-300);
+}
+
+.input {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border-radius: var(--vl-radius);
+  border: 1px solid var(--vl-border-strong);
+  background: rgba(3, 6, 21, 0.6);
+  color: var(--vl-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition:
+    border-color var(--vl-speed) var(--vl-ease),
+    box-shadow var(--vl-speed) var(--vl-ease);
+}
+.input::placeholder {
+  color: var(--vl-text-faint);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--vl-violet-300);
+  box-shadow: 0 0 0 3px rgba(200, 88, 250, 0.22);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--vl-red-500);
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+}
+.passwordInput {
+  padding-right: 2.9rem;
+}
+.reveal {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--vl-text-muted);
+  cursor: pointer;
+  transition: color var(--vl-speed) var(--vl-ease), background-color var(--vl-speed) var(--vl-ease);
+}
+.reveal:hover {
+  color: var(--vl-text);
+  background: rgba(131, 69, 240, 0.14);
+}
+
+.error {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vl-red-500);
+}
+
+.formError {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--vl-radius);
+  border: 1px solid rgba(240, 87, 109, 0.4);
+  background: rgba(240, 87, 109, 0.1);
+  color: var(--vl-red-500);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .toggle {
@@ -47,6 +183,27 @@
 .btn {
   justify-content: center;
   margin-top: 0.25rem;
+}
+
+.switchNote {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--vl-text-muted);
+}
+.linkBtn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--vl-violet-300);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.linkBtn:hover {
+  color: var(--vl-gold-500);
 }
 
 .signedIn {

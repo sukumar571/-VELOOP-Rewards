@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LogIn,
   Check,
@@ -9,6 +9,8 @@ import {
   CalendarClock,
   Trophy,
   ShieldAlert,
+  Bell,
+  TrendingUp,
 } from 'lucide-react';
 import { useAsync } from '../../hooks/useAsync.js';
 import { getEntryState, joinGiveaway } from '../../services/giveawayService.js';
@@ -46,6 +48,10 @@ export default function EntryPanel({ giveaway }) {
   const [submitting, setSubmitting] = useState(false);
   const [joinError, setJoinError] = useState(null);
   const [justJoined, setJustJoined] = useState(null); // receipt for success banner
+  // Spec §17 "Notify Me" — explicitly a frontend-state demonstration (upcoming
+  // draws). Nothing is sent anywhere: real reminders need the not-yet-connected
+  // VELOOP notification channel, and the note below says so (spec §63).
+  const [notifySet, setNotifySet] = useState(false);
 
   function goLogin() {
     // Preserve the intended destination so login can return here.
@@ -131,7 +137,7 @@ export default function EntryPanel({ giveaway }) {
           </p>
           <button type="button" className="vl-btn vl-btn-cta" onClick={goLogin}>
             <LogIn size={16} aria-hidden="true" />
-            Sign in to enter
+            Login to Participate
           </button>
         </div>
       ) : (
@@ -201,10 +207,10 @@ export default function EntryPanel({ giveaway }) {
             <StateNote
               icon={<AlertTriangle size={15} aria-hidden="true" />}
               tone="error"
-              text={`You need ${feeLabel} to enter, but your balance is ${formatAmount(
-                entry.entry?.currency,
-                entry.balance,
-              )}.`}
+              text={`You need ${Math.max(
+                0,
+                (entry.entry?.amount ?? 0) - entry.balance,
+              )} more ${currency.label} to participate (entry fee ${feeLabel}).`}
             />
           ) : null}
 
@@ -215,6 +221,10 @@ export default function EntryPanel({ giveaway }) {
             eligible={entry.eligible}
             sufficient={entry.sufficient}
             balanceKnown={balanceKnown}
+            feeLabel={feeLabel}
+            currencyLabel={currency.label}
+            notifySet={notifySet}
+            onToggleNotify={() => setNotifySet((v) => !v)}
             onJoin={openConfirm}
           />
 
@@ -297,38 +307,89 @@ export default function EntryPanel({ giveaway }) {
 
 /* -------------------------------------------------------------------------- */
 
-function JoinAction({ status, hasJoined, eligible, sufficient, balanceKnown, onJoin }) {
+/* Primary CTA state machine, labels per spec §17 (Participation CTA) with the
+ * cost made explicit on the button itself (§86) and the insufficient-balance
+ * case redirected to "Earn More" (§88). */
+function JoinAction({
+  status,
+  hasJoined,
+  eligible,
+  sufficient,
+  balanceKnown,
+  feeLabel,
+  currencyLabel,
+  notifySet,
+  onToggleNotify,
+  onJoin,
+}) {
+  if (status === 'upcoming') {
+    return (
+      <div className={styles.notifyWrap}>
+        <button
+          type="button"
+          className="vl-btn vl-btn-cta"
+          onClick={onToggleNotify}
+          aria-pressed={notifySet}
+        >
+          <Bell size={16} aria-hidden="true" />
+          {notifySet ? 'Notify Me ✓' : 'Notify Me'}
+        </button>
+        {notifySet ? (
+          <p className={styles.notifyNote} role="status">
+            Saved on this device for the demo — real reminders need the (not yet
+            connected) VELOOP notification channel.
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+  if (status === 'ended') {
+    return (
+      <Link className="vl-btn vl-btn-cta" to="/winners">
+        <Trophy size={16} aria-hidden="true" />
+        View Winners
+      </Link>
+    );
+  }
   if (status !== 'active') {
+    // draft or any other non-live status: same safe fallback as before.
     return (
       <button type="button" className="vl-btn vl-btn-outline" disabled>
-        {status === 'upcoming' ? 'Entries not open yet' : 'Entries closed'}
+        Entries closed
       </button>
     );
   }
   if (hasJoined) {
     return (
       <button type="button" className="vl-btn vl-btn-outline" disabled>
-        <Check size={16} aria-hidden="true" /> Already entered
+        <Check size={16} aria-hidden="true" /> You&apos;re Participating ✓
       </button>
     );
   }
-  const blocked = !eligible || !sufficient;
+  if (!eligible || !balanceKnown) {
+    return (
+      <button type="button" className={`vl-btn vl-btn-cta ${styles.joinBtn}`} disabled aria-disabled="true">
+        <Lock size={16} aria-hidden="true" />
+        {!eligible ? 'Not eligible' : 'Balance unavailable'}
+      </button>
+    );
+  }
+  if (!sufficient) {
+    // §88: the CTA becomes "Earn More …" instead of allowing the join.
+    return (
+      <Link className={`vl-btn vl-btn-cta ${styles.joinBtn}`} to="/earn">
+        <TrendingUp size={16} aria-hidden="true" />
+        Earn More {currencyLabel} →
+      </Link>
+    );
+  }
   return (
     <button
       type="button"
       className={`vl-btn vl-btn-cta ${styles.joinBtn}`}
       onClick={onJoin}
-      disabled={blocked}
-      aria-disabled={blocked}
     >
-      {blocked ? (
-        <>
-          <Lock size={16} aria-hidden="true" />
-          {!eligible ? 'Not eligible' : !balanceKnown ? 'Balance unavailable' : 'Insufficient balance'}
-        </>
-      ) : (
-        'Join Now'
-      )}
+      {feeLabel ? `Join for ${feeLabel}` : 'Join Giveaway'}
     </button>
   );
 }

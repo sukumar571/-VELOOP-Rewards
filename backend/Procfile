@@ -1,0 +1,3 @@
+# Heroku/Render-style process declaration. The app also honors PORT on
+# Railway/Fly/compose hosts that do not read Procfiles.
+web: node src/server.js

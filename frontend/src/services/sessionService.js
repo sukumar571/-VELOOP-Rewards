@@ -32,7 +32,7 @@ const STORAGE_KEY = 'veloop.demo.session.v1';
 export const IS_DEMO_SESSION = true;
 
 function freshState() {
-  return { user: null, balances: { ...DEMO_WALLET }, joined: [], eligible: true };
+  return { user: null, balances: { ...DEMO_WALLET }, joined: [], redeemed: [], eligible: true };
 }
 
 function read() {
@@ -65,8 +65,17 @@ export const _store = {
     state.balances[currency] = (state.balances[currency] ?? 0) - amount;
     persist();
   },
+  credit: (currency, amount) => {
+    state.balances[currency] = (state.balances[currency] ?? 0) + amount;
+    persist();
+  },
   addJoin: (giveawayId) => {
     if (!state.joined.includes(giveawayId)) state.joined.push(giveawayId);
+    persist();
+  },
+  hasRedeemed: (code) => state.redeemed.includes(code),
+  addRedeem: (code) => {
+    if (!state.redeemed.includes(code)) state.redeemed.push(code);
     persist();
   },
 };
@@ -109,9 +118,16 @@ export async function getSession() {
   }
 }
 
-export async function login() {
+export async function login(profile) {
   if (isMockEnabled()) {
-    state = { ...freshState(), user: { ...DEMO_MEMBER }, eligible: state.eligible };
+    // A demo profile (from the local sign-in/registration form) personalises the
+    // session; with none we fall back to the generic demo member. Either way this
+    // is a client-side demo session only — never a real authenticated principal.
+    const user =
+      profile && profile.email
+        ? { id: profile.id || DEMO_MEMBER.id, name: profile.name || 'Member', email: profile.email }
+        : { ...DEMO_MEMBER };
+    state = { ...freshState(), user, eligible: state.eligible };
     persist();
     return settle({ user: state.user });
   }

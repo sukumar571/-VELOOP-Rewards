@@ -70,7 +70,7 @@ let originalFraudEnabled;
 
 beforeAll(async () => {
   mongoose.set('autoIndex', false);
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 60000 } }); // cold mongod start on Windows can exceed the 10s default
   await mongoose.connect(mongod.getUri('veloop_admin_authz_test'), { serverSelectionTimeoutMS: 10000 });
   await Promise.all(Object.values(models).map((m) => m.syncIndexes()));
   // These tests are about authorization and the draw, not the risk engine.
@@ -81,7 +81,7 @@ beforeAll(async () => {
 afterAll(async () => {
   config.security.fraud.enabled = originalFraudEnabled;
   await mongoose.disconnect();
-  await mongod.stop();
+  if (mongod) await mongod.stop();
 });
 
 beforeEach(async () => {

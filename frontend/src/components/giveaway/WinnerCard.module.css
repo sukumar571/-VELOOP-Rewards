@@ -1,6 +1,7 @@
 .card {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  flex: 1 1 auto;
   gap: 1rem;
   padding: 1.05rem 1.2rem;
   transition:
@@ -15,6 +16,7 @@
 .avatar {
   display: grid;
   place-items: center;
+  align-self: center;
   width: 52px;
   height: 52px;
   flex: none;
@@ -33,6 +35,8 @@
 
 .info {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .name {
@@ -80,7 +84,7 @@
 }
 
 .meta {
-  margin: 0.25rem 0 0;
+  margin: 0.25rem 0 0.55rem;
   font-size: 0.8rem;
   color: var(--vl-text-muted);
 }
@@ -95,7 +99,8 @@
 
 .status {
   display: inline-block;
-  margin-top: 0.45rem;
+  align-self: flex-start;
+  margin-top: auto;
   padding: 0.2rem 0.6rem;
   border-radius: var(--vl-radius-pill);
   font-size: 0.7rem;

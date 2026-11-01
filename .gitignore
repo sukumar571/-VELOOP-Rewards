@@ -2,6 +2,9 @@
 node_modules/
 coverage/
 
+# Local capture tooling (Playwright + ffmpeg) used to generate demo assets
+.qa-capture/
+
 # Secrets / environment — never commit real credentials
 .env
 .env.*

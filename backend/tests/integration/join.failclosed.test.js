@@ -57,7 +57,7 @@ async function fundUser({ currency = 'VE', balance = 1_000_000 } = {}) {
 
 beforeAll(async () => {
   mongoose.set('autoIndex', false);
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 60000 } }); // cold mongod start on Windows can exceed the 10s default
   await mongoose.connect(mongod.getUri('veloop_notxn_test'), { serverSelectionTimeoutMS: 10000 });
   await Promise.all(Object.values(models).map((m) => m.syncIndexes()));
   config.wallet.mode = 'dev';

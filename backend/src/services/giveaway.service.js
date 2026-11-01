@@ -51,9 +51,15 @@ async function listGiveaways(query = {}) {
   };
 }
 
-/** Fetch one giveaway by id or throw a 404. */
+/**
+ * Fetch one giveaway by id or throw a 404.
+ * Projects like every other public read: the config/audit block (entryCurrencies,
+ * prizeConfig, eligibility, statusHistory, createdBy/updatedBy) stays server-side.
+ * `published` is retained so the controller can still hide an unpublished draw
+ * from non-admins; the legitimate operator view lives at the admin config route.
+ */
 async function getGiveawayById(id) {
-  const doc = await Giveaway.findById(id).lean();
+  const doc = await Giveaway.findById(id).select(PUBLIC_PROJECTION).lean();
   if (!doc) {
     const { ApiError } = require('../utils/ApiError.js');
     throw ApiError.notFound('Giveaway not found.');

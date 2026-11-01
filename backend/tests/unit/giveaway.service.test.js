@@ -95,17 +95,22 @@ describe('giveaway.service.listGiveaways (against the mocked model)', () => {
 
 describe('giveaway.service.getGiveawayById', () => {
   it('throws a 404 ApiError when the doc is missing', async () => {
-    Giveaway.findById.mockImplementation(() => ({ lean: () => Promise.resolve(null) }));
+    Giveaway.findById.mockImplementation(() => chainable(null));
     await expect(service.getGiveawayById(new mongoose.Types.ObjectId())).rejects.toMatchObject({
       statusCode: 404,
       code: 'NOT_FOUND',
     });
   });
 
-  it('returns the real document when found', async () => {
+  it('returns the projected document and applies PUBLIC_PROJECTION', async () => {
     const doc = { _id: 'x', title: 'Found', status: 'ACTIVE', published: true };
-    Giveaway.findById.mockImplementation(() => ({ lean: () => Promise.resolve(doc) }));
+    const q = chainable(doc);
+    Giveaway.findById.mockImplementation(() => q);
     await expect(service.getGiveawayById('507f1f77bcf86cd799439011')).resolves.toEqual(doc);
+    // Regression: the detail read must project like every sibling, or config/audit
+    // fields (entryCurrencies, prizeConfig, eligibility, statusHistory, createdBy)
+    // leak to the public.
+    expect(lastCall(q, 'select')).toBe(service.PUBLIC_PROJECTION);
   });
 });
 

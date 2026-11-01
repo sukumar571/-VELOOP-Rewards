@@ -1,0 +1,16 @@
+# Netlify configuration for the VELOOP Rewards Giveaway frontend.
+# Root is the frontend package itself (site base = frontend/ when deploying
+# from the repository root, set build command accordingly).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA routing: every non-asset path must serve index.html (React Router).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

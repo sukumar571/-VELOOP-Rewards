@@ -1,0 +1,244 @@
+/* Demo "Earn VEs" page. Uses design tokens from variables.css. */
+
+.page {
+  padding-block: 2.5rem 4rem;
+}
+
+/* ---- current balances ---- */
+.balances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.balancePill {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 150px;
+  padding: 0.8rem 1.1rem;
+  border-radius: var(--vl-radius-lg, 16px);
+  border: 1px solid var(--vl-border, rgba(255, 255, 255, 0.1));
+  background: var(--vl-surface, rgba(255, 255, 255, 0.03));
+}
+
+.balanceLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted, #9aa3b2);
+}
+
+.balanceValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--vl-text, #fff);
+}
+
+/* per-currency accent (matches the currency registry `accent` keys) */
+.ve .balanceValue { color: #b98bff; }
+.sve .balanceValue { color: #ff9dc4; }
+.token .balanceValue { color: #7fd1ff; }
+
+.signInNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--vl-radius-lg, 16px);
+  border: 1px dashed var(--vl-border, rgba(255, 255, 255, 0.16));
+  background: var(--vl-surface, rgba(255, 255, 255, 0.03));
+}
+.signInNote p { margin: 0; color: var(--vl-text-muted, #c3cad6); }
+
+/* ---- main card ---- */
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  padding: 1.75rem;
+}
+
+@media (min-width: 860px) {
+  .card {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--vl-text-muted, #c3cad6);
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 0.75rem 0.95rem;
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vl-text, #fff);
+  background: var(--vl-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--vl-border, rgba(255, 255, 255, 0.14));
+  border-radius: var(--vl-radius-md, 12px);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+.input[aria-invalid='true'] {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.18);
+}
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.redeemBtn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.ok,
+.err {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.ok { color: #4ade80; }
+.err { color: #ff8080; }
+
+/* ---- code catalog ---- */
+.catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.catalogTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--vl-text, #fff);
+}
+
+.catalogHint {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  color: var(--vl-text-muted, #9aa3b2);
+}
+
+.codeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.codeBtn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.1rem 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  color: var(--vl-text, #fff);
+  background: var(--vl-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--vl-border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--vl-radius-md, 12px);
+  transition: border-color 0.15s ease, transform 0.1s ease, background 0.15s ease;
+}
+.codeBtn:hover:not(:disabled) {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-1px);
+}
+.codeBtn:disabled {
+  cursor: not-allowed;
+}
+
+.codeText {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.codeReward {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  font-weight: 700;
+  color: #b98bff;
+}
+
+.codeLabel {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: var(--vl-text-muted, #9aa3b2);
+}
+
+.codeUsed {
+  opacity: 0.55;
+}
+.codeUsed .codeReward { color: var(--vl-text-muted, #9aa3b2); }
+
+.usedTag {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  align-self: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted, #9aa3b2);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--vl-border, rgba(255, 255, 255, 0.16));
+}
+
+/* ---- notices ---- */
+.noticeWrap {
+  margin-top: 1.5rem;
+}
+
+.note {
+  margin: 0.9rem 0 0;
+  max-width: 68ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--vl-text-muted, #8b93a3);
+}
+.note strong { color: var(--vl-text, #d7dbe3); }
