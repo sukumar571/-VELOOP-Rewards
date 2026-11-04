@@ -13,10 +13,20 @@
  * build — so a real API failure can never be papered over with fake data.
  * ========================================================================= */
 
-/** Base URL of the versioned REST API. Empty string → same-origin (proxy). */
-export const API_BASE_URL = normalizeBaseUrl(
+/**
+ * Base URL of the versioned REST API. Empty string → same-origin.
+ * An explicitly configured VITE_API_BASE_URL always wins. When nothing is set,
+ * a PRODUCTION build (the Vercel `frontend` service) defaults to the same-origin
+ * `/api/v1` mount so the SPA reaches the `backend` service through the top-level
+ * rewrite with no cross-origin call and no injected secret — a static bundle
+ * cannot read a runtime service binding, so same-origin routing is the contract.
+ * A dev server keeps '' and relies on the Vite `/api` proxy instead.
+ */
+const configuredApiBase = normalizeBaseUrl(
   import.meta.env.VITE_API_BASE_URL ?? '',
 );
+export const API_BASE_URL =
+  configuredApiBase || (import.meta.env.PROD === true ? '/api/v1' : '');
 
 function normalizeBaseUrl(raw) {
   const trimmed = String(raw).trim().replace(/\/+$/, '');
