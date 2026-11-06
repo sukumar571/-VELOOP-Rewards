@@ -25,6 +25,15 @@ const CODES = Object.freeze({
   LOGIN_REQUIRED: { status: 401, message: 'A valid access token is required.' },
   TOKEN_EXPIRED: { status: 401, message: 'Access token has expired.' },
   INVALID_TOKEN: { status: 401, message: 'Access token is invalid.' },
+  // Bad email+password pair on /auth/login. Deliberately identical for "unknown
+  // email" and "wrong password" so the response cannot enumerate accounts; the
+  // service also performs a bcrypt.compare against a dummy hash on the unknown-
+  // email path so the wall-clock time of both branches stays the same.
+  INVALID_CREDENTIALS: { status: 401, message: 'Incorrect email or password.' },
+  // Duplicate email on /auth/signup. The database unique index on `veloopId`
+  // (locally-minted accounts use `local:<email>`) is the real enforcement; this
+  // code is what the service surfaces to the caller after catching E11000.
+  EMAIL_TAKEN: { status: 409, message: 'An account with this email already exists.' },
   ACCOUNT_NOT_ACTIVE: { status: 403, message: 'This account may not use the giveaway service.' },
   IDENTITY_UNRESOLVED: { status: 403, message: 'The account behind this token could not be resolved.' },
   FORBIDDEN: { status: 403, message: 'You do not have permission to perform this action.' },

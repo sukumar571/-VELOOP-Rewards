@@ -17,6 +17,10 @@ import {
   verifyAccount,
   hasAnyAccount,
 } from '../services/demoAuth.js';
+import { signup as signupRequest, signIn as signInRequest } from '../services/sessionService.js';
+import { isMockEnabled } from '../config/env.js';
+import { ApiClientError } from '../api/client.js';
+import { ServiceError } from '../api/errors.js';
 import DemoNotice from '../components/common/DemoNotice.jsx';
 import styles from './LoginPage.module.css';
 
@@ -26,18 +30,29 @@ const EMPTY = { name: '', email: '', password: '', confirm: '' };
 /**
  * Sign-in / registration journey.
  *
- * There is no VELOOP auth backend yet, so this is an explicitly-labelled
- * DEVELOPMENT flow: "Create account" stores a demo profile in this browser
- * only, and "Sign in" checks the details you registered against that local
- * directory before establishing the demo member session. Real OAuth/OTP login
- * is [EXTERNAL] (docs/PLAN.md — A1 auth). No password ever leaves the browser
- * and we never claim this is a real login. After signing in we return the
- * visitor to the page they came from (their intended giveaway).
+ * Two modes, decided by `isMockEnabled()` (see config/env.js):
+ *
+ *   • **Real API mode** — the form calls `POST /api/v1/auth/signup` or
+ *     `POST /api/v1/auth/login`. The backend bcrypt-hashes the password and
+ *     persists the row in the `users` collection of the MongoDB configured by
+ *     backend/.env (this deployment: MongoDB Atlas). A successful call returns
+ *     `{ user, token }`; the token is stored via tokenStore.js and the UI
+ *     hydrates identity from `GET /auth/me`, never from the request body.
+ *     No DEVELOPMENT notice is shown in this mode.
+ *
+ *   • **Development mock mode** — kept intact for offline demos and tests.
+ *     Accounts live only in this browser's localStorage (`veloop.demo.accounts.v1`)
+ *     behind a non-cryptographic digest. The UI displays an explicit
+ *     DEVELOPMENT chip and footnote; we never claim this is a real login.
+ *
+ * In both modes a successful sign-in hands the profile to `login()` and
+ * returns the visitor to the page they came from.
  */
 export default function LoginPage() {
   const { user, authenticated, login, setEligible } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const mockMode = isMockEnabled();
 
   const [mode, setMode] = useState('signin'); // 'signin' | 'register'
   const [values, setValues] = useState(EMPTY);
@@ -49,7 +64,7 @@ export default function LoginPage() {
   const firstFieldRef = useRef(null);
 
   const from = location.state?.from || '/giveaways';
-  const anyAccount = useMemo(() => hasAnyAccount(), [mode, busy]);
+  const anyAccount = useMemo(() => (mockMode ? hasAnyAccount() : true), [mockMode, mode, busy]);
 
   // Already signed in? Straight back to where they were headed.
   useEffect(() => {
@@ -92,11 +107,45 @@ export default function LoginPage() {
   const completeSignIn = async (profile) => {
     setBusy(true);
     try {
-      await setEligible(mode === 'signin' ? !demoIneligible : true);
+      // The "simulate ineligible" toggle only makes sense in the mock store —
+      // eligibility is server-authoritative in real API mode.
+      await setEligible(mockMode ? (mode === 'signin' ? !demoIneligible : true) : true);
       await login(profile);
       navigate(from, { replace: true });
     } finally {
       setBusy(false);
+    }
+  };
+
+  /**
+   * Map an ApiClientError / ServiceError thrown by the auth endpoints onto
+   * per-field messages the form can render. Never surface an internal message
+   * verbatim — the caller sees only the mapped text or a safe fallback.
+   */
+  const applyAuthError = (err) => {
+    const code = err && (err.code || err.name);
+    const fieldOf = {
+      EMAIL_TAKEN: 'email',
+      INVALID_CREDENTIALS: 'form',
+      VALIDATION_ERROR: undefined,
+    };
+    if (code === 'VALIDATION_ERROR' && err.details && typeof err.details === 'object') {
+      const next = {};
+      for (const [k, msg] of Object.entries(err.details)) next[k] = msg;
+      setErrors(next);
+      return;
+    }
+    const target = fieldOf[code];
+    const safeMsg =
+      code === 'EMAIL_TAKEN'
+        ? 'An account with this email already exists. Try signing in.'
+        : code === 'INVALID_CREDENTIALS'
+          ? 'Incorrect email or password.'
+          : 'We could not complete that request. Please try again.';
+    if (target && target !== 'form') {
+      setErrors({ [target]: safeMsg });
+    } else {
+      setFormError(safeMsg);
     }
   };
 
@@ -105,6 +154,31 @@ export default function LoginPage() {
     setFormError('');
     if (!validate()) return;
 
+    // -------------------- real-API path --------------------
+    if (!mockMode) {
+      setBusy(true);
+      try {
+        if (mode === 'register') {
+          const res = await signupRequest({
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          });
+          await completeSignIn(res.user);
+        } else {
+          const res = await signInRequest({ email: values.email, password: values.password });
+          await completeSignIn(res.user);
+        }
+      } catch (err) {
+        if (err instanceof ApiClientError || err instanceof ServiceError) applyAuthError(err);
+        else setFormError('Something went wrong. Please try again.');
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    // -------------------- development-mock path (unchanged) --------------------
     if (mode === 'register') {
       const res = registerAccount({
         name: values.name,
@@ -119,7 +193,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Sign in — must match a locally-registered demo account.
     if (!anyAccount) {
       setFormError('No demo account found on this device yet. Create one first.');
       return;
@@ -168,19 +241,23 @@ export default function LoginPage() {
         </div>
 
         <div id="vl-auth-panel" role="tabpanel" aria-labelledby={isRegister ? 'vl-tab-register' : 'vl-tab-signin'}>
-          <h1 className="vl-h2">{isRegister ? 'Create your demo account' : 'Sign in to enter'}</h1>
+          <h1 className="vl-h2">{isRegister ? (mockMode ? 'Create your demo account' : 'Create your account') : 'Sign in to enter'}</h1>
           <p className={styles.lead}>
             {isRegister
-              ? 'Register once on this device, then sign in with the same details to see your balance and join a draw.'
-              : 'Giveaway entry is tied to your verified VELOOP account. Sign in to see your balance and join this draw.'}
+              ? (mockMode
+                  ? 'Register once on this device, then sign in with the same details to see your balance and join a draw.'
+                  : 'Your account is created in the VELOOP Rewards database and works from any device you sign in from.')
+              : 'Giveaway entry is tied to your account. Sign in to see your balance and join this draw.'}
           </p>
 
-          <div className={styles.noticeWrap}>
-            <DemoNotice
-              variant="chip"
-              text="Development sign-in — accounts are stored only in this browser. Real authentication activates with the VELOOP backend."
-            />
-          </div>
+          {mockMode ? (
+            <div className={styles.noticeWrap}>
+              <DemoNotice
+                variant="chip"
+                text="Development sign-in — accounts are stored only in this browser. Real authentication activates with the VELOOP backend."
+              />
+            </div>
+          ) : null}
 
           <form className={styles.form} onSubmit={onSubmit} noValidate>
             {isRegister ? (
@@ -288,7 +365,7 @@ export default function LoginPage() {
               </div>
             ) : null}
 
-            {!isRegister ? (
+            {!isRegister && mockMode ? (
               <label className={styles.toggle}>
                 <input
                   type="checkbox"
@@ -326,7 +403,7 @@ export default function LoginPage() {
                 <>
                   New here?{' '}
                   <button type="button" className={styles.linkBtn} onClick={() => switchMode('register')}>
-                    Create a demo account
+                    {mockMode ? 'Create a demo account' : 'Create an account'}
                   </button>
                 </>
               )}
@@ -340,9 +417,14 @@ export default function LoginPage() {
 
         <p className={styles.note} role="note">
           <Info size={14} aria-hidden="true" />
-          This demo keeps your details in this browser only — no password is sent
-          anywhere. <ShieldAlert size={14} aria-hidden="true" /> We never claim this
-          is a real VELOOP login.
+          {mockMode ? (
+            <>This demo keeps your details in this browser only — no password is sent
+              anywhere. <ShieldAlert size={14} aria-hidden="true" /> We never claim this
+              is a real VELOOP login.</>
+          ) : (
+            <>Passwords are bcrypt-hashed and stored in the VELOOP Rewards database.
+              Your session token lives only for this browser tab. <ShieldAlert size={14} aria-hidden="true" /></>
+          )}
         </p>
       </div>
     </div>

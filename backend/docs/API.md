@@ -25,16 +25,19 @@ Every protected endpoint expects a bearer access token:
 Authorization: Bearer <access token>
 ```
 
-The token is verified in exactly one place, `src/integrations/veloopAuth.js`,
-selected by `AUTH_MODE`:
+Tokens are minted by exactly one of two paths, both verified in `src/integrations/veloopAuth.js` and signed/verified with the mode's configured key:
 
 | Mode | Behaviour | Where it may run |
 | --- | --- | --- |
 | `jwt` | Verifies the signature with `JWT_SECRET` (HMAC) or `JWT_PUBLIC_KEY` (RSA/EC), enforces expiry, and — when configured — `JWT_ISSUER` / `JWT_AUDIENCE`. This is the production seam. | Production |
 | `dev-mock` | Verifies tokens signed with `DEV_JWT_SECRET` so the API and its tests run without the external issuer. **Hard-refused in production** (`validateRuntimeConfig()` blocks boot). | Local / test only |
 
-**[INTEGRATION REQUIRED] — production auth.** To go live you must, as the VELOOP
-platform owner:
+Two credential sources feed these tokens:
+
+- **External VELOOP identity** — the platform owner's issuer mints bearer tokens; this application only *verifies* them and lazily caches the subject in the `users` collection with `authProvider: 'veloop'` (see `User.resolve`). No password ever leaves VELOOP.
+- **Local email+password accounts** (added for this deployment) — a visitor may `POST /auth/signup` with an email and password. The API bcrypt-hashes the password, stores the row in this application's own MongoDB (`MONGODB_URI`, `authProvider: 'local'`, `veloopId = local:<email>`), and returns a signed bearer token. `POST /auth/login` re-verifies the same way and re-mints the token. Passwords never leave the database, the hash uses `select:false` + `privatePaths` so a controller cannot accidentally serialize it, and unknown-email vs. wrong-password responses are byte-identical (both `401 INVALID_CREDENTIALS`) with a dummy bcrypt.compare on the missing-user path to keep timings indistinguishable.
+
+**[INTEGRATION REQUIRED] — production auth.** To go live against VELOOP you must:
 
 1. Set `AUTH_MODE=jwt` and provide `JWT_PUBLIC_KEY` (preferred) or a shared
    `JWT_SECRET` (≥ 32 chars). Set `JWT_ISSUER` and `JWT_AUDIENCE` to the values
@@ -42,7 +45,11 @@ platform owner:
 2. Ensure issued tokens carry a subject (`sub`, or one of `userId` / `user_id` /
    `veoopId` / `veId`) and, for administrators, an explicit `admin` role claim
    (`roles` / `realm_roles` / `authorities`).
-3. This application never mints production tokens and never stores passwords.
+3. If you do NOT use the local signup path in production, keep `AUTH_MODE=jwt`
+   and simply do not mount `/auth/signup` in front of real users. The bcrypt
+   hashes for any local accounts remain in the `users` collection with
+   `authProvider: 'local'`; they never become admin-capable on their own because
+   `requireRole` confirms the role against the stored row (see §8.5).
 
 ### Identity, not impersonation
 
@@ -98,6 +105,8 @@ serialised as `id`; private fields and winner PII never appear.
 | `LOGIN_REQUIRED` | 401 | No/missing access token. |
 | `TOKEN_EXPIRED` | 401 | Token `exp` passed. |
 | `INVALID_TOKEN` | 401 | Signature/claims invalid, or no subject. |
+| `INVALID_CREDENTIALS` | 401 | `/auth/login` — email+password pair does not match a local account. Identical for unknown-email vs. wrong-password. |
+| `EMAIL_TAKEN` | 409 | `/auth/signup` — a local account already exists for that email. |
 | `FORBIDDEN` | 403 | Authenticated but not permitted (e.g. non-admin on admin). |
 | `ACCOUNT_NOT_ACTIVE` | 403 | Blocked/suspended account. |
 | `ENTRY_BLOCKED` | 403 | The risk engine rejected this entry. The message is deliberately generic and discloses nothing about which rule fired — see §8. |
@@ -201,11 +210,13 @@ Legend — 🔓 public · 🔑 any authenticated user · 🛡️ admin only.
 |  | `GET /api/v1/admin/audit-logs` | Audit trail (paginated, filters). |
 |  | `GET /api/v1/admin/audit-logs/:entityType/:entityId` | History for one entity. |
 
-### 4.6 Authenticated principal
+### 4.6 Authenticated principal & local accounts
 
 | | Method & path | Auth | Description |
 | --- | --- | --- | --- |
 |  | `GET /api/v1/auth/me` | 🔑 | The caller's verified principal (subject, resolved roles, sources). |
+|  | `POST /api/v1/auth/signup` | 🔓 | Create a **local** account. Body `{ name, email, password }` (strict). Bcrypt-hashes the password and stores the row in the `users` collection with `authProvider:'local'` and a deterministic `veloopId = local:<email>`, so the unique index on `veloopId` enforces email uniqueness. Responds `201 { data: { user, token } }`; a duplicate email is `409 EMAIL_TAKEN`. |
+|  | `POST /api/v1/auth/login` | 🔓 | Verify a local account's email+password. Responds `200 { data: { user, token } }`. Unknown email and wrong password both give `401 INVALID_CREDENTIALS`, with a dummy bcrypt.compare on the missing-user path so timings do not disclose which branch fired. Never touches VELOOP-owned rows. |
 
 ---
 

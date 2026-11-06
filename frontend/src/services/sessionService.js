@@ -2,16 +2,19 @@
  * ============================================================================
  * SESSION / WALLET SERVICE — authentication + authoritative wallet surface.
  * ============================================================================
- * Two data sources behind ONE stable surface (getSession / login / logout /
- * getWallet / getMembership / _store):
+ * Two data sources behind ONE stable surface (getSession / signup / login /
+ * logout / getWallet / getMembership / _store):
  *   • Development mocks (isMockEnabled()) — an explicitly-fictional store so
  *     the participation flow can be exercised with no backend and no network.
- *   • The real Express API — /auth/me (verified principal) and
- *     /wallet/balances (read-only, authoritative). The stored token is only a
- *     CREDENTIAL: identity, eligibility and balance are always re-read from the
- *     server, never trusted from localStorage/sessionStorage.
- * There is no in-app sign-in against the API: real authentication is issued by
- * the VELOOP identity system (external), so login() is a dev-mock affordance.
+ *     Registration + sign-in stay in browser localStorage in this mode
+ *     (see services/demoAuth.js).
+ *   • The real Express API — `/auth/signup`, `/auth/login`, `/auth/me` and
+ *     `/wallet/balances`. Signup/login write to the users collection in the
+ *     MongoDB configured by backend/.env (Atlas in this deployment) and
+ *     return a bearer credential that tokenStore.js holds.
+ * Identity, eligibility and balance are ALWAYS re-read from the server after
+ * the credential is installed; the client-held token is only a credential, never
+ * the authority.
  * ========================================================================= */
 import { isMockEnabled } from '../config/env.js';
 import * as authApi from '../api/authApi.js';
@@ -20,6 +23,7 @@ import { balancesMap } from '../api/normalize.js';
 import { ApiClientError } from '../api/client.js';
 import { getToken, setToken, clearToken, hasToken } from '../api/tokenStore.js';
 import { ServiceError } from '../api/errors.js';
+import { registerAccount, verifyAccount } from './demoAuth.js';
 
 /* -------------------------------------------------------------------------- */
 /* DEMO MOCK STORE (development only)                                          */
@@ -131,11 +135,60 @@ export async function login(profile) {
     persist();
     return settle({ user: state.user });
   }
-  // The API issues no token in-app; authentication is handled by VELOOP (external).
-  throw new ServiceError(
-    'AUTH_EXTERNAL',
-    'Sign-in is handled by the VELOOP identity system; this build has no in-app login endpoint.',
-  );
+  // Real mode: the caller is expected to have already installed a bearer
+  // credential via signup()/signIn(). We DO NOT trust the `profile` argument —
+  // identity comes from /auth/me, which the server verifies from the token.
+  const s = await getSession();
+  if (!s.user) {
+    throw new ServiceError(
+      'LOGIN_REQUIRED',
+      'A verified session could not be established. Please sign in again.',
+    );
+  }
+  return s;
+}
+
+/**
+ * Real-mode email+password registration. Creates the account in the MongoDB
+ * configured by backend/.env (the Atlas `users` collection), installs the
+ * returned bearer credential, then hydrates the session via /auth/me so the
+ * caller never has to trust the response body for identity.
+ *
+ * Mock-mode fallthrough: kept here so LoginPage has ONE entry point and the
+ * existing demo tests (which rely on localStorage) continue to pass without
+ * any page-level branching.
+ */
+export async function signup({ name, email, password } = {}) {
+  if (isMockEnabled()) {
+    const res = registerAccount({ name, email, password });
+    if (!res.ok) throw new ServiceError(res.field === 'email' ? 'EMAIL_TAKEN' : 'VALIDATION_ERROR', res.message, { field: res.field });
+    // Also start the demo session so callers can chain signup → login if they
+    // want the old behaviour; if they set the token themselves, nothing breaks.
+    state = { ...freshState(), user: { id: res.account.id, name: res.account.name, email: res.account.email }, eligible: state.eligible };
+    persist();
+    return settle({ user: state.user });
+  }
+  const { user, token } = await authApi.signup({ name, email, password });
+  setToken(token);
+  return { user, token };
+}
+
+/**
+ * Real-mode email+password sign-in. Verifies the pair server-side, installs the
+ * bearer, hydrates via /auth/me. The API's error for a bad pair is a single
+ * INVALID_CREDENTIALS (401) regardless of which half was wrong.
+ */
+export async function signIn({ email, password } = {}) {
+  if (isMockEnabled()) {
+    const res = verifyAccount({ email, password });
+    if (!res.ok) throw new ServiceError('INVALID_CREDENTIALS', res.message);
+    state = { ...freshState(), user: { id: res.account.id, name: res.account.name, email: res.account.email }, eligible: state.eligible };
+    persist();
+    return settle({ user: state.user });
+  }
+  const { user, token } = await authApi.login({ email, password });
+  setToken(token);
+  return { user, token };
 }
 
 /**

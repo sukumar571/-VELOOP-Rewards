@@ -55,14 +55,20 @@ describe('listRoutes against the live app', () => {
       'POST /api/v1/admin/claims/:id/review',
       'GET /api/v1/admin/fraud-events',
       'GET /api/v1/admin/audit-logs',
+      // Local-account authentication (see services/auth.service.js).
+      'POST /api/v1/auth/signup',
+      'POST /api/v1/auth/login',
     ];
     for (const r of required) expect(routes).toContain(r);
   });
 
   it('does not invent an endpoint express has not registered', () => {
-    // There is no DELETE giveaway route and no login route in this API.
+    // There is no DELETE route anywhere in this API, and no hard user-
+    // deletion or logout endpoint (the credential is client-held; the server
+    // only mints and verifies it).
     expect(routes.some((r) => r.startsWith('DELETE '))).toBe(false);
-    expect(routes).not.toContain('POST /api/v1/auth/login');
+    expect(routes).not.toContain('POST /api/v1/auth/logout');
+    expect(routes).not.toContain('DELETE /api/v1/auth/me');
   });
 
   it('handlerCount reports the real number of handlers for a route', () => {

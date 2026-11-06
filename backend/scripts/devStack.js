@@ -2,45 +2,48 @@
  * ============================================================================
  * LOCAL DEMO STACK ORCHESTRATOR  (node scripts/devStack.js)
  * ----------------------------------------------------------------------------
- * Brings up the FULL application locally without any external cloud account:
+ * Brings up the application locally against the MongoDB configured in
+ * backend/.env (a real MongoDB Atlas replica set in this deployment):
  *
- *   1. Boots an in-memory MongoDB REPLICA SET (mongodb-memory-server) so the
- *      dev wallet's paid-join transactions are supported (a standalone cannot).
- *   2. Seeds the fictional dev fixtures into it (scripts/seed/seed.dev.js).
- *   3. Starts the Express API pointed at that database (auth=dev-mock,
- *      wallet=dev) and keeps it running.
+ *   1. Seeds the dev fixtures into that database (scripts/seed/seed.dev.js
+ *      --force, which is idempotent: it only touches `seedBatch`-tagged rows).
+ *   2. Starts the Express API pointed at the SAME database, with the local
+ *      auth/wallet modes the demo needs.
+ *
+ * Nothing here boots an in-memory MongoDB any more — every write, including
+ * local signup/login (see services/auth.service.js), lands in the Atlas cluster
+ * configured by MONGODB_URI. The Atlas project's Network Access allow-list must
+ * include this machine's public IP, or the seed/API will fail to connect.
  *
  * The frontend `vite` dev server then proxies /api to this on :4000.
  *
- * This is a DEMO deployment: it uses dev-mock identity and fictional in-database
- * balances. It is NOT the production stack and needs no secrets or Atlas IP
- * allow-listing. Ctrl+C stops the API, the seed, and the memory database.
+ * Ctrl+C stops the API. It never drops a collection: seeded rows survive the
+ * restart and can be removed explicitly with `npm run seed:reset`.
  * ========================================================================= */
 const { spawn } = require('child_process');
 const path = require('path');
-const { MongoMemoryReplSet } = require('mongodb-memory-server');
 
 const ROOT = path.resolve(__dirname, '..'); // backend/
 
-/** Env shared by the seed + server children. Overrides .env (dotenv never
- *  overwrites an existing process.env value), so the Atlas URI is bypassed. */
-function childEnv(uri) {
+/**
+ * Env shared by the seed + server children. We deliberately do NOT override
+ * MONGODB_URI: dotenv inside `src/config/index.js` reads backend/.env, so the
+ * Atlas URI (and its credentials) is what actually connects. Only the demo
+ * toggles are forced here so the stack works without any additional setup.
+ */
+function childEnv() {
   return {
     ...process.env,
     NODE_ENV: 'development',
     PORT: process.env.PORT || '4000',
-    MONGODB_URI: uri,
-    MONGODB_SERVER_SELECTION_TIMEOUT_MS: '15000',
-    EXIT_ON_DB_FAILURE: 'false',
-    AUTH_MODE: 'dev-mock',
-    DEV_JWT_SECRET: 'local-demo-stack-secret',
-    DEV_JWT_TTL_SECONDS: '28800',
-    WALLET_MODE: 'dev',
-    MONGODB_REQUIRE_TRANSACTIONS: 'true',
-    DEVICE_HASH_SALT: 'local-demo-stack-salt',
-    CORS_ORIGINS: 'http://localhost:5173,http://127.0.0.1:5173',
-    LOG_LEVEL: 'info',
-    TRUST_PROXY: '0',
+    MONGODB_SERVER_SELECTION_TIMEOUT_MS: process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS || '15000',
+    EXIT_ON_DB_FAILURE: 'true', // Atlas is the source of truth; a failure to reach it must be loud.
+    AUTH_MODE: 'dev-mock', // local signup/login + dev JWTs signed with DEV_JWT_SECRET
+    WALLET_MODE: 'dev', // fictional in-DB balances for the paid-join demo
+    MONGODB_REQUIRE_TRANSACTIONS: 'true', // Atlas is a replica set — transactions supported
+    CORS_ORIGINS: process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173',
+    LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+    TRUST_PROXY: process.env.TRUST_PROXY || '0',
   };
 }
 
@@ -57,34 +60,31 @@ function runChild(cmd, args, env, label) {
 }
 
 async function main() {
-  console.log('[devStack] starting in-memory MongoDB replica set (this can take ~30-60s on first launch on Windows)...');
-  const replSet = await MongoMemoryReplSet.create({
-    replSet: { count: 1, storageEngine: 'wiredTiger', launchTimeout: 60000 },
-  });
-  const uri = replSet.getUri('veloop_project');
-  console.log('[devStack] memory MongoDB ready.');
+  const env = childEnv();
+  // Redact credentials before printing so an operator can see WHICH Atlas
+  // database is about to receive the fixtures without leaking them to a shell
+  // history or a screenshot.
+  const displayUri = String(env.MONGODB_URI || '')
+    .replace(/\/\/[^@/]+@/, '//[REDACTED]@')
+    || '(unset — copy backend/.env.example to backend/.env first)';
+  console.log(`[devStack] target MongoDB: ${displayUri}`);
 
-  const env = childEnv(uri);
-
-  // 1) Seed the demo fixtures (force = idempotent reset+seed).
-  console.log('[devStack] seeding dev fixtures...');
+  console.log('[devStack] seeding dev fixtures (idempotent, seedBatch-tagged rows only)…');
   await runChild(process.execPath, ['scripts/seed/seed.dev.js', '--force'], env, 'seed:dev');
 
-  // 2) Start the API and keep it alive.
-  console.log('[devStack] starting API on port ' + env.PORT + ' ...');
+  console.log('[devStack] starting API on port ' + env.PORT + ' …');
   const api = spawn(process.execPath, ['src/server.js'], { cwd: ROOT, env, stdio: 'inherit' });
 
   const shutdown = () => {
-    console.log('\n[devStack] shutting down...');
+    console.log('\n[devStack] shutting down API…');
     try { api.kill('SIGINT'); } catch (_) {}
-    replSet.stop().then(() => process.exit(0));
     setTimeout(() => process.exit(0), 4000);
   };
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
   api.on('close', (code) => {
-    console.log(`[devStack] API exited (code ${code}); stopping memory DB.`);
-    replSet.stop().then(() => process.exit(code || 0));
+    console.log(`[devStack] API exited (code ${code}).`);
+    process.exit(code || 0);
   });
 }
 

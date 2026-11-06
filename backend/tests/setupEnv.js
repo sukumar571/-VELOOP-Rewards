@@ -15,3 +15,8 @@ process.env.CORS_ORIGINS =
 process.env.MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/veloop_giveaway_test';
 process.env.EXIT_ON_DB_FAILURE = 'false';
+// Wallet defaults to 'disabled' so the config tests can assert the honest
+// default even when backend/.env has been flipped to `dev` for local demo
+// runs. Individual tests that need the in-DB wallet still override via
+// `jest.isolateModules` + a process.env write before requiring config.
+process.env.WALLET_MODE = process.env.WALLET_MODE || 'disabled';

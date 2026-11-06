@@ -25,8 +25,6 @@
 const configuredApiBase = normalizeBaseUrl(
   import.meta.env.VITE_API_BASE_URL ?? '',
 );
-export const API_BASE_URL =
-  configuredApiBase || (import.meta.env.PROD === true ? '/api/v1' : '');
 
 function normalizeBaseUrl(raw) {
   const trimmed = String(raw).trim().replace(/\/+$/, '');
@@ -50,10 +48,21 @@ function defaultMockEnabled() {
   if (flag === 'true' || flag === '1') return true;
   if (flag === 'false' || flag === '0') return false;
   // No configured API and not production → fall back to the demo store.
-  return API_BASE_URL === '';
+  return configuredApiBase === '';
 }
 
 let mockEnabled = defaultMockEnabled();
+
+/**
+ * Base URL of the versioned REST API. An explicitly configured
+ * VITE_API_BASE_URL always wins. Otherwise, whenever we talk to a REAL API
+ * (mocks off) we default to the same-origin `/api/v1` mount so the browser
+ * actually requests `/api/v1/...` — which the Vite dev proxy forwards to Express
+ * and which a production deploy serves same-origin. In mock mode the value is
+ * unused, so it stays empty (what the offline demo and the test suite load with).
+ */
+export const API_BASE_URL =
+  configuredApiBase || (mockEnabled ? '' : '/api/v1');
 
 /** Whether reads should come from the fictional development mocks. */
 export function isMockEnabled() {

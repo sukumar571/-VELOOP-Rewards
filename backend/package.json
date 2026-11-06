@@ -23,6 +23,7 @@
     "seed:reset": "cross-env NODE_ENV=development node scripts/seed/reset.dev.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

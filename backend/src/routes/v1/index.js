@@ -33,8 +33,8 @@ router.get('/', (req, res) => {
     count: routes.length,
     routes,
     notes: {
-      authentication: 'Bearer access token verified by the VELOOP auth adapter (AUTH_MODE=jwt); a clearly isolated dev-mock adapter serves local/test only.',
-      identity: 'userId is derived from the verified token, never from a request body.',
+      authentication: 'Bearer access token verified by the VELOOP auth adapter (AUTH_MODE=jwt) OR by a token this API signed at /auth/signup|/login for a local email+password account (AUTH_MODE=dev-mock in local/test). Both flows funnel through the same verifyAccessToken path.',
+      identity: 'userId is derived from the verified token, never from a request body. Local accounts resolve to a User row with authProvider=\'local\'; external accounts resolve to authProvider=\'veloop\'.',
       errors: 'Non-sensitive domain codes (ALREADY_JOINED, GIVEAWAY_ENDED, INSUFFICIENT_BALANCE, LOGIN_REQUIRED, CLAIM_EXPIRED, …) with { error: { code, message, details? }, requestId }.',
     },
   });
