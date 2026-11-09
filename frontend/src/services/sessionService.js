@@ -186,9 +186,11 @@ export async function signIn({ email, password } = {}) {
     persist();
     return settle({ user: state.user });
   }
-  const { user, token } = await authApi.login({ email, password });
+  const { user: apiUser, token } = await authApi.login({ email, password });
   setToken(token);
-  return { user, token };
+  // Retrieve the full principal (including roles) from the backend
+  const session = await getSession();
+  return { user: session.user, token };
 }
 
 /**
