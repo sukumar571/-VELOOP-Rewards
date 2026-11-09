@@ -1,0 +1,136 @@
+.header {
+  height: 68px;
+  background: var(--vl-surface);
+  border-bottom: 1px solid var(--vl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menuBtn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  color: var(--vl-text);
+  padding: 0.4rem;
+  cursor: pointer;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: var(--vl-text);
+  margin: 0;
+  letter-spacing: var(--vl-tracking-tight);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.actionBtn {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  gap: 0.4rem;
+}
+
+.profileBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.6rem 0.35rem 0.35rem;
+  background: var(--vl-bg-2);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-pill);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--vl-grad-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.profileMeta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.userName {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--vl-text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userRole {
+  font-size: 0.68rem;
+  color: var(--vl-green-500);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-weight: 600;
+}
+
+.logoutBtn {
+  background: transparent;
+  border: none;
+  color: var(--vl-text-muted);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--vl-speed) var(--vl-ease);
+}
+
+.logoutBtn:hover {
+  color: var(--vl-red-500);
+}
+
+@media (max-width: 992px) {
+  .menuBtn {
+    display: flex;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 0 1rem;
+  }
+
+  .profileMeta {
+    display: none;
+  }
+
+  .actionBtn span {
+    display: none;
+  }
+}

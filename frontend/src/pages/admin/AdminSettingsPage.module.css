@@ -1,0 +1,137 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--vl-text);
+  margin: 0;
+}
+
+.pageSubtitle {
+  font-size: 0.88rem;
+  color: var(--vl-text-muted);
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: var(--vl-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--vl-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardIcon {
+  color: var(--vl-violet-400);
+}
+
+.configList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.configRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.85rem;
+  background: var(--vl-surface-2);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  font-size: 0.88rem;
+}
+
+.configKey {
+  color: var(--vl-text-muted);
+  font-weight: 500;
+}
+
+.configVal {
+  color: var(--vl-text);
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.badgeLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--vl-radius-full);
+  background: rgba(41, 196, 126, 0.15);
+  color: var(--vl-green-500);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-green-500);
+}
+
+.currencyCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  background: var(--vl-surface-2);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+}
+
+.currencyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.currencyCode {
+  font-weight: 700;
+  color: var(--vl-text);
+}
+
+.currencyDesc {
+  font-size: 0.8rem;
+  color: var(--vl-text-muted);
+}

@@ -123,14 +123,44 @@ async function getCollectionStats() {
   const GiveawayParticipation = require('../models/giveawayParticipation.model.js');
   const GiveawayEntryTransaction = require('../models/giveawayEntryTransaction.model.js');
   const Prize = require('../models/prize.model.js');
+  const GiveawayWinner = require('../models/giveawayWinner.model.js');
+  const PrizeClaim = require('../models/prizeClaim.model.js');
 
-  const [giveaways, prizes, participations, settledTransactions] = await Promise.all([
+  const [
+    giveaways,
+    giveawaysActive,
+    giveawaysUpcoming,
+    giveawaysCompleted,
+    prizes,
+    participations,
+    settledTransactions,
+    totalWinners,
+    pendingClaims,
+    completedClaims,
+  ] = await Promise.all([
     Giveaway.countDocuments({}),
+    Giveaway.countDocuments({ status: 'ACTIVE' }),
+    Giveaway.countDocuments({ status: 'UPCOMING' }),
+    Giveaway.countDocuments({ status: { $in: ['ENDED', 'ARCHIVED'] } }),
     Prize.countDocuments({ active: true }),
     GiveawayParticipation.countDocuments({}),
     GiveawayEntryTransaction.countDocuments({ status: 'SUCCESS' }),
+    GiveawayWinner.countDocuments({}),
+    PrizeClaim.countDocuments({ status: { $in: ['NOT_SUBMITTED', 'SUBMITTED', 'PROCESSING'] } }),
+    PrizeClaim.countDocuments({ status: 'COMPLETED' }),
   ]);
-  return { giveaways, prizes, participations, settledTransactions };
+  return {
+    giveaways,
+    giveawaysActive,
+    giveawaysUpcoming,
+    giveawaysCompleted,
+    prizes,
+    participations,
+    settledTransactions,
+    totalWinners,
+    pendingClaims,
+    completedClaims,
+  };
 }
 
 module.exports = {

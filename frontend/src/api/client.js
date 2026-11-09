@@ -137,5 +137,7 @@ function safeMessage(raw, status) {
 }
 
 export const get = (path, options) => request(path, { ...options, method: 'GET' });
+export const patch = (path, body, options) =>
+  request(path, { ...options, method: 'PATCH', body });
 export const post = (path, body, options) =>
   request(path, { ...options, method: 'POST', body });

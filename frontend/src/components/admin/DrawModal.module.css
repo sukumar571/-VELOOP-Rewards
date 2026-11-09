@@ -1,0 +1,204 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 21, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.modal {
+  width: 100%;
+  max-width: 540px;
+  background: var(--vl-surface-2);
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--vl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sparkleIcon {
+  color: var(--vl-gold-400);
+}
+
+.header h2 {
+  font-size: 1.15rem;
+  font-weight: 750;
+  margin: 0;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--vl-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.form,
+.resultBox {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.errorBanner {
+  background: rgba(240, 87, 109, 0.15);
+  border: 1px solid rgba(240, 87, 109, 0.35);
+  color: var(--vl-red-500);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.infoCard {
+  background: var(--vl-bg);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.infoRow span {
+  color: var(--vl-text-muted);
+}
+
+.highlight {
+  color: var(--vl-gold-400);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--vl-text-muted);
+}
+
+.field input {
+  background: var(--vl-bg);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.65rem 0.85rem;
+  color: var(--vl-text);
+  font-size: 0.95rem;
+}
+
+.fieldHint {
+  font-size: 0.78rem;
+  color: var(--vl-text-faint);
+  line-height: 1.35;
+}
+
+.warningBox {
+  background: rgba(255, 195, 80, 0.1);
+  border: 1px solid rgba(255, 195, 80, 0.25);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.85rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--vl-gold-400);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+/* Result Box */
+.resultHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.successIcon {
+  color: var(--vl-green-500);
+}
+
+.resultHeader h3 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--vl-text);
+}
+
+.resultHeader p {
+  font-size: 0.85rem;
+  color: var(--vl-text-muted);
+  margin: 0;
+}
+
+.resultHeader code {
+  color: var(--vl-violet-300);
+}
+
+.statsSummary {
+  background: var(--vl-bg);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.statItem {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statItem span {
+  color: var(--vl-text-muted);
+}
+
+.noticeText {
+  font-size: 0.85rem;
+  color: var(--vl-text-muted);
+  line-height: 1.45;
+  background: rgba(131, 69, 240, 0.1);
+  padding: 0.75rem;
+  border-radius: var(--vl-radius-sm);
+  margin: 0;
+}

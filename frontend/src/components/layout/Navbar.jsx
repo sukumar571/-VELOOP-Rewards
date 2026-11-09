@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, LogIn, LogOut, Wallet } from 'lucide-react';
+import { Menu, X, ArrowRight, LogIn, LogOut, Wallet, ShieldCheck } from 'lucide-react';
 import { NAV_LINKS } from '../../content/site.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { CURRENCIES, formatAmountValue } from '../../config/currencies.js';
@@ -55,6 +55,12 @@ export default function Navbar() {
               {link.label}
             </NavLink>
           ))}
+          {authenticated && Array.isArray(user?.roles) && user.roles.includes('admin') && (
+            <Link to="/admin" className={`vl-btn vl-btn-outline ${styles.adminBtn}`}>
+              <ShieldCheck size={15} />
+              <span>Admin</span>
+            </Link>
+          )}
           <Link to="/giveaways" className={`vl-btn vl-btn-primary ${styles.cta}`}>
             Browse Giveaways
             <ArrowRight size={16} aria-hidden="true" />

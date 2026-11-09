@@ -1,0 +1,233 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.topBar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 1.35rem;
+  font-weight: 750;
+  margin: 0 0 0.25rem 0;
+  color: var(--vl-text);
+}
+
+.pageLead {
+  font-size: 0.88rem;
+  color: var(--vl-text-muted);
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.45rem 0.75rem;
+  min-width: 220px;
+}
+
+.searchIcon {
+  color: var(--vl-text-muted);
+}
+
+.searchBox input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--vl-text);
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.select {
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.5rem 0.85rem;
+  color: var(--vl-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tableCard {
+  border-radius: var(--vl-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableResponsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.table th {
+  padding: 0.85rem 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--vl-border);
+  color: var(--vl-text-muted);
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+  vertical-align: middle;
+}
+
+.table td code {
+  color: var(--vl-gold-400);
+  background: var(--vl-bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.memberCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.emailText {
+  font-size: 0.78rem;
+  color: var(--vl-text-faint);
+}
+
+.rolesList {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.roleBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--vl-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-transform: uppercase;
+}
+
+.roleAdmin {
+  background: rgba(41, 196, 126, 0.2);
+  color: var(--vl-green-500);
+  border: 1px solid rgba(41, 196, 126, 0.3);
+}
+
+.roleUser {
+  background: rgba(131, 69, 240, 0.15);
+  color: var(--vl-violet-300);
+}
+
+.providerBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  background: var(--vl-bg);
+  border: 1px solid var(--vl-border);
+  border-radius: 4px;
+  color: var(--vl-text-muted);
+  text-transform: uppercase;
+}
+
+.dateCell {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--vl-text-muted);
+  white-space: nowrap;
+}
+
+.statusChip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--vl-radius-pill);
+  text-transform: uppercase;
+}
+
+.status_ACTIVE {
+  background: rgba(41, 196, 126, 0.2);
+  color: var(--vl-green-500);
+}
+
+.status_BLOCKED,
+.status_SUSPENDED {
+  background: rgba(240, 87, 109, 0.2);
+  color: var(--vl-red-500);
+}
+
+.loadingBox,
+.emptyBox,
+.errorBox {
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  color: var(--vl-text-muted);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--vl-border);
+  border-top-color: var(--vl-violet-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pagination {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--vl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pageMeta {
+  font-size: 0.82rem;
+  color: var(--vl-text-muted);
+}
+
+.pageButtons {
+  display: flex;
+  gap: 0.5rem;
+}

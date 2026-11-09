@@ -34,6 +34,8 @@ router.use(authenticate, requireAdmin, resolveIdentity, requireAdmin);
 
 // ---- aggregate -------------------------------------------------------------
 router.get('/stats', admin.stats);
+router.get('/users', validate({ query: adminSchemas.adminUsersQuery }), admin.listUsers);
+router.get('/giveaways', validate({ query: adminSchemas.adminGiveawaysQuery }), admin.listGiveaways);
 
 // ---- giveaway configuration & lifecycle -----------------------------------
 // Sensitive WRITE routes carry the dedicated admin budget; a burst is throttled

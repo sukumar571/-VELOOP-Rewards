@@ -202,6 +202,23 @@
   color: #8fb7ff;
 }
 
+.adminBtn {
+  padding: 0.5rem 0.95rem;
+  font-size: 0.84rem;
+  border-color: rgba(41, 196, 126, 0.4);
+  color: var(--vl-green-500);
+  background: rgba(41, 196, 126, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.adminBtn:hover {
+  background: rgba(41, 196, 126, 0.2);
+  border-color: var(--vl-green-500);
+  color: #fff;
+}
+
 .authBtn {
   padding: 0.5rem 0.95rem;
   font-size: 0.84rem;
@@ -213,7 +230,24 @@
     justify-content: space-between;
     flex-wrap: wrap;
   }
-  .authBtn {
+  .adminBtn {
+  padding: 0.5rem 0.95rem;
+  font-size: 0.84rem;
+  border-color: rgba(41, 196, 126, 0.4);
+  color: var(--vl-green-500);
+  background: rgba(41, 196, 126, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.adminBtn:hover {
+  background: rgba(41, 196, 126, 0.2);
+  border-color: var(--vl-green-500);
+  color: #fff;
+}
+
+.authBtn {
     justify-content: center;
   }
 }

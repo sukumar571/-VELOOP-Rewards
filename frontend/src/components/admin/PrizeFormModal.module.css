@@ -1,0 +1,152 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 21, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal {
+  width: 100%;
+  max-width: 640px;
+  background: var(--vl-surface-2);
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.header {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--vl-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  font-size: 1.2rem;
+  font-weight: 750;
+  margin: 0;
+  color: var(--vl-text);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--vl-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.closeBtn:hover {
+  color: var(--vl-text);
+}
+
+.form {
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.errorBanner {
+  background: rgba(240, 87, 109, 0.15);
+  border: 1px solid rgba(240, 87, 109, 0.35);
+  color: var(--vl-red-500);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label,
+.fieldFull label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--vl-text-muted);
+}
+
+.field input,
+.field select,
+.fieldFull input,
+.fieldFull select,
+.fieldFull textarea {
+  background: var(--vl-bg);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  padding: 0.65rem 0.85rem;
+  color: var(--vl-text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: border-color var(--vl-speed) var(--vl-ease);
+}
+
+.field input:focus,
+.field select:focus,
+.fieldFull input:focus,
+.fieldFull select:focus,
+.fieldFull textarea:focus {
+  border-color: var(--vl-violet-500);
+  outline: none;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--vl-text);
+  padding-top: 0.5rem;
+}
+
+.checkLabel input[type='checkbox'] {
+  accent-color: var(--vl-violet-500);
+  width: 16px;
+  height: 16px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vl-border);
+}
+
+@media (max-width: 600px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

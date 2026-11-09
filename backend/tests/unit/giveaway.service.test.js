@@ -5,12 +5,16 @@ jest.mock('../../src/models/giveaway.model.js');
 jest.mock('../../src/models/prize.model.js');
 jest.mock('../../src/models/giveawayParticipation.model.js');
 jest.mock('../../src/models/giveawayEntryTransaction.model.js');
+jest.mock('../../src/models/giveawayWinner.model.js');
+jest.mock('../../src/models/prizeClaim.model.js');
 
 const mongoose = require('mongoose');
 const Giveaway = require('../../src/models/giveaway.model.js');
 const Prize = require('../../src/models/prize.model.js');
 const GiveawayParticipation = require('../../src/models/giveawayParticipation.model.js');
 const GiveawayEntryTransaction = require('../../src/models/giveawayEntryTransaction.model.js');
+const GiveawayWinner = require('../../src/models/giveawayWinner.model.js');
+const PrizeClaim = require('../../src/models/prizeClaim.model.js');
 const service = require('../../src/services/giveaway.service.js');
 
 /** A chainable Query stand-in: find().sort().skip().limit().select().lean() -> rows. */
@@ -131,14 +135,35 @@ describe('giveaway.service.listPrizes', () => {
 
 describe('giveaway.service.getCollectionStats', () => {
   it('aggregates real counts from every collection it reports', async () => {
-    Giveaway.countDocuments.mockResolvedValue(12);
+    Giveaway.countDocuments.mockImplementation(async (filter = {}) => {
+      if (filter.status === 'ACTIVE') return 5;
+      if (filter.status === 'UPCOMING') return 3;
+      if (filter.status && filter.status.$in) return 4;
+      return 12;
+    });
     Prize.countDocuments.mockResolvedValue(30);
     GiveawayParticipation.countDocuments.mockResolvedValue(4180);
     GiveawayEntryTransaction.countDocuments.mockResolvedValue(5002);
+    GiveawayWinner.countDocuments.mockResolvedValue(25);
+    PrizeClaim.countDocuments.mockImplementation(async (filter = {}) => {
+      if (filter.status === 'COMPLETED') return 15;
+      return 10;
+    });
 
     const stats = await service.getCollectionStats();
 
-    expect(stats).toEqual({ giveaways: 12, prizes: 30, participations: 4180, settledTransactions: 5002 });
+    expect(stats).toEqual({
+      giveaways: 12,
+      giveawaysActive: 5,
+      giveawaysUpcoming: 3,
+      giveawaysCompleted: 4,
+      prizes: 30,
+      participations: 4180,
+      settledTransactions: 5002,
+      totalWinners: 25,
+      pendingClaims: 10,
+      completedClaims: 15,
+    });
     // Prize counts only active tiers; the ledger counts only settled (SUCCESS) rows.
     expect(Prize.countDocuments.mock.calls[0][0]).toEqual({ active: true });
     expect(GiveawayEntryTransaction.countDocuments.mock.calls[0][0]).toEqual({ status: 'SUCCESS' });

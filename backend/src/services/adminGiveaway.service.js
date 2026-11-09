@@ -22,6 +22,7 @@ const Winner = require('../models/giveawayWinner.model.js');
 const Participation = require('../models/giveawayParticipation.model.js');
 const Ledger = require('../models/giveawayEntryTransaction.model.js');
 const AuditLog = require('../models/auditLog.model.js');
+const User = require('../models/user.model.js');
 const { domain } = require('../utils/domainErrors.js');
 const { ApiError } = require('../utils/ApiError.js');
 const { GIVEAWAY_STATUS, GIVEAWAY_STATUS_TRANSITIONS } = require('../config/constants.js');
@@ -410,7 +411,74 @@ async function listLedger({ giveawayId, status, page = 1, limit = 20 }) {
   };
 }
 
+async function listAdminGiveaways({ status, published, search, sort = 'createdAt', order = 'desc', page = 1, limit = 20 } = {}) {
+  const filter = {};
+  if (status) filter.status = status;
+  if (typeof published === 'boolean') filter.published = published;
+  if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.$or = [
+      { title: { $regex: escaped, $options: 'i' } },
+      { slug: { $regex: escaped, $options: 'i' } },
+    ];
+  }
+
+  const sortOrder = order === 'asc' ? 1 : -1;
+  const skip = (page - 1) * limit;
+
+  const [items, total] = await Promise.all([
+    Giveaway.find(filter)
+      .sort({ [sort]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Giveaway.countDocuments(filter),
+  ]);
+
+  return {
+    items,
+    meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+  };
+}
+
+async function listUsers({ search, status, role, page = 1, limit = 20 } = {}) {
+  const filter = {};
+  if (status) filter.status = status;
+  if (role) filter.roles = role;
+  if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.$or = [
+      { email: { $regex: escaped, $options: 'i' } },
+      { displayName: { $regex: escaped, $options: 'i' } },
+      { publicAlias: { $regex: escaped, $options: 'i' } },
+      { veloopId: { $regex: escaped, $options: 'i' } },
+    ];
+  }
+  const skip = (page - 1) * limit;
+  const [items, total] = await Promise.all([
+    User.find(filter).select('-passwordHash').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    User.countDocuments(filter),
+  ]);
+  return {
+    items: items.map((u) => ({
+      id: String(u._id),
+      veloopId: u.veloopId,
+      email: u.email || null,
+      displayName: u.displayName || null,
+      publicAlias: u.publicAlias || null,
+      roles: u.roles || [],
+      status: u.status,
+      authProvider: u.authProvider,
+      lastSeenAt: u.lastSeenAt || null,
+      createdAt: u.createdAt,
+    })),
+    meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+  };
+}
+
 module.exports = {
+  listAdminGiveaways,
+  listUsers,
   createGiveaway,
   updateGiveaway,
   setPublished,

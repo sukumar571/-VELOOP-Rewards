@@ -18,6 +18,16 @@ const actor = (req) => req.auth.userId;
 const rid = (req) => req.id;
 
 // ---- giveaway configuration ----------------------------------------------
+const listGiveaways = asyncHandler(async (req, res) => {
+  const { items, meta } = await config.listAdminGiveaways(req.valid.query);
+  return ok(res, items, meta);
+});
+
+const listUsers = asyncHandler(async (req, res) => {
+  const { items, meta } = await config.listUsers(req.valid.query);
+  return ok(res, items, meta);
+});
+
 const createGiveaway = asyncHandler(async (req, res) =>
   created(res, await config.createGiveaway({ body: req.valid.body, actorUserId: actor(req), requestId: rid(req) })));
 
@@ -110,6 +120,8 @@ const stats = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  listGiveaways,
+  listUsers,
   createGiveaway,
   updateGiveaway,
   getGiveawayConfig,

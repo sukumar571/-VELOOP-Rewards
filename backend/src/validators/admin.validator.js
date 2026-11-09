@@ -11,6 +11,8 @@ const { z } = require('zod');
 const {
   objectId,
   pagination,
+  booleanLike,
+  optionalEnum,
   giveawayStatus,
   currency,
   prizeType,
@@ -179,6 +181,22 @@ const voidBody = z
   })
   .strict();
 
+const adminGiveawaysQuery = z.object({
+  status: optionalEnum(giveawayStatus),
+  published: booleanLike.optional(),
+  search: z.string().trim().max(100).optional(),
+  sort: z.enum(['endAt', 'startAt', 'createdAt', 'title']).optional(),
+  order: z.enum(['asc', 'desc']).optional(),
+  ...pagination,
+});
+
+const adminUsersQuery = z.object({
+  search: z.string().trim().max(100).optional(),
+  status: z.enum(['ACTIVE', 'BLOCKED', 'SUSPENDED']).optional(),
+  role: z.enum(['user', 'admin']).optional(),
+  ...pagination,
+});
+
 module.exports = {
   idParam,
   slugParam,
@@ -191,4 +209,6 @@ module.exports = {
   participationsQuery,
   ledgerQuery,
   voidBody,
+  adminGiveawaysQuery,
+  adminUsersQuery,
 };

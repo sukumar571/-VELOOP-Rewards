@@ -1,0 +1,129 @@
+.loadingWrap {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--vl-border);
+  border-top-color: var(--vl-violet-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  color: var(--vl-text-muted);
+  font-size: 0.95rem;
+}
+
+.deniedContainer {
+  min-height: calc(100vh - var(--vl-nav-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.deniedCard {
+  max-width: 540px;
+  width: 100%;
+  padding: 2.5rem;
+  border-radius: var(--vl-radius-lg);
+  text-align: center;
+  border-color: rgba(240, 87, 109, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.iconWrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(240, 87, 109, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.alertIcon {
+  color: var(--vl-red-500);
+}
+
+.roleBox {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--vl-bg-2);
+  border-radius: var(--vl-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.roleLabel {
+  font-size: 0.85rem;
+  color: var(--vl-text-muted);
+}
+
+.roleTags {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.roleTag {
+  padding: 0.2rem 0.6rem;
+  background: rgba(131, 69, 240, 0.2);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--vl-text);
+  text-transform: uppercase;
+}
+
+.devHint {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(236, 177, 59, 0.1);
+  border: 1px solid rgba(236, 177, 59, 0.25);
+  border-radius: var(--vl-radius-sm);
+  color: var(--vl-gold-400);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.devHint code {
+  display: block;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--vl-bg);
+  border-radius: 4px;
+  font-family: monospace;
+  color: var(--vl-text);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (max-width: 520px) {
+  .actions {
+    flex-direction: column;
+  }
+}

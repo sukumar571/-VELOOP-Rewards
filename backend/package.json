@@ -20,7 +20,8 @@
     "db:migrate:check": "cross-env NODE_ENV=development node scripts/migrate.js --check",
     "seed:dev": "cross-env NODE_ENV=development node scripts/seed/seed.dev.js",
     "seed:dev:force": "cross-env NODE_ENV=development node scripts/seed/seed.dev.js --force",
-    "seed:reset": "cross-env NODE_ENV=development node scripts/seed/reset.dev.js"
+    "seed:reset": "cross-env NODE_ENV=development node scripts/seed/reset.dev.js",
+    "seed:admin": "cross-env NODE_ENV=development node scripts/createAdmin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
