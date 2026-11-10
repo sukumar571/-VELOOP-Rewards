@@ -6,11 +6,8 @@
  * username and password, receiving a verified JWT token with roles: ['admin'].
  *
  * Default Admin Credentials created:
- *   Email (Username): admin@veloop.io
- *   Password:         Admin@123456
- *
- *   Email (Username): ops.lead@example.com
- *   Password:         Admin@123456
+ *   Email (Username): admin@gmail.com
+ *   Password:         Admin@123
  */
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -22,16 +19,14 @@ const { ROLE, USER_STATUS } = require('../src/config/constants.js');
 
 const ADMIN_ACCOUNTS = [
   {
-    email: 'admin@veloop.io',
+    email: 'admin@gmail.com',
     displayName: 'Admin Lead',
-    password: 'Admin@123456',
-  },
-  {
-    email: 'ops.lead@example.com',
-    displayName: 'Ops Lead (dev)',
-    password: 'Admin@123456',
+    password: 'Admin@123',
   },
 ];
+
+// Superseded default admins removed so only the account above remains.
+const LEGACY_ADMIN_EMAILS = ['admin@veloop.io', 'ops.lead@example.com'];
 
 async function main() {
   const uri = process.env.MONGODB_URI;
@@ -45,6 +40,16 @@ async function main() {
   console.log('Connected to MongoDB.');
 
   const BCRYPT_ROUNDS = 10;
+
+  for (const email of LEGACY_ADMIN_EMAILS) {
+    const veloopId = User.localVeloopId(email);
+    const { deletedCount } = await User.deleteOne({ veloopId }).setOptions({ overrideHistoryGuard: true });
+    console.log(
+      deletedCount
+        ? `[REMOVED] Legacy administrator account: ${email}`
+        : `[SKIP] Legacy administrator not present: ${email}`
+    );
+  }
 
   for (const acc of ADMIN_ACCOUNTS) {
     const cleanEmail = acc.email.trim().toLowerCase();
