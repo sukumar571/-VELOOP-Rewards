@@ -8,10 +8,15 @@
   },
   "rewrites": [
     {
+      // Forward any /api/* calls to the Render backend (unchanged from original intent)
+      "source": "/api/(.*)",
+      "destination": "https://veloop-rewards-qssb.onrender.com/api/$1"
+    },
+    {
+      // SPA fallback: any other request that does not match a static asset will serve index.html
+      // Vercel automatically serves files from the built "frontend/dist" folder.
       "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
+      "destination": "/frontend/dist/index.html"
     }
   ]
 }
