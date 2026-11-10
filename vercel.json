@@ -1,22 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "frontend": {
-      "root": "frontend",
-      "framework": "vite"
-    }
-  },
   "rewrites": [
     {
-      // Forward any /api/* calls to the Render backend (unchanged from original intent)
       "source": "/api/(.*)",
       "destination": "https://veloop-rewards-qssb.onrender.com/api/$1"
     },
     {
-      // SPA fallback: any other request that does not match a static asset will serve index.html
-      // Vercel automatically serves files from the built "frontend/dist" folder.
       "source": "/(.*)",
-      "destination": "/frontend/dist/index.html"
+      "destination": "/index.html"
     }
   ]
 }
