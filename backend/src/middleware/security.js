@@ -10,9 +10,26 @@ const helmet = require('helmet');
 const cors = require('cors');
 const { config } = require('../config/index.js');
 
+/**
+ * An Origin is scheme + host + port ONLY — it never carries a path or a trailing
+ * slash. Operators pasting `CORS_ORIGINS` from a browser address bar routinely
+ * include one (`https://app.example/`), and an exact string compare against the
+ * browser-sent `https://app.example` then silently rejects EVERY request from
+ * the deployed SPA. Normalizing both sides makes that harmless formatting
+ * difference impossible to trip over while keeping the allow-list exact.
+ */
+function normalizeOrigin(value) {
+  return String(value === undefined || value === null ? '' : value)
+    .trim()
+    .toLowerCase()
+    .replace(/\/+$/, '');
+}
+
 function buildCorsOptions() {
-  const allowList = config.security.corsOrigins;
-  const wildcard = allowList.includes('*');
+  const allowList = new Set(
+    (config.security.corsOrigins || []).map(normalizeOrigin).filter(Boolean),
+  );
+  const wildcard = allowList.has('*');
 
   return {
     credentials: !wildcard,
@@ -20,7 +37,7 @@ function buildCorsOptions() {
       // Non-browser clients (no Origin header) are allowed.
       if (!origin) return callback(null, true);
       if (wildcard) return callback(null, true);
-      if (allowList.includes(origin)) return callback(null, true);
+      if (allowList.has(normalizeOrigin(origin))) return callback(null, true);
       // Unknown origin: do not set CORS headers; the browser blocks the read.
       return callback(null, false);
     },
@@ -41,4 +58,4 @@ function applySecurity(app) {
   app.use(cors(buildCorsOptions()));
 }
 
-module.exports = { applySecurity, buildCorsOptions };
+module.exports = { applySecurity, buildCorsOptions, normalizeOrigin };

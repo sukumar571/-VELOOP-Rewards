@@ -141,7 +141,9 @@ export default function LoginPage() {
         ? 'An account with this email already exists. Try signing in.'
         : code === 'INVALID_CREDENTIALS'
           ? 'Incorrect email or password.'
-          : 'We could not complete that request. Please try again.';
+          : code === 'NETWORK_ERROR'
+            ? 'We could not reach the VELOOP service. Please check your connection and try again.'
+            : 'We could not complete that request. Please try again.';
     if (target && target !== 'form') {
       setErrors({ [target]: safeMsg });
     } else {

@@ -33,6 +33,18 @@ function toList(value, fallback = []) {
     .filter(Boolean);
 }
 
+/**
+ * Origins are compared scheme+host+port only. A trailing slash (a very common
+ * copy/paste from the address bar) would otherwise never match the browser's
+ * Origin header and would block every CORS request — so strip it here, once.
+ * A lone '*' (wildcard) is preserved.
+ */
+function toOriginList(value, fallback = []) {
+  return toList(value, fallback)
+    .map((origin) => (origin === '*' ? '*' : origin.toLowerCase().replace(/\/+$/, '')))
+    .filter(Boolean);
+}
+
 const config = {
   env: NODE_ENV,
   isProduction: IS_PROD,
@@ -140,7 +152,7 @@ const config = {
   },
 
   security: {
-    corsOrigins: toList(process.env.CORS_ORIGINS, [
+    corsOrigins: toOriginList(process.env.CORS_ORIGINS, [
       'http://localhost:5173',
       'http://127.0.0.1:5173',
     ]),
