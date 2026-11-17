@@ -274,9 +274,9 @@ export default function AdminOverviewPage() {
               <p className={styles.emptyText}>No giveaways configured yet.</p>
             ) : (
               giveaways.map((g) => (
-                <div key={g._id} className={styles.giveawayRow}>
+                <div key={g.id} className={styles.giveawayRow}>
                   <div className={styles.giveawayMeta}>
-                    <Link to={`/admin/giveaways/${g._id}`} className={styles.giveawayName}>
+                    <Link to={`/admin/giveaways/${g.id}`} className={styles.giveawayName}>
                       {g.title}
                     </Link>
                     <div className={styles.giveawayBadges}>
@@ -292,7 +292,7 @@ export default function AdminOverviewPage() {
                     <span className={styles.statCount}>
                       {g.stats?.participationCount ?? 0} entries
                     </span>
-                    <Link to={`/admin/giveaways/${g._id}`} className={styles.manageBtn}>
+                    <Link to={`/admin/giveaways/${g.id}`} className={styles.manageBtn}>
                       Manage
                     </Link>
                   </div>
@@ -319,7 +319,7 @@ export default function AdminOverviewPage() {
               <p className={styles.emptyText}>No audit entries recorded.</p>
             ) : (
               auditLogs.map((log) => (
-                <div key={log.id || log._id} className={styles.auditRow}>
+                <div key={log.id || log.id} className={styles.auditRow}>
                   <div className={styles.auditIconWrap}>
                     <FileText size={15} />
                   </div>

@@ -425,10 +425,12 @@ async function listAdminGiveaways({ status, published, search, sort = 'createdAt
 
   const sortOrder = order === 'asc' ? 1 : -1;
   const skip = (page - 1) * limit;
+  // 'participationCount' is a denormalized counter, not a top-level path.
+  const sortField = sort === 'participationCount' ? 'stats.participationCount' : sort;
 
   const [items, total] = await Promise.all([
     Giveaway.find(filter)
-      .sort({ [sort]: sortOrder })
+      .sort({ [sortField]: sortOrder })
       .skip(skip)
       .limit(limit)
       .lean(),

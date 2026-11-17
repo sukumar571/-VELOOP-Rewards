@@ -185,7 +185,9 @@ const adminGiveawaysQuery = z.object({
   status: optionalEnum(giveawayStatus),
   published: booleanLike.optional(),
   search: z.string().trim().max(100).optional(),
-  sort: z.enum(['endAt', 'startAt', 'createdAt', 'title']).optional(),
+  // 'participationCount' ranks by entrants (the Reports page's "top giveaways"
+  // view); the service maps it onto the denormalized stats.participationCount.
+  sort: z.enum(['endAt', 'startAt', 'createdAt', 'title', 'participationCount']).optional(),
   order: z.enum(['asc', 'desc']).optional(),
   ...pagination,
 });

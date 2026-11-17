@@ -17,8 +17,8 @@ export default function DrawModal({ giveaway, prize, freeSlots = 1, isOpen, onCl
 
     try {
       const result = await onDrawComplete({
-        giveawayId: giveaway._id,
-        prizeId: prize._id,
+        giveawayId: giveaway.id,
+        prizeId: prize.id,
         count: Number(count),
       });
       setDrawResult(result);

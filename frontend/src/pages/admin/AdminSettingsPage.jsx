@@ -92,11 +92,13 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className={styles.configList}>
-            {CURRENCIES.map((c) => (
+            {/* CURRENCIES is the registry keyed by currency code, so it must be
+                iterated as values — mapping the object itself crashed the page. */}
+            {Object.values(CURRENCIES).map((c) => (
               <div key={c.code} className={styles.currencyCard}>
                 <div className={styles.currencyHeader}>
-                  <span className={styles.currencyCode}>{c.name} ({c.code})</span>
-                  <span className={styles.configVal}>{c.symbol || c.code}</span>
+                  <span className={styles.currencyCode}>{c.longName} ({c.code})</span>
+                  <span className={styles.configVal}>{c.label}</span>
                 </div>
                 <span className={styles.currencyDesc}>
                   {c.code === 'VE' && 'Primary ecosystem loyalty credits used for promotional entry.'}

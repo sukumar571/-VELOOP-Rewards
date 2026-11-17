@@ -48,7 +48,12 @@ async function seedDev({ force = false, log = console.log, runMigrationFn } = {}
   }
   if (already > 0 && force) {
     const { resetDev } = require('./reset.dev.js');
+    // resetDev() is a standalone CLI too, so it opens AND closes its own
+    // connection. Reconnect here before continuing — otherwise every insert
+    // below runs on a closed client and fails with MongoNotConnectedError
+    // ("Client must be connected before running operations").
     await resetDev({ log: () => {} });
+    await connect();
   }
 
   const fixtures = buildFixtures(new Date());

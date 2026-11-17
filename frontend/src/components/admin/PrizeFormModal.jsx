@@ -21,7 +21,7 @@ export default function PrizeFormModal({ prize, giveawayId, isOpen, onClose, onS
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const isEdit = Boolean(prize?._id);
+  const isEdit = Boolean(prize?.id);
 
   useEffect(() => {
     if (prize) {

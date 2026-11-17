@@ -44,7 +44,7 @@ export default function AdminPrizesPage() {
         const list = res.items || [];
         setGiveaways(list);
         if (list.length > 0) {
-          setSelectedGiveawayId(list[0]._id);
+          setSelectedGiveawayId(list[0].id);
         }
       } catch (err) {
         if (alive) showError(err.message || 'Failed to load campaigns list.');
@@ -83,7 +83,7 @@ export default function AdminPrizesPage() {
   const handleSavePrize = async (formData) => {
     try {
       if (selectedPrize) {
-        await modifyPrizeTier(selectedPrize._id, formData);
+        await modifyPrizeTier(selectedPrize.id, formData);
         showSuccess(`Prize tier "${formData.name}" updated successfully.`);
       } else {
         await addPrizeTier(selectedGiveawayId, formData);
@@ -110,7 +110,7 @@ export default function AdminPrizesPage() {
     }
   };
 
-  const selectedGiveaway = giveaways.find((g) => g._id === selectedGiveawayId);
+  const selectedGiveaway = giveaways.find((g) => g.id === selectedGiveawayId);
 
   // Filtered prizes
   const filteredPrizes = prizes.filter((p) => {
@@ -164,7 +164,7 @@ export default function AdminPrizesPage() {
                 <option value="">No giveaways available</option>
               ) : (
                 giveaways.map((g) => (
-                  <option key={g._id} value={g._id}>
+                  <option key={g.id} value={g.id}>
                     {g.title} ({g.status})
                   </option>
                 ))
@@ -259,7 +259,7 @@ export default function AdminPrizesPage() {
               </thead>
               <tbody>
                 {filteredPrizes.map((prize) => (
-                  <tr key={prize._id}>
+                  <tr key={prize.id}>
                     <td>
                       <span className={styles.tierBadge}>#{prize.position}</span>
                     </td>

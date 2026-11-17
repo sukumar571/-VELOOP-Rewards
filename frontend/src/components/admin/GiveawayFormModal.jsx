@@ -34,7 +34,7 @@ export default function GiveawayFormModal({ giveaway, isOpen, onClose, onSave })
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const isEdit = Boolean(giveaway?._id);
+  const isEdit = Boolean(giveaway?.id);
 
   useEffect(() => {
     if (giveaway) {

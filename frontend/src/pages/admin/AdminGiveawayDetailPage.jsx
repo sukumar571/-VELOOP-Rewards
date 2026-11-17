@@ -120,7 +120,7 @@ export default function AdminGiveawayDetailPage() {
     const next = !g.published;
     if (!window.confirm(next ? 'Publish this giveaway publicly?' : 'Unpublish this giveaway?')) return;
     try {
-      await togglePublishGiveaway(g._id, next, 'Detail page toggle');
+      await togglePublishGiveaway(g.id, next, 'Detail page toggle');
       await loadConfig();
     } catch (err) {
       alert(err.message || 'Failed to toggle publication state.');
@@ -134,7 +134,7 @@ export default function AdminGiveawayDetailPage() {
 
   const handleSavePrize = async (payload) => {
     if (selectedPrize?._id) {
-      await modifyPrizeTier(selectedPrize._id, payload);
+      await modifyPrizeTier(selectedPrize.id, payload);
     } else {
       await addPrizeTier(id, payload);
     }
@@ -145,7 +145,7 @@ export default function AdminGiveawayDetailPage() {
     const next = !prize.active;
     if (!window.confirm(`${next ? 'Activate' : 'Deactivate'} prize tier "${prize.name}"?`)) return;
     try {
-      await modifyPrizeTier(prize._id, { active: next });
+      await modifyPrizeTier(prize.id, { active: next });
       await loadConfig();
     } catch (err) {
       alert(err.message || 'Failed to update prize status.');
@@ -442,7 +442,7 @@ export default function AdminGiveawayDetailPage() {
               </div>
             ) : (
               prizes.map((p) => (
-                <div key={p._id} className={`${styles.prizeCard} vl-card ${!p.active ? styles.prizeInactive : ''}`}>
+                <div key={p.id} className={`${styles.prizeCard} vl-card ${!p.active ? styles.prizeInactive : ''}`}>
                   <div className={styles.prizeCardHeader}>
                     <div className={styles.rankBadge}>Rank #{p.position}</div>
                     <span className={`${styles.prizeTypeBadge} ${styles[`pt_${p.prizeType}`]}`}>

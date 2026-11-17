@@ -95,7 +95,7 @@ export default function AdminGiveawaysPage() {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      await togglePublishGiveaway(g._id, nextState, 'Operator toggle from admin table');
+      await togglePublishGiveaway(g.id, nextState, 'Operator toggle from admin table');
       await loadData(meta.page);
     } catch (err) {
       alert(err.message || 'Failed to toggle publication state.');
@@ -115,7 +115,7 @@ export default function AdminGiveawaysPage() {
 
     setTransitionBusy(true);
     try {
-      await changeGiveawayStatus(transitionTarget._id, transitionStatus, transitionReason);
+      await changeGiveawayStatus(transitionTarget.id, transitionStatus, transitionReason);
       setTransitionTarget(null);
       await loadData(meta.page);
     } catch (err) {
@@ -126,8 +126,8 @@ export default function AdminGiveawaysPage() {
   };
 
   const handleSaveGiveaway = async (payload) => {
-    if (selectedGiveaway?._id) {
-      await modifyGiveaway(selectedGiveaway._id, payload);
+    if (selectedGiveaway?.id) {
+      await modifyGiveaway(selectedGiveaway.id, payload);
     } else {
       await createNewGiveaway(payload);
     }
@@ -219,10 +219,10 @@ export default function AdminGiveawaysPage() {
                 {giveaways.map((g) => {
                   const allowedTransitions = ALLOWED_TRANSITIONS[g.status] || [];
                   return (
-                    <tr key={g._id}>
+                    <tr key={g.id}>
                       <td>
                         <div className={styles.nameCell}>
-                          <Link to={`/admin/giveaways/${g._id}`} className={styles.titleLink}>
+                          <Link to={`/admin/giveaways/${g.id}`} className={styles.titleLink}>
                             {g.title}
                           </Link>
                           <span className={styles.slugCode}>/{g.slug}</span>
@@ -263,7 +263,7 @@ export default function AdminGiveawaysPage() {
                       <td>
                         <div className={styles.actionButtons}>
                           <Link
-                            to={`/admin/giveaways/${g._id}`}
+                            to={`/admin/giveaways/${g.id}`}
                             className={styles.iconBtn}
                             title="Manage prizes, entries, and draw"
                           >

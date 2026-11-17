@@ -72,7 +72,7 @@ export default function AdminReportsPage() {
       }
       const headers = ['Transaction ID', 'User ID', 'Giveaway ID', 'Prize ID', 'Amount', 'Currency', 'Status', 'Date'];
       const rows = ledgerEntries.map((row) => [
-        row._id || '',
+        row.id || '',
         row.userId || '',
         row.giveawayId || '',
         row.prizeId || '',
@@ -224,7 +224,7 @@ export default function AdminReportsPage() {
                   </tr>
                 ) : (
                   giveaways.slice(0, 5).map((g) => (
-                    <tr key={g._id}>
+                    <tr key={g.id}>
                       <td style={{ fontWeight: 600 }}>{g.title}</td>
                       <td>
                         <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: 'var(--vl-violet-300)' }}>

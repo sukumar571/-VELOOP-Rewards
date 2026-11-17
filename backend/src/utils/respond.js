@@ -15,6 +15,15 @@
 function normalize(value) {
   if (value === null || value === undefined) return value;
   if (value instanceof Date) return value.toISOString();
+  // BSON scalars are LEAVES, not plain objects: walking them (as the generic
+  // branch below would) exposes driver internals such as
+  // `{buffer:{0:240,…}, id:…}` instead of the id the client expects. This
+  // matters for rows a service already flattened with `toJSON()`, where the
+  // ObjectId fields are instances again rather than pre-stringified values.
+  if (typeof value._bsontype === 'string') {
+    return typeof value.toHexString === 'function' ? value.toHexString() : String(value);
+  }
+  if (Buffer.isBuffer(value)) return value;
   if (Array.isArray(value)) return value.map(normalize);
   if (typeof value !== 'object') return value;
   // A Mongoose document knows its own safe shape (private paths included).

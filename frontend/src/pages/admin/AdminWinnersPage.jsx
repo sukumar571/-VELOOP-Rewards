@@ -57,7 +57,7 @@ export default function AdminWinnersPage() {
         const list = res.items || [];
         setGiveaways(list);
         if (list.length > 0) {
-          setSelectedGiveawayId(list[0]._id);
+          setSelectedGiveawayId(list[0].id);
         }
       } catch (err) {
         if (alive) showError(err.message || 'Failed to load campaigns list.');
@@ -97,7 +97,7 @@ export default function AdminWinnersPage() {
     }
   }, [selectedGiveawayId, loadWinners]);
 
-  const selectedGiveaway = giveaways.find((g) => g._id === selectedGiveawayId);
+  const selectedGiveaway = giveaways.find((g) => g.id === selectedGiveawayId);
 
   // Draw Trigger
   const handleExecuteDraw = async ({ prizeId, count }) => {
@@ -145,7 +145,7 @@ export default function AdminWinnersPage() {
     if (!targetWinner) return;
     try {
       setSavingVerification(true);
-      await verifyWinner(targetWinner._id, {
+      await verifyWinner(targetWinner.id, {
         verificationStatus: newVerificationStatus,
         reason: verificationReason.trim() || undefined,
       });
@@ -219,7 +219,7 @@ export default function AdminWinnersPage() {
                 <option value="">No campaigns found</option>
               ) : (
                 giveaways.map((g) => (
-                  <option key={g._id} value={g._id}>
+                  <option key={g.id} value={g.id}>
                     {g.title} ({g.status})
                   </option>
                 ))
@@ -270,11 +270,11 @@ export default function AdminWinnersPage() {
               </thead>
               <tbody>
                 {winners.map((w, idx) => {
-                  const prize = prizes.find((p) => p._id === w.prizeId);
+                  const prize = prizes.find((p) => p.id === w.prizeId);
                   const isVerified = w.verificationStatus === 'VERIFIED';
                   const isRejected = w.verificationStatus === 'REJECTED';
                   return (
-                    <tr key={w._id || idx}>
+                    <tr key={w.id || idx}>
                       <td>
                         <div className={styles.rankBadge}>#{w.rank || idx + 1}</div>
                       </td>

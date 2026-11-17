@@ -83,7 +83,7 @@ export default function AdminParticipantsPage() {
 
     try {
       setSubmittingVoid(true);
-      await voidEntrantParticipation(selectedParticipation._id, {
+      await voidEntrantParticipation(selectedParticipation.id, {
         mode: voidMode,
         reason: voidReason.trim(),
         refund: voidRefund,
@@ -131,7 +131,7 @@ export default function AdminParticipantsPage() {
             >
               <option value="">All Giveaway Campaigns</option>
               {giveaways.map((g) => (
-                <option key={g._id} value={g._id}>
+                <option key={g.id} value={g.id}>
                   {g.title}
                 </option>
               ))}
@@ -176,9 +176,9 @@ export default function AdminParticipantsPage() {
                   {participations.map((p) => {
                     const isVoided = p.status?.startsWith('VOIDED');
                     return (
-                      <tr key={p._id}>
+                      <tr key={p.id}>
                         <td className={styles.idCell}>
-                          {p._id ? p._id.slice(-8) : 'N/A'}
+                          {p.id ? p.id.slice(-8) : 'N/A'}
                         </td>
                         <td>
                           <div className={styles.userCell}>

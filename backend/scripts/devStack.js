@@ -26,6 +26,22 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..'); // backend/
 
 /**
+ * Reads a single key from backend/.env WITHOUT putting it into process.env.
+ * Used only so the "target MongoDB" line below can report the database the
+ * children will actually use instead of claiming the URI is unset. The children
+ * still load .env themselves; overriding process.env here would also override
+ * PORT, which must stay the demo's own value.
+ */
+function envFileValue(key) {
+  try {
+    const parsed = require('dotenv').parse(require('fs').readFileSync(path.join(ROOT, '.env')));
+    return parsed[key];
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Env shared by the seed + server children. We deliberately do NOT override
  * MONGODB_URI: dotenv inside `src/config/index.js` reads backend/.env, so the
  * Atlas URI (and its credentials) is what actually connects. Only the demo
@@ -35,7 +51,9 @@ function childEnv() {
   return {
     ...process.env,
     NODE_ENV: 'development',
-    PORT: process.env.PORT || '4000',
+    // An inherited PORT=0 would make the API bind a random ephemeral port and
+    // silently break the frontend's /api proxy, so only a real port is honoured.
+    PORT: Number(process.env.PORT) > 0 ? String(process.env.PORT) : '4000',
     MONGODB_SERVER_SELECTION_TIMEOUT_MS: process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS || '15000',
     EXIT_ON_DB_FAILURE: 'true', // Atlas is the source of truth; a failure to reach it must be loud.
     AUTH_MODE: 'dev-mock', // local signup/login + dev JWTs signed with DEV_JWT_SECRET
@@ -64,7 +82,7 @@ async function main() {
   // Redact credentials before printing so an operator can see WHICH Atlas
   // database is about to receive the fixtures without leaking them to a shell
   // history or a screenshot.
-  const displayUri = String(env.MONGODB_URI || '')
+  const displayUri = String(env.MONGODB_URI || envFileValue('MONGODB_URI') || '')
     .replace(/\/\/[^@/]+@/, '//[REDACTED]@')
     || '(unset — copy backend/.env.example to backend/.env first)';
   console.log(`[devStack] target MongoDB: ${displayUri}`);
