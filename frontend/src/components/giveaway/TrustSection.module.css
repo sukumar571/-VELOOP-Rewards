@@ -1,19 +1,32 @@
+/* ============================================================================
+   Trust & transparency
+   ==========================================================================*/
 .wrap {
-  padding-block: clamp(1.6rem, 4vw, 2.6rem);
+  padding-block: var(--vl-section-gap);
+}
+
+.head {
+  max-width: 62ch;
+  margin: 0 auto var(--vl-space-6);
+  text-align: center;
 }
 
 .title {
-  margin: 0 0 1.1rem;
-  text-align: center;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--vl-text);
+  margin: 0.4rem 0 0;
+}
+
+.lead {
+  margin: var(--vl-space-3) auto 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.65;
+  color: var(--vl-text-muted);
+  max-width: 58ch;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: var(--vl-space-3);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -21,17 +34,23 @@
 
 .item {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  padding: 1rem 0.8rem;
-  border-radius: var(--vl-radius);
-  background: var(--vl-surface);
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.35rem 1.3rem 1.5rem;
+  border-radius: var(--vl-radius-lg);
+  background-color: rgba(21, 22, 36, 0.55);
+  background-image: var(--vl-glass-highlight);
   border: 1px solid var(--vl-border);
-  transition: border-color var(--vl-speed) var(--vl-ease);
+  box-shadow: var(--vl-inset-highlight);
+  transition:
+    border-color var(--vl-speed) var(--vl-ease-out),
+    transform var(--vl-speed-slow) var(--vl-ease-out),
+    background-color var(--vl-speed) var(--vl-ease-out);
 }
 .item:hover {
+  transform: translateY(-3px);
   border-color: var(--vl-border-strong);
+  background-color: rgba(139, 92, 246, 0.08);
 }
 
 .icon {
@@ -39,16 +58,26 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  flex: none;
+  margin-bottom: 0.15rem;
   border-radius: 12px;
-  background: rgba(131, 69, 240, 0.16);
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(196, 167, 255, 0.22);
   color: var(--vl-violet-300);
 }
 
 .label {
-  font-size: 0.88rem;
+  margin: 0;
+  font-size: var(--vl-fs-sm);
   font-weight: 700;
   color: var(--vl-text);
+  letter-spacing: var(--vl-tracking-tight);
+}
+
+.text {
+  margin: 0;
+  font-size: var(--vl-fs-xs);
+  line-height: 1.6;
+  color: var(--vl-text-muted);
 }
 
 @media (max-width: 991.98px) {
@@ -60,5 +89,12 @@
 @media (max-width: 575.98px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+  .head {
+    text-align: left;
+    margin-inline: 0;
+  }
+  .lead {
+    margin-inline: 0;
   }
 }

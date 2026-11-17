@@ -1,6 +1,7 @@
 import { UserPlus, ListChecks, Ticket, Trophy } from 'lucide-react';
 import { STEPS } from '../../content/site.js';
 import SectionHeading from '../common/SectionHeading.jsx';
+import Reveal from '../common/Reveal.jsx';
 import styles from './HowToParticipate.module.css';
 
 const ICONS = { UserPlus, ListChecks, Ticket, Trophy };
@@ -21,7 +22,7 @@ export default function HowToParticipate() {
         {STEPS.map((step, i) => {
           const Icon = ICONS[step.icon] ?? Trophy;
           return (
-            <li key={step.title} className={styles.step}>
+            <Reveal as="li" key={step.title} className={styles.step} delay={i * 70}>
               <div className={styles.stepTop}>
                 <span className={styles.num} aria-hidden="true">
                   {i + 1}
@@ -35,7 +36,7 @@ export default function HowToParticipate() {
               {i < STEPS.length - 1 ? (
                 <span className={styles.connector} aria-hidden="true" />
               ) : null}
-            </li>
+            </Reveal>
           );
         })}
       </ol>

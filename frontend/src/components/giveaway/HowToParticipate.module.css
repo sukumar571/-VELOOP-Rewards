@@ -1,85 +1,106 @@
+/* ============================================================================
+   How to participate — four steps on a glowing rail
+   ==========================================================================*/
+
 .grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: var(--vl-space-3);
   list-style: none;
   margin: 0;
   padding: 0;
-  counter-reset: step;
 }
 
 .step {
   position: relative;
-  padding: 1.3rem 1.35rem 1.45rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.4rem 1.35rem 1.55rem;
   border-radius: var(--vl-radius-lg);
-  background: linear-gradient(180deg, var(--vl-surface-2) 0%, var(--vl-surface) 100%);
+  background-color: rgba(21, 22, 36, 0.6);
+  background-image: var(--vl-glass-highlight);
   border: 1px solid var(--vl-border);
+  box-shadow: var(--vl-inset-highlight);
   transition:
-    border-color var(--vl-speed) var(--vl-ease),
-    transform var(--vl-speed) var(--vl-ease);
+    border-color var(--vl-speed) var(--vl-ease-out),
+    transform var(--vl-speed-slow) var(--vl-ease-out),
+    box-shadow var(--vl-speed-slow) var(--vl-ease-out);
 }
 .step:hover {
+  transform: translateY(-4px);
   border-color: var(--vl-border-strong);
-  transform: translateY(-3px);
+  box-shadow:
+    var(--vl-shadow-sm),
+    0 18px 44px rgba(83, 109, 255, 0.14);
 }
 
 .stepTop {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.9rem;
+  gap: var(--vl-space-3);
+  margin-bottom: var(--vl-space-4);
 }
 
 .num {
-  font-size: 2.1rem;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 11px;
+  background-image: var(--vl-grad-brand);
+  color: #fff;
+  font-size: var(--vl-fs-xs);
   font-weight: 800;
-  line-height: 1;
-  background: var(--vl-grad-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  box-shadow:
+    0 6px 18px rgba(109, 63, 214, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 .iconWrap {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(131, 69, 240, 0.14);
+  width: 38px;
+  height: 38px;
+  margin-left: auto;
+  border-radius: 11px;
+  background: rgba(139, 92, 246, 0.12);
   border: 1px solid var(--vl-border-strong);
   color: var(--vl-violet-300);
 }
 
 .title {
-  margin: 0 0 0.45rem;
-  font-size: 1.02rem;
-  font-weight: 750;
+  margin: 0 0 0.4rem;
+  font-size: var(--vl-fs-h4);
+  font-weight: 700;
   color: var(--vl-text);
+  letter-spacing: var(--vl-tracking-tight);
 }
 
 .text {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: var(--vl-fs-sm);
   line-height: 1.6;
   color: var(--vl-text-muted);
 }
 
+/* Connector: a lit line running from this card to the next */
 .connector {
   position: absolute;
-  top: 50%;
-  right: -0.72rem;
-  width: 0.44rem;
-  height: 0.44rem;
-  border-top: 2px solid var(--vl-border-strong);
-  border-right: 2px solid var(--vl-border-strong);
-  transform: translateY(-50%) rotate(45deg);
+  top: 2.85rem;
+  right: calc(var(--vl-space-3) * -1);
+  width: var(--vl-space-3);
+  height: 2px;
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.75), rgba(83, 109, 255, 0.25));
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.55);
+  pointer-events: none;
 }
 
 @media (max-width: 991.98px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--vl-space-3);
   }
   .connector {
     display: none;
@@ -89,5 +110,8 @@
 @media (max-width: 575.98px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+  .step {
+    padding: 1.15rem 1.1rem 1.25rem;
   }
 }

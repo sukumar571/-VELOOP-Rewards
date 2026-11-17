@@ -12,20 +12,17 @@ export const NAV_LINKS = [
 
 export const HERO = {
   marquee:
-    '🎁  Enter Giveaway Codes · Unlock Amazing Rewards  🎁  Enter Giveaway Codes · Unlock Amazing Rewards  🎁  Enter Giveaway Codes · Unlock Amazing Rewards  🎁  Enter Giveaway Codes · Unlock Amazing Rewards  ',
-  badge: 'Exclusive Giveaway',
-  titlePlain: 'Enter special codes. Unlock amazing',
-  titleGradient: 'Rewards',
-  // "VEs" highlighted in violet, per Ref_01.
-  subtitleLead: 'Enter special giveaway codes and unlock exciting',
-  subtitleHighlight: 'VEs',
-  subtitleTail: 'rewards instantly.',
-  cta: { label: 'Enter Giveaway', to: '/giveaways' },
-  ctaSecondary: { label: 'Recent winners', to: '/winners' },
+    '✦  Exclusive draws open now  ✦  Premium prizes every season  ✦  Verified entries, transparent draws  ✦  Rewards, reimagined  ✦  ',
+  badge: 'VELOOP Rewards · Season 04',
+  titlePlain: 'Unlock',
+  titleGradient: 'Extraordinary Rewards.',
+  subtitle: 'Discover exclusive giveaways. Experience rewards differently.',
+  cta: { label: 'Explore Giveaways', to: '/giveaways' },
+  ctaSecondary: { label: 'How It Works', to: '/#how-it-works' },
   pills: [
-    { icon: 'ShieldCheck', title: '100% Safe', sub: 'Secure & Trusted' },
-    { icon: 'Zap', title: 'Instant Rewards', sub: 'Get Rewards Fast' },
-    { icon: 'Gift', title: 'Exclusive VEs', sub: 'Special for You' },
+    { icon: 'ShieldCheck', title: 'Verified entry', sub: 'Checked before every charge' },
+    { icon: 'Zap', title: 'Instant confirmation', sub: 'Enter in a single tap' },
+    { icon: 'Gift', title: 'Premium prizes', sub: 'Devices, vouchers & more' },
   ],
 };
 
@@ -41,7 +38,7 @@ export const STEPS = [
     icon: 'ListChecks',
   },
   {
-    title: 'Get entries',
+    title: 'Secure your entry',
     text: 'Pay your entry fee in VEs, SVEs or Tokens — every entry is a fair chance.',
     icon: 'Ticket',
   },
@@ -52,11 +49,32 @@ export const STEPS = [
   },
 ];
 
+/**
+ * Trust points. Each one describes behaviour the application actually
+ * implements (entry validation, idempotent charging, masked winners, claim
+ * windows) — no invented guarantees, statistics or user counts.
+ */
 export const TRUST = [
-  { icon: 'Scale', label: '100% Fair & Transparent' },
-  { icon: 'Lock', label: 'Secure & Safe' },
-  { icon: 'Users', label: 'Trusted by 10K+ Users' },
-  { icon: 'Headphones', label: '24/7 Customer Support' },
+  {
+    icon: 'Scale',
+    label: 'One entry, one chance',
+    text: 'Winners are drawn from the closed entry snapshot, so additional entries only ever add chances.',
+  },
+  {
+    icon: 'ShieldCheck',
+    label: 'Checked before charged',
+    text: 'Lifecycle, quota, eligibility and balance are validated before any entry fee is taken.',
+  },
+  {
+    icon: 'Lock',
+    label: 'Masked identities',
+    text: 'Winner announcements show masked account IDs — never personal details.',
+  },
+  {
+    icon: 'Headphones',
+    label: 'A claim window',
+    text: 'Winners follow a private claim flow with a visible deadline for their prize.',
+  },
 ];
 
 export const FOOTER = {

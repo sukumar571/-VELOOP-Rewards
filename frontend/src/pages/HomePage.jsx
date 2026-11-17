@@ -3,8 +3,10 @@ import { useLocation } from 'react-router-dom';
 import GiveawayBanner from '../components/giveaway/GiveawayBanner.jsx';
 import GiveawayHero from '../components/giveaway/GiveawayHero.jsx';
 import GiveawayStats from '../components/giveaway/GiveawayStats.jsx';
+import FeaturedSpotlight from '../components/giveaway/FeaturedSpotlight.jsx';
 import FeaturedGiveaways from '../components/giveaway/FeaturedGiveaways.jsx';
 import HowToParticipate from '../components/giveaway/HowToParticipate.jsx';
+import DrawSchedule from '../components/giveaway/DrawSchedule.jsx';
 import WinnersTabs from '../components/giveaway/WinnersTabs.jsx';
 import GiveawayRules from '../components/giveaway/GiveawayRules.jsx';
 import FaqAccordion from '../components/giveaway/FaqAccordion.jsx';
@@ -32,6 +34,11 @@ export default function HomePage() {
       <GiveawayBanner variant="marquee" />
       <GiveawayHero />
       <GiveawayStats />
+
+      {/* The one draw in the spotlight */}
+      <FeaturedSpotlight />
+
+      {/* The full prize collection */}
       <FeaturedGiveaways />
 
       <section className={`vl-section container ${styles.how}`} aria-labelledby="how-heading">
@@ -55,6 +62,9 @@ export default function HomePage() {
           <WinnersTabs />
         </div>
       </section>
+
+      {/* Live draw calendar: active, upcoming and finished draws */}
+      <DrawSchedule />
 
       <GiveawayBanner variant="cta" />
 

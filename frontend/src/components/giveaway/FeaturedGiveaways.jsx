@@ -1,10 +1,11 @@
 import { useAsync } from '../../hooks/useAsync.js';
 import { getFeaturedGiveaways } from '../../services/giveawayService.js';
 import SectionHeading from '../common/SectionHeading.jsx';
-import GiveawayLoader from '../common/GiveawayLoader.jsx';
+import Reveal from '../common/Reveal.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import ErrorState from '../common/ErrorState.jsx';
 import PrizeCard from './PrizeCard.jsx';
+import PrizeCardSkeleton from './PrizeCardSkeleton.jsx';
 import styles from './FeaturedGiveaways.module.css';
 
 /**
@@ -18,9 +19,9 @@ export default function FeaturedGiveaways() {
     <section className={`vl-section container ${styles.section}`} aria-labelledby="featured-heading">
       <div id="giveaways" className="vl-anchor-offset">
         <SectionHeading
-          eyebrow="Handpicked draws"
-          title="Featured Giveaways"
-          subtitle="Live prize draws you can join right now — tap a prize to open its entry page."
+          eyebrow="Curated prizes"
+          title="The prize collection"
+          subtitle="Every prize currently open for entry — open a card to see its draw, entry fee and how to join."
           link={{ to: '/giveaways', label: 'View All Giveaways' }}
         />
         <h2 id="featured-heading" className="visually-hidden">
@@ -29,9 +30,7 @@ export default function FeaturedGiveaways() {
 
         <div className={styles.grid} aria-busy={loading || undefined}>
           {loading ? (
-            <div className={styles.state}>
-              <GiveawayLoader />
-            </div>
+            <PrizeCardSkeleton count={4} />
           ) : error ? (
             <div className={styles.state}>
               <ErrorState
@@ -48,10 +47,14 @@ export default function FeaturedGiveaways() {
               />
             </div>
           ) : (
-            data.map((giveaway) => (
-              <div key={giveaway.slug} className={styles.gridItem}>
+            data.map((giveaway, i) => (
+              <Reveal
+                key={giveaway.slug}
+                className={styles.gridItem}
+                delay={Math.min(i, 6) * 60}
+              >
                 <PrizeCard giveaway={giveaway} />
-              </div>
+              </Reveal>
             ))
           )}
         </div>

@@ -4,7 +4,8 @@ import { useAsync } from '../hooks/useAsync.js';
 import { getGiveaways } from '../services/giveawayService.js';
 import PageHeader from '../components/common/PageHeader.jsx';
 import PrizeCard from '../components/giveaway/PrizeCard.jsx';
-import GiveawayLoader from '../components/common/GiveawayLoader.jsx';
+import PrizeCardSkeleton from '../components/giveaway/PrizeCardSkeleton.jsx';
+import Reveal from '../components/common/Reveal.jsx';
 import EmptyState from '../components/common/EmptyState.jsx';
 import ErrorState from '../components/common/ErrorState.jsx';
 import DemoNotice from '../components/common/DemoNotice.jsx';
@@ -74,8 +75,8 @@ export default function GiveawaysPage() {
       </div>
 
       {loading ? (
-        <div className={styles.loadingWrap} aria-busy="true">
-          <GiveawayLoader />
+        <div className={styles.grid} aria-busy="true">
+          <PrizeCardSkeleton count={6} />
         </div>
       ) : error ? (
         <ErrorState
@@ -85,10 +86,10 @@ export default function GiveawaysPage() {
         />
       ) : shown.length ? (
         <div className={styles.grid}>
-          {shown.map((g) => (
-            <div key={g.slug} className={styles.gridItem}>
+          {shown.map((g, i) => (
+            <Reveal key={g.slug} className={styles.gridItem} delay={Math.min(i, 6) * 50}>
               <PrizeCard giveaway={g} />
-            </div>
+            </Reveal>
           ))}
         </div>
       ) : (

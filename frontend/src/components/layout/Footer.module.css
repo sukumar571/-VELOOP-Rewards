@@ -1,15 +1,34 @@
+/* ============================================================================
+   Footer — quiet luxury: hairline, ambient glow, generous rhythm
+   ==========================================================================*/
+
 .footer {
+  position: relative;
   margin-top: var(--vl-section-gap);
+  padding-top: clamp(2.25rem, 4vw, 3.25rem);
+  padding-bottom: var(--vl-space-5);
   border-top: 1px solid var(--vl-border);
-  background: linear-gradient(180deg, transparent, rgba(10, 10, 38, 0.65));
-  padding-top: 3rem;
-  padding-bottom: 1.5rem;
+  background-image:
+    radial-gradient(46% 60% at 12% 0%, rgba(139, 92, 246, 0.1) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(16, 17, 29, 0.35), rgba(8, 9, 18, 0.9));
+}
+
+/* Top hairline highlight */
+.footer::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: -1px;
+  height: 1px;
+  background: var(--vl-grad-hairline);
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(1.75rem, 3vw, 3rem);
 }
 
 .brandCol {
@@ -19,53 +38,63 @@
 .brandLine {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.9rem;
+  gap: 0.65rem;
+  margin-bottom: var(--vl-space-4);
 }
 
 .mark {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: var(--vl-grad-gold);
-  color: #241300;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background-image: var(--vl-grad-brand);
+  color: #fff;
   font-weight: 800;
+  font-size: 1rem;
+  box-shadow:
+    0 6px 18px rgba(109, 63, 214, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 .wordmark {
-  font-weight: 800;
-  font-size: 1.05rem;
+  font-weight: 750;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
   color: var(--vl-text);
-  letter-spacing: 0.02em;
 }
 
 .blurb {
-  max-width: 42ch;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  margin: 0 0 1rem;
+  max-width: 46ch;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.7;
+  margin: 0 0 var(--vl-space-4);
 }
 
 .trustLine {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.82rem;
-  color: var(--vl-green-500);
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--vl-radius-pill);
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  background: rgba(52, 211, 153, 0.06);
+  font-size: var(--vl-fs-xs);
+  color: #a7f3d0;
 }
 .trustLine svg {
   flex: none;
+  color: var(--vl-green-500);
 }
 
 .colTitle {
-  font-size: 0.8rem;
+  margin: 0 0 var(--vl-space-4);
+  font-size: var(--vl-fs-2xs);
   font-weight: 700;
   letter-spacing: var(--vl-tracking-wide);
   text-transform: uppercase;
   color: var(--vl-text);
-  margin-bottom: 0.9rem;
 }
 
 .col ul {
@@ -73,26 +102,45 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 .col a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px; /* comfortable tap target */
   color: var(--vl-text-muted);
-  font-size: 0.92rem;
+  font-size: var(--vl-fs-sm);
+  transition:
+    color var(--vl-speed) var(--vl-ease-out),
+    transform var(--vl-speed) var(--vl-ease-out);
+}
+
+@media (pointer: coarse) {
+  .col a {
+    min-height: 44px;
+  }
 }
 .col a:hover {
-  color: var(--vl-violet-300);
+  color: var(--vl-text);
+  transform: translateX(2px);
+}
+.col a:focus-visible {
+  outline: none;
+  color: var(--vl-text);
+  box-shadow: var(--vl-focus-ring);
+  border-radius: var(--vl-radius-xs);
 }
 
 .bottom {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
+  gap: 0.5rem var(--vl-space-5);
   justify-content: space-between;
   align-items: center;
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  padding-top: var(--vl-space-4);
   border-top: 1px solid var(--vl-border);
-  font-size: 0.8rem;
+  font-size: var(--vl-fs-xs);
   color: var(--vl-text-muted);
 }
 
@@ -100,9 +148,23 @@
   color: var(--vl-text-faint);
 }
 
+@media (max-width: 991.98px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .brandCol {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 575.98px) {
   .grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: var(--vl-space-6);
+  }
+  .bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
   }
 }

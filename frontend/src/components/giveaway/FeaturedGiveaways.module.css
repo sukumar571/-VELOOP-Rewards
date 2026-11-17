@@ -2,14 +2,21 @@
   scroll-margin-top: 84px;
 }
 
+/* Four equal columns on desktop; cards stretch to the tallest row item so
+   every image, meta row and CTA lines up. */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.1rem;
+  align-items: stretch;
+  gap: var(--vl-space-4);
 }
 
 .gridItem {
   min-width: 0;
+  display: flex;
+}
+.gridItem > * {
+  width: 100%;
 }
 
 .state {
@@ -34,5 +41,6 @@
 @media (max-width: 575.98px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: var(--vl-space-3);
   }
 }

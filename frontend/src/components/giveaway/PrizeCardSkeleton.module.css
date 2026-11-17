@@ -1,0 +1,78 @@
+/* ============================================================================
+   PrizeCardSkeleton — same footprint as a real card
+   ==========================================================================*/
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.visual {
+  aspect-ratio: 16 / 9;
+  background:
+    linear-gradient(100deg, rgba(196, 167, 255, 0.05) 30%, rgba(196, 167, 255, 0.14) 50%, rgba(196, 167, 255, 0.05) 70%),
+    var(--vl-surface-2);
+  background-size: 220% 100%;
+  animation: shimmer 1.8s var(--vl-ease) infinite;
+  border-bottom: 1px solid var(--vl-border);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: var(--vl-space-4);
+  flex: 1;
+  min-height: 176px;
+}
+
+.title,
+.tagline,
+.metaRow,
+.cta {
+  display: block;
+  border-radius: var(--vl-radius-xs);
+  background:
+    linear-gradient(100deg, rgba(196, 167, 255, 0.05) 30%, rgba(196, 167, 255, 0.13) 50%, rgba(196, 167, 255, 0.05) 70%),
+    var(--vl-surface-2);
+  background-size: 220% 100%;
+  animation: shimmer 1.8s var(--vl-ease) infinite;
+}
+
+.title {
+  height: 18px;
+  width: 72%;
+}
+.tagline {
+  height: 13px;
+  width: 92%;
+}
+.metaRow {
+  height: 34px;
+  margin-top: auto;
+  border-radius: var(--vl-radius-pill);
+}
+.cta {
+  height: 44px;
+  border-radius: var(--vl-radius-pill);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visual,
+  .title,
+  .tagline,
+  .metaRow,
+  .cta {
+    animation: none;
+  }
+}

@@ -7,6 +7,7 @@ import {
   setEligibleForDemo,
 } from '../services/sessionService.js';
 import { redeemCode } from '../services/earnService.js';
+import { subscribe } from '../api/tokenStore.js';
 
 const AuthContext = createContext(null);
 
@@ -34,6 +35,22 @@ export function AuthProvider({ children }) {
       alive = false;
     };
   }, [hydrate]);
+
+  /**
+   * React to credential changes broadcast by the API layer. A 401 anywhere in
+   * the app drops the credential; without this the context kept a stale
+   * signed-in identity (chrome, admin link, /login redirect) until a reload.
+   */
+  useEffect(
+    () =>
+      subscribe(({ hasToken }) => {
+        if (!hasToken) {
+          setUser(null);
+          setBalances(null);
+        }
+      }),
+    [],
+  );
 
   const login = useCallback(async (profile) => {
     const s = await sessionLogin(profile);

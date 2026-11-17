@@ -1,19 +1,34 @@
+/* ============================================================================
+   Countdown — compact .chip (cards) and .blocks (detail / spotlight)
+   Numerals are tabular so the tile never jitters as seconds tick.
+   ==========================================================================*/
+
 .root {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
-/* ---- chip ---- */
+/* ---- compact chip ---- */
 .chip {
-  padding: 0.34rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.32rem 0.7rem 0.32rem 0.55rem;
   border-radius: var(--vl-radius-pill);
-  background: rgba(131, 69, 240, 0.16);
-  border: 1px solid var(--vl-border-strong);
+  background-color: rgba(8, 9, 18, 0.74);
+  border: 1px solid rgba(196, 167, 255, 0.26);
   color: var(--vl-text);
-  font-size: 0.82rem;
+  font-size: 0.82rem; /* legible over prize art */
   font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 8px 22px rgba(4, 5, 16, 0.5);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
 }
 .chip svg {
   color: var(--vl-violet-300);
@@ -21,32 +36,52 @@
 }
 .sec {
   color: var(--vl-violet-300);
+  font-weight: 750;
 }
 
-/* ---- blocks ---- */
+/* ---- block variant ---- */
 .blocks {
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 .unit {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 64px;
   padding: 0.7rem 0.55rem 0.6rem;
   border-radius: var(--vl-radius);
-  background: linear-gradient(180deg, var(--vl-surface-2), var(--vl-surface));
+  background-image:
+    var(--vl-glass-highlight),
+    linear-gradient(180deg, rgba(26, 27, 44, 0.95) 0%, rgba(17, 18, 31, 0.95) 100%);
   border: 1px solid var(--vl-border-strong);
-  box-shadow: var(--vl-shadow-sm);
+  box-shadow: var(--vl-shadow-sm), var(--vl-inset-highlight);
+  overflow: hidden;
 }
+/* Lit top edge, echoing the card lighting */
+.unit::before {
+  content: '';
+  position: absolute;
+  inset-inline: 18%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196, 167, 255, 0.75), transparent);
+}
+
 .value {
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 800;
   line-height: 1;
-  color: var(--vl-text);
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(180deg, #ffffff 34%, #c4a7ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #fff; /* fallback when background-clip is unsupported */
 }
 .label {
   margin-top: 0.35rem;
-  font-size: 0.66rem;
+  font-size: var(--vl-fs-2xs);
   font-weight: 700;
   letter-spacing: var(--vl-tracking-wide);
   text-transform: uppercase;
@@ -56,12 +91,18 @@
   color: var(--vl-violet-300);
   font-weight: 800;
   font-size: 1.2rem;
+  opacity: 0.7;
 }
 
 .ended {
   color: var(--vl-text-muted);
-  background: rgba(154, 157, 174, 0.1);
-  border-color: rgba(154, 157, 174, 0.3);
+  background-color: rgba(161, 161, 181, 0.08);
+  background-image: none;
+  border-color: var(--vl-border);
+  box-shadow: none;
+}
+.ended svg {
+  color: var(--vl-text-faint);
 }
 
 @media (max-width: 575.98px) {
@@ -71,5 +112,9 @@
   }
   .sep {
     font-size: 1rem;
+  }
+  .chip {
+    font-size: 0.78rem;
+    padding-inline: 0.6rem 0.5rem;
   }
 }

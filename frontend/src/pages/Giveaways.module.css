@@ -1,63 +1,115 @@
 .page {
-  padding-bottom: 2rem;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem) var(--vl-space-8);
 }
 
+/* Sticky glass filter bar, kept clear of the fixed header */
 .chips {
-  /* Pin the filter bar just below the sticky header so a chip is never
-     hidden under it (the header sits at z-index 1030 and would otherwise
-     swallow clicks on a scrolled-up chip). */
   position: sticky;
-  top: var(--vl-nav-h);
+  top: calc(var(--vl-nav-h) + 0.5rem);
   z-index: 20;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: center;
   justify-content: center;
-  padding: 0.7rem 0.75rem;
-  margin-bottom: 1.75rem;
-  background: rgba(3, 6, 21, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 0.4rem;
+  padding: 0.45rem;
+  margin-bottom: var(--vl-space-6);
   border-radius: var(--vl-radius-pill);
+  background-color: rgba(16, 17, 29, 0.78);
+  border: 1px solid var(--vl-border);
+  box-shadow: var(--vl-shadow-sm), var(--vl-inset-highlight);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .chip {
-  padding: 0.45rem 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* touch-friendly filter target */
+  padding: 0.5rem 1.05rem;
   border-radius: var(--vl-radius-pill);
-  border: 1px solid var(--vl-border-strong);
+  border: 1px solid transparent;
   background: transparent;
-  color: var(--vl-text-body);
-  font-size: 0.86rem;
-  font-weight: 700;
+  color: var(--vl-text-muted);
+  font-family: inherit;
+  font-size: var(--vl-fs-xs);
+  font-weight: 650;
   cursor: pointer;
   transition:
-    background-color var(--vl-speed) var(--vl-ease),
-    color var(--vl-speed) var(--vl-ease),
-    border-color var(--vl-speed) var(--vl-ease);
+    background-color var(--vl-speed) var(--vl-ease-out),
+    border-color var(--vl-speed) var(--vl-ease-out),
+    color var(--vl-speed) var(--vl-ease-out),
+    box-shadow var(--vl-speed) var(--vl-ease-out);
 }
 .chip:hover {
-  border-color: var(--vl-violet-300);
-  color: #fff;
+  color: var(--vl-text);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--vl-border);
+}
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--vl-focus-ring);
 }
 .chipActive {
-  background: var(--vl-grad-primary);
+  background-image: var(--vl-grad-cta);
   border-color: transparent;
   color: #fff;
+  box-shadow: var(--vl-shadow-glow);
+}
+.chipActive:hover {
+  color: #fff;
+  background-image: var(--vl-grad-cta);
 }
 
+/* Same 4 → 3 → 2 → 1 rhythm as the prize collection so cards match across
+   pages on every breakpoint. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--vl-space-4);
+}
+
+@media (max-width: 1199.98px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991.98px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--vl-space-3);
+  }
 }
 
 .gridItem {
   min-width: 0;
+  display: flex;
+  align-items: stretch;
+}
+.gridItem > * {
+  width: 100%;
 }
 
-/* Branded initial-loading region for the giveaway grid. */
-.loadingWrap {
-  display: flex;
-  justify-content: center;
-  min-height: 280px;
+@media (max-width: 575.98px) {
+  .chips {
+    border-radius: var(--vl-radius-lg);
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    flex: none;
+  }
 }

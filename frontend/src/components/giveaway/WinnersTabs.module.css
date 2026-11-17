@@ -1,61 +1,68 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: var(--vl-space-4);
 }
 
 .head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--vl-space-4);
   flex-wrap: wrap;
 }
 
 .tablist {
   display: inline-flex;
-  gap: 0.35rem;
-  padding: 0.35rem;
+  gap: 0.2rem;
+  padding: 0.28rem;
   border-radius: var(--vl-radius-pill);
-  background: var(--vl-surface);
+  background: rgba(16, 17, 29, 0.8);
   border: 1px solid var(--vl-border);
 }
 
 .tab {
-  padding: 0.55rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.55rem 1.2rem;
   border: 0;
   border-radius: var(--vl-radius-pill);
   background: transparent;
   color: var(--vl-text-muted);
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-family: inherit;
+  font-size: var(--vl-fs-xs);
+  font-weight: 650;
   cursor: pointer;
   transition:
-    background-color var(--vl-speed) var(--vl-ease),
-    color var(--vl-speed) var(--vl-ease);
+    background-color var(--vl-speed) var(--vl-ease-out),
+    color var(--vl-speed) var(--vl-ease-out);
 }
 .tab:hover {
   color: var(--vl-text);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .tab:focus-visible {
-  outline: 2px solid var(--vl-violet-300);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--vl-focus-ring);
 }
 
 .tabActive {
-  background: var(--vl-grad-cta);
+  background-image: var(--vl-grad-cta);
   color: #fff;
   box-shadow: var(--vl-shadow-glow);
 }
 .tabActive:hover {
   color: #fff;
+  background-image: var(--vl-grad-cta);
 }
 
 /* ---- previous winners grid ---- */
 .prevGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: var(--vl-space-3);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -80,6 +87,7 @@
   }
   .tab {
     flex: 1;
+    min-height: 44px;
     text-align: center;
     padding-inline: 0.6rem;
   }

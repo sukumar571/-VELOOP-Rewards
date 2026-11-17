@@ -1,0 +1,244 @@
+/* ============================================================================
+   Featured giveaway spotlight
+   ==========================================================================*/
+.section {
+  padding-block: var(--vl-space-2) var(--vl-section-gap);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--vl-space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--vl-space-5);
+}
+
+.headTitle {
+  margin-top: 0.4rem;
+}
+
+.state {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* ---- Card ---- */
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  overflow: hidden;
+  border-radius: var(--vl-radius-xl);
+}
+
+.mediaCol {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  padding: var(--vl-space-3);
+}
+
+/* Extra specificity so the prize visual's own aspect-ratio never wins here */
+.card .visual {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  aspect-ratio: auto;
+  border-radius: var(--vl-radius-lg);
+  border: 1px solid var(--vl-border-strong);
+  box-shadow: inset 0 0 60px rgba(4, 5, 16, 0.6);
+}
+
+.mediaOverlay {
+  position: absolute;
+  inset: var(--vl-space-3);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--vl-space-2);
+  padding: var(--vl-space-3);
+  pointer-events: none;
+}
+
+.mediaHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.26rem 0.6rem;
+  border-radius: var(--vl-radius-pill);
+  background: rgba(8, 9, 18, 0.6);
+  border: 1px solid var(--vl-border);
+  color: var(--vl-text-faint);
+  font-size: var(--vl-fs-2xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---- Body ---- */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vl-space-4);
+  min-width: 0;
+  padding: clamp(1.25rem, 2.4vw, 2.15rem);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 1.5vw + 1rem, 2.15rem);
+  font-weight: 750;
+  line-height: 1.16;
+  letter-spacing: var(--vl-tracking-tight);
+  color: var(--vl-text);
+}
+
+.tagline {
+  margin: calc(var(--vl-space-4) * -1 + 0.15rem) 0 0;
+  font-size: var(--vl-fs-sm);
+  font-weight: 600;
+  color: var(--vl-violet-300);
+}
+
+.description {
+  margin: 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.65;
+  color: var(--vl-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- Facts ---- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--vl-space-2);
+  margin: 0;
+  padding: var(--vl-space-3) 0;
+  border-top: 1px solid var(--vl-border);
+  border-bottom: 1px solid var(--vl-border);
+}
+
+.fact {
+  min-width: 0;
+}
+.fact dt {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--vl-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.fact dt svg {
+  color: var(--vl-violet-300);
+  flex: none;
+}
+.fact dd {
+  margin: 0.3rem 0 0;
+  font-size: var(--vl-fs-sm);
+  font-weight: 700;
+  color: var(--vl-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Countdown ---- */
+.timerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vl-space-3);
+  flex-wrap: wrap;
+}
+.timerLabel {
+  font-size: var(--vl-fs-2xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+
+/* ---- Entry row ---- */
+.entryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vl-space-3);
+  flex-wrap: wrap;
+}
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.entryLabel {
+  font-size: var(--vl-fs-2xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.join {
+  margin-left: auto;
+}
+.join svg {
+  transition: transform var(--vl-speed) var(--vl-ease-out);
+}
+.join:hover svg {
+  transform: translateX(4px);
+}
+
+/* ---- Eligibility ---- */
+.eligibility {
+  padding: var(--vl-space-3) var(--vl-space-4);
+  border-radius: var(--vl-radius);
+  border: 1px solid var(--vl-border);
+  background: rgba(8, 9, 18, 0.4);
+}
+.eligibilityTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 var(--vl-space-2);
+  font-size: var(--vl-fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vl-text-body);
+}
+.eligibilityTitle svg {
+  color: var(--vl-green-500);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 991.98px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+  .card .visual {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .mediaHint {
+    display: none;
+  }
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .join {
+    width: 100%;
+    margin-left: 0;
+  }
+}

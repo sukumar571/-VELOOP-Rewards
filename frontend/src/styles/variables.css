@@ -1,80 +1,177 @@
 /* ============================================================================
-   VELOOP Rewards — Design Tokens
-   Palette measured from the project design references (Ref_01 / Ref_02):
-   dark navy base, violet gradient accents, gold brand highlights.
+   VELOOP Rewards — Design System Tokens
+   ----------------------------------------------------------------------------
+   Single source of truth for the premium dark interface: luxe surfaces,
+   futuristic purple/blue lighting, glassmorphism and consistent spacing.
+
+   CONTRACT: the token NAMES below are consumed by every *.module.css file and
+   by the global vl-* primitives. Rename one and you restyle nothing — add a new
+   token instead. Values may change freely; names may not.
    ==========================================================================*/
 
 :root,
 [data-vl-theme='dark'] {
-  /* Surfaces */
-  --vl-bg: #030615;
-  --vl-bg-2: #0a0a26;
-  --vl-surface: #0b0426;
-  --vl-surface-2: #0d042f;
-  --vl-border: rgba(139, 92, 246, 0.16);
-  --vl-border-strong: rgba(139, 92, 246, 0.34);
+  /* --------------------------------------------------------------------- */
+  /* Surfaces — calm, deep, layered                                       */
+  /* --------------------------------------------------------------------- */
+  --vl-bg: #080912;
+  --vl-bg-2: #10111d;
+  --vl-surface: #10111d;
+  --vl-surface-2: #151624;
+  --vl-card: #151624;
+  --vl-surface-raised: #1a1b2c;
+  --vl-scrim: rgba(4, 5, 12, 0.72);
 
-  /* Brand */
-  --vl-violet-300: #c858fa;
-  --vl-violet-500: #8345f0;
-  --vl-violet-700: #6314d1;
-  --vl-violet-800: #7626a1;
-  --vl-blue-600: #444bfb;
-  --vl-blue-700: #0145c2;
-  --vl-blue-500: #0054c5;
-  --vl-gold-300: #ffefb4;
-  --vl-gold-400: #ffcd75;
-  --vl-gold-500: #ffc350;
-  --vl-gold-600: #ecb13b;
-  --vl-green-500: #29c47e;
-  --vl-red-500: #f0576d;
+  /* Hairlines & glass edges */
+  --vl-border: rgba(255, 255, 255, 0.07);
+  --vl-border-strong: rgba(196, 167, 255, 0.24);
+  --vl-border-glow: rgba(139, 92, 246, 0.42);
 
-  /* Text */
-  --vl-text: #f0f0f2;
-  --vl-text-body: #d1d4e5;
-  --vl-text-muted: #9a9dae;
-  --vl-text-faint: #6d7086;
+  /* --------------------------------------------------------------------- */
+  /* Brand — futuristic violet → electric blue                            */
+  /* --------------------------------------------------------------------- */
+  --vl-violet-300: #c4a7ff; /* highlight / accent text                */
+  --vl-violet-500: #8b5cf6; /* primary purple                         */
+  --vl-violet-700: #7c3aed; /* gradient start (AA with white text)   */
+  --vl-violet-800: #4c1d95; /* deep tint                              */
+  /* Legacy aliases kept so existing modules keep resolving */
+  --vl-violet-400: #a78bfa;
+  --vl-violet-600: #7c3aed;
+  --vl-blue-500: #6b82ff;
+  --vl-blue-600: #536dff; /* electric blue                          */
+  --vl-blue-700: #4b5eff; /* gradient end (AA with white text)      */
 
-  /* Gradients */
-  --vl-grad-brand: linear-gradient(92deg, #c858fa 0%, #8345f0 100%);
-  --vl-grad-cta: linear-gradient(92deg, #c35bf8 0%, #444bfb 100%);
-  --vl-grad-primary: linear-gradient(92deg, #7626a1 0%, #6314d1 100%);
-  --vl-grad-gold: linear-gradient(92deg, #ffcd75 0%, #ecb13b 100%);
-  --vl-grad-glow: radial-gradient(
-    55% 55% at 78% -8%,
-    rgba(131, 69, 240, 0.24) 0%,
-    rgba(199, 88, 250, 0.08) 45%,
-    transparent 75%
+  /* Champagne accent: reserved for scarcity cues (brand mark, VE balances) */
+  --vl-gold-300: #f7e7c6;
+  --vl-gold-400: #f3d8a7;
+  --vl-gold-500: #e8c384;
+  --vl-gold-600: #d4a862;
+
+  /* Semantic */
+  --vl-green-500: #34d399;
+  --vl-red-500: #f87171;
+
+  /* --------------------------------------------------------------------- */
+  /* Text — WCAG AA on --vl-card                                           */
+  /* --------------------------------------------------------------------- */
+  --vl-text: #f8fafc; /* 17.9:1 on #151624 */
+  --vl-text-body: #d6daea; /* 12.9:1            */
+  --vl-text-muted: #a1a1b5; /*  7.0:1            */
+  --vl-text-faint: #8c8da3; /*  5.5:1            */
+
+  /* --------------------------------------------------------------------- */
+  /* Gradients & lighting                                                  */
+  /* --------------------------------------------------------------------- */
+  --vl-grad-brand: linear-gradient(100deg, #8b5cf6 0%, #536dff 100%);
+  --vl-grad-cta: linear-gradient(100deg, #7c3aed 0%, #4b5eff 100%);
+  --vl-grad-primary: linear-gradient(100deg, #6d3fd6 0%, #4b5eff 100%);
+  --vl-grad-gold: linear-gradient(140deg, #f7e7c6 0%, #e8c384 100%);
+  --vl-grad-surface: linear-gradient(180deg, #1a1b2c 0%, #131422 100%);
+  --vl-grad-hairline: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 167, 255, 0.35) 50%,
+    transparent 100%
   );
 
-  /* Typography */
+  /* Ambient page lighting (layered radial "spotlights") */
+  --vl-grad-glow:
+    radial-gradient(52% 46% at 82% -6%, rgba(139, 92, 246, 0.22) 0%, transparent 72%),
+    radial-gradient(46% 42% at 8% 4%, rgba(83, 109, 255, 0.14) 0%, transparent 70%);
+
+  /* --------------------------------------------------------------------- */
+  /* Glassmorphism                                                        */
+  /* --------------------------------------------------------------------- */
+  --vl-glass-bg: rgba(21, 22, 36, 0.62);
+  --vl-glass-bg-strong: rgba(16, 17, 29, 0.86);
+  --vl-glass-border: rgba(255, 255, 255, 0.09);
+  --vl-glass-highlight: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 42%
+  );
+  --vl-glass-blur: 18px;
+
+  /* --------------------------------------------------------------------- */
+  /* Typography                                                           */
+  /* --------------------------------------------------------------------- */
   --vl-font:
     'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
-  --vl-tracking-tight: -0.025em;
-  --vl-tracking-wide: 0.08em;
+  --vl-font-mono: 'SFMono-Regular', ui-monospace, 'Cascadia Mono', Menlo, monospace;
 
-  /* Geometry */
+  /* Fluid type scale (min → max, viewport-driven) */
+  --vl-fs-display: clamp(2.35rem, 4.2vw + 0.9rem, 4rem);
+  --vl-fs-h1: clamp(1.95rem, 2.6vw + 0.9rem, 3rem);
+  --vl-fs-h2: clamp(1.5rem, 1.5vw + 0.9rem, 2.1rem);
+  --vl-fs-h3: clamp(1.18rem, 0.7vw + 0.95rem, 1.45rem);
+  --vl-fs-h4: clamp(1.02rem, 0.4vw + 0.92rem, 1.12rem);
+  --vl-fs-lead: clamp(1rem, 0.35vw + 0.94rem, 1.12rem);
+  --vl-fs-body: 0.975rem;
+  --vl-fs-sm: 0.875rem;
+  --vl-fs-xs: 0.78rem;
+  --vl-fs-2xs: 0.7rem;
+
+  --vl-tracking-display: -0.032em;
+  --vl-tracking-tight: -0.02em;
+  --vl-tracking-wide: 0.09em;
+
+  /* --------------------------------------------------------------------- */
+  /* Geometry                                                             */
+  /* --------------------------------------------------------------------- */
+  --vl-radius-xs: 8px;
   --vl-radius-sm: 10px;
   --vl-radius: 16px;
   --vl-radius-lg: 22px;
+  --vl-radius-xl: 28px;
   --vl-radius-pill: 999px;
+  /* Legacy aliases */
+  --vl-radius-md: 16px;
+  --vl-radius-full: 999px;
 
-  /* Elevation */
-  --vl-shadow-sm: 0 2px 10px rgba(1, 2, 12, 0.45);
-  --vl-shadow: 0 10px 32px rgba(1, 2, 12, 0.55);
-  --vl-shadow-glow: 0 8px 30px rgba(131, 69, 240, 0.35);
+  /* --------------------------------------------------------------------- */
+  /* Elevation — tinted, never neutral black                              */
+  /* --------------------------------------------------------------------- */
+  --vl-shadow-sm: 0 2px 10px rgba(3, 4, 12, 0.5);
+  --vl-shadow: 0 18px 44px rgba(3, 4, 12, 0.55);
+  --vl-shadow-lg: 0 32px 80px rgba(3, 4, 12, 0.62);
+  --vl-shadow-glow: 0 12px 34px rgba(109, 63, 214, 0.38);
+  --vl-shadow-glow-strong: 0 18px 48px rgba(83, 109, 255, 0.42);
+  --vl-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
-  /* Motion */
+  /* --------------------------------------------------------------------- */
+  /* Motion                                                               */
+  /* --------------------------------------------------------------------- */
   --vl-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --vl-speed: 180ms;
+  --vl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --vl-speed-fast: 120ms;
+  --vl-speed: 200ms;
+  --vl-speed-slow: 420ms;
 
-  /* Layout */
-  --vl-nav-h: 68px;
-  --vl-section-gap: clamp(3rem, 6vw, 5.5rem);
+  /* --------------------------------------------------------------------- */
+  /* Layout & spacing (4px base scale)                                    */
+  /* --------------------------------------------------------------------- */
+  --vl-space-0: 0;
+  --vl-space-1: 0.25rem;
+  --vl-space-2: 0.5rem;
+  --vl-space-3: 0.75rem;
+  --vl-space-4: 1rem;
+  --vl-space-5: 1.5rem;
+  --vl-space-6: 2rem;
+  --vl-space-7: 2.5rem;
+  --vl-space-8: 3rem;
+  --vl-space-9: 4rem;
+  --vl-space-10: 5rem;
+  --vl-space-11: 6rem;
+
+  --vl-container: 1240px;
+  --vl-gutter: clamp(1rem, 4vw, 2rem);
+  --vl-nav-h: 72px;
+  --vl-section-gap: clamp(3rem, 5.5vw, 5rem);
+  --vl-focus-ring: 0 0 0 3px rgba(196, 167, 255, 0.45);
 }
 
-/* Colour-scheme hint for native form controls / scrollbars */
+/* Colour-scheme hint for native controls / scrollbars */
 html {
   color-scheme: dark;
 }
