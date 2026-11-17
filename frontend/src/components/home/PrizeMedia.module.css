@@ -1,0 +1,130 @@
+/* ============================================================================
+   PrizeMedia — the reward frame
+   Holds an authentic photograph when one is supplied; otherwise composes a
+   typographic plate (category line, serif monogram, product name).
+   ==========================================================================*/
+
+.media {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  background-color: var(--vl-surface-2);
+  background-image:
+    radial-gradient(72% 58% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 72%),
+    linear-gradient(180deg, #171719 0%, #111113 66%, #0d0d0f 100%);
+}
+
+.portrait {
+  aspect-ratio: 4 / 5;
+}
+.landscape {
+  aspect-ratio: 4 / 3;
+}
+.wide {
+  aspect-ratio: 16 / 9;
+}
+.square {
+  aspect-ratio: 1 / 1;
+}
+
+/* Accent light — a single quiet wash, never a neon glow */
+.accent_violet {
+  --vl-media-accent: rgba(124, 92, 255, 0.16);
+}
+.accent_blue {
+  --vl-media-accent: rgba(85, 102, 240, 0.15);
+}
+.accent_gold {
+  --vl-media-accent: rgba(201, 169, 106, 0.15);
+}
+
+.light {
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  background: radial-gradient(36% 40% at 50% 30%, var(--vl-media-accent, rgba(124, 92, 255, 0.14)) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(70% 70% at 50% 45%, #000 10%, transparent 78%);
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 45%, #000 10%, transparent 78%);
+  pointer-events: none;
+}
+
+.category {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 1.15rem 0;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.category svg {
+  color: var(--vl-gold-500);
+}
+
+.monogram {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  margin-block: auto;
+  font-family: var(--vl-font-display);
+  font-size: clamp(3rem, 7vw, 5.25rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: rgba(244, 242, 239, 0.9);
+  text-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+
+.rule {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 1px;
+  margin: 0 1.15rem 0.6rem;
+  background-image: var(--vl-grad-gold);
+  opacity: 0.75;
+}
+
+.caption {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.15rem 1.15rem;
+  font-family: var(--vl-font-display);
+  font-size: clamp(1rem, 0.6vw + 0.9rem, 1.25rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--vl-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}

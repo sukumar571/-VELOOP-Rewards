@@ -9,6 +9,7 @@ import {
   ListChecks,
   Sparkles,
   LifeBuoy,
+  History,
 } from 'lucide-react';
 import { useAsync } from '../hooks/useAsync.js';
 import {
@@ -18,8 +19,10 @@ import {
 } from '../services/giveawayService.js';
 import { getClaimContext } from '../services/claimService.js';
 import { getHowItWorksSteps } from '../config/howItWorks.js';
+import { getPrizeType } from '../config/prizeTypes.js';
+import { formatAmount } from '../config/currencies.js';
 import { formatCount, formatDate } from '../utils/format.js';
-import PrizeVisual from '../components/common/PrizeVisual.jsx';
+import PrizeMedia from '../components/home/PrizeMedia.jsx';
 import StatusBadge from '../components/common/StatusBadge.jsx';
 import Countdown from '../components/common/Countdown.jsx';
 import Skeleton from '../components/common/Skeleton.jsx';
@@ -37,10 +40,13 @@ import NotFoundPage from './NotFoundPage.jsx';
 import styles from './GiveawayDetail.module.css';
 
 /**
- * Individual giveaway details page. Everything (fees, currency, lifecycle,
- * entry states, claim info) is driven from structured config via the service
- * layer — no prize-specific branches live here. Participation is delegated to
- * <EntryPanel>, which enforces the server-authoritative flow.
+ * Giveaway detail — premium product page.
+ *
+ * Every value shown is the normalized service payload: title, tagline, entry
+ * fee, lifecycle status, entry window and participant/winner counts. The
+ * participation surface is <EntryPanel>, which enforces the unchanged
+ * server-authoritative join flow (fees, eligibility, idempotency, balance).
+ * No brand name or reward value is displayed because the data carries neither.
  */
 export default function GiveawayDetailPage() {
   const { slug } = useParams();
@@ -100,14 +106,14 @@ export default function GiveawayDetailPage() {
     );
   }
 
-  const { title, tagline, status, endingSoon, participants, winners, startsAt, endsAt } =
+  const { title, tagline, status, endingSoon, participants, winners, startsAt, endsAt, entry } =
     giveaway;
   const open = status === 'active';
   const steps = getHowItWorksSteps(giveaway);
+  const category = getPrizeType(giveaway.prizeType).label;
 
   return (
     <div className={`container ${styles.page}`}>
-      {/* Visible link back to Giveaway Home */}
       <nav className={styles.crumbs} aria-label="Breadcrumb">
         <Link to="/">Home</Link>
         <ChevronRight size={13} aria-hidden="true" />
@@ -117,17 +123,35 @@ export default function GiveawayDetailPage() {
       </nav>
 
       <div className={styles.layout}>
-        {/* ---- Left: visual + long copy + info sections ---- */}
-        <div className={styles.colVisual}>
-          <PrizeVisual giveaway={giveaway} size="detail" className={styles.visual} />
+        {/* ---------------- Main column ---------------- */}
+        <div className={styles.main}>
+          {/* Gallery */}
+          <figure className={styles.gallery}>
+            <div className={styles.galleryFrame}>
+              <PrizeMedia giveaway={giveaway} categoryLabel={category} ratio="wide" priority />
+            </div>
+            <figcaption className={styles.galleryCaption}>
+              <span className={styles.captionCategory}>
+                {category}
+                {IS_DEMO ? <DemoNotice variant="chip" /> : null}
+              </span>
+              <span className={styles.captionMeta}>
+                {status === 'active'
+                  ? `Entries close ${formatDate(endsAt)}`
+                  : status === 'upcoming'
+                    ? `Entries open ${formatDate(startsAt)}`
+                    : `Entries closed ${formatDate(endsAt)}`}
+              </span>
+            </figcaption>
+          </figure>
 
           <section className={`vl-card ${styles.panel}`} aria-labelledby="about-h">
-            <h2 id="about-h" className="vl-h2">
+            <h2 id="about-h" className={`vl-h3 ${styles.panelTitle}`}>
               About this prize
             </h2>
             <p className={styles.desc}>{giveaway.description}</p>
 
-            <h3 className={styles.rulesTitle}>Draw &amp; entry rules</h3>
+            <h3 className={styles.subTitle}>Draw &amp; entry rules</h3>
             <ul className={styles.rules}>
               {giveaway.rules.map((rule) => (
                 <li key={rule}>
@@ -138,91 +162,135 @@ export default function GiveawayDetailPage() {
             </ul>
           </section>
 
-          {/* Accessible How This Giveaway Works timeline */}
           <section className={`vl-card ${styles.panel}`} aria-labelledby="how-h">
-            <h2 id="how-h" className={styles.entryTitle}>
-              <Sparkles size={18} aria-hidden="true" /> How this giveaway works
+            <h2 id="how-h" className={`vl-h3 ${styles.panelTitle}`}>
+              <Sparkles size={17} aria-hidden="true" /> How this giveaway works
             </h2>
             <HowItWorksTimeline steps={steps} />
           </section>
 
-          {/* Winner-selection & prize-claim information */}
+          {/* Transparency — only fields the API actually returns */}
+          <section className={`vl-card ${styles.panel}`} aria-labelledby="transparency-h">
+            <h2 id="transparency-h" className={`vl-h3 ${styles.panelTitle}`}>
+              <History size={17} aria-hidden="true" /> Draw transparency
+            </h2>
+            <dl className={styles.transparency}>
+              <div>
+                <dt>Status</dt>
+                <dd className={styles.capitalize}>{status}</dd>
+              </div>
+              <div>
+                <dt>Entry window</dt>
+                <dd>
+                  {formatDate(startsAt)} — {formatDate(endsAt)}
+                </dd>
+              </div>
+              <div>
+                <dt>Entry fee</dt>
+                <dd>
+                  {entry
+                    ? formatAmount(entry.currency, entry.amount)
+                    : 'Not published for this draw'}
+                </dd>
+              </div>
+              <div>
+                <dt>Participants recorded</dt>
+                <dd className="vl-num">{formatCount(participants)}</dd>
+              </div>
+              <div>
+                <dt>Winner slots</dt>
+                <dd className="vl-num">{winners}</dd>
+              </div>
+              <div>
+                <dt>Selection</dt>
+                <dd>Random draw from the closed entry snapshot</dd>
+              </div>
+            </dl>
+            <p className={styles.transparencyNote}>
+              Individual participation records are private to the account that entered; public
+              pages show aggregate counts and masked winner identities only.
+            </p>
+          </section>
+
           <section className={`vl-card ${styles.panel}`} aria-labelledby="claim-h2">
-            <h2 id="claim-h2" className={styles.entryTitle}>
-              <Trophy size={18} aria-hidden="true" /> Winner selection &amp; claim
+            <h2 id="claim-h2" className={`vl-h3 ${styles.panelTitle}`}>
+              <Trophy size={17} aria-hidden="true" /> Winner selection &amp; claim
             </h2>
             <WinnerClaimPanel giveaway={giveaway} />
           </section>
 
-          {/* Expandable Terms & Conditions + Important Information */}
           <section className={`vl-card ${styles.panel}`} aria-labelledby="legal-h">
-            <h2 id="legal-h" className={styles.entryTitle}>
-              <ListChecks size={18} aria-hidden="true" /> Terms &amp; important information
+            <h2 id="legal-h" className={`vl-h3 ${styles.panelTitle}`}>
+              <ListChecks size={17} aria-hidden="true" /> Terms &amp; important information
             </h2>
             <LegalSection />
           </section>
         </div>
 
-        {/* ---- Right: facts + participation + eligibility ---- */}
-        <div className={styles.colFacts}>
-          <section className={`vl-card ${styles.panel}`} aria-label="Giveaway summary">
+        {/* ---------------- Summary rail ---------------- */}
+        <aside className={styles.rail} aria-label="Draw summary and entry">
+          <div className={`vl-card ${styles.summary}`}>
             <div className={styles.badgeRow}>
               <StatusBadge status={status} endingSoon={endingSoon} />
-              {open ? <Countdown endsAt={endsAt} variant="blocks" /> : null}
-              {IS_DEMO ? <DemoNotice variant="chip" /> : null}
+              {open && endsAt ? <Countdown endsAt={endsAt} variant="chip" /> : null}
             </div>
 
             <h1 className={styles.title}>{title}</h1>
-            <p className={styles.tagline}>{tagline}</p>
+            {tagline ? <p className={styles.tagline}>{tagline}</p> : null}
+
+            {open && endsAt ? (
+              <div className={styles.countdownBlock}>
+                <span className={styles.countdownLabel}>Entries close in</span>
+                <Countdown endsAt={endsAt} variant="blocks" />
+              </div>
+            ) : null}
 
             <dl className={styles.facts}>
               <div className={styles.fact}>
                 <dt>
-                  <Users size={14} aria-hidden="true" /> Participants
+                  <Users size={13} aria-hidden="true" /> Participants
                 </dt>
                 <dd>{formatCount(participants)}</dd>
               </div>
               <div className={styles.fact}>
                 <dt>
-                  <Trophy size={14} aria-hidden="true" /> Winners
+                  <Trophy size={13} aria-hidden="true" /> Winners
                 </dt>
                 <dd>{winners}</dd>
               </div>
               <div className={styles.fact}>
                 <dt>
-                  <CalendarClock size={14} aria-hidden="true" />{' '}
-                  {status === 'upcoming' ? 'Entries open' : 'Entries close'}
+                  <CalendarClock size={13} aria-hidden="true" />{' '}
+                  {status === 'upcoming' ? 'Opens' : 'Closes'}
                 </dt>
                 <dd>{formatDate(status === 'upcoming' ? startsAt : endsAt)}</dd>
               </div>
             </dl>
 
-            {/* Participation flow — all authoritative checks live in the service */}
+            {/* Participation flow — unchanged server-authoritative component */}
             {open || status === 'upcoming' ? (
-              <EntryPanel giveaway={giveaway} />
+              <div className={styles.entryWrap}>
+                <EntryPanel giveaway={giveaway} />
+              </div>
             ) : (
               <p className={styles.closedNote} role="status">
                 The entry window for this draw has closed.
               </p>
             )}
-          </section>
+          </div>
 
-          {/* Eligibility & participation requirements */}
-          <section className={`vl-card ${styles.panel}`} aria-labelledby="elig-h">
-            <h2 id="elig-h" className={styles.entryTitle}>
-              <ShieldCheck size={18} aria-hidden="true" /> Eligibility &amp; requirements
+          <section className={`vl-card ${styles.sidePanel}`} aria-labelledby="elig-h">
+            <h2 id="elig-h" className={`vl-h4 ${styles.sidePanelTitle}`}>
+              <ShieldCheck size={16} aria-hidden="true" /> Eligibility &amp; requirements
             </h2>
             <EligibilityList />
           </section>
 
-          {/* ENDED-only draw result (ACTIVE never renders winners). */}
           {ended ? (
-            <section className={`vl-card ${styles.panel}`} aria-labelledby="draw-winners-h">
-              <h2 id="draw-winners-h" className={styles.entryTitle}>
+            <section className={`vl-card ${styles.sidePanel}`} aria-labelledby="draw-winners-h">
+              <h2 id="draw-winners-h" className={`vl-h4 ${styles.sidePanelTitle}`}>
                 Draw result
               </h2>
-              {/* Personalized claim — rendered ONLY when the server confirms this
-                  account is the winner. Non-winners see just the masked public list. */}
               {claimCtx?.isWinner ? (
                 <div className={styles.claimBlock}>
                   <WinnerClaimCard record={claimCtx} onUpdated={reloadClaim} />
@@ -253,16 +321,15 @@ export default function GiveawayDetailPage() {
           ) : null}
 
           <Link to="/giveaways" className={styles.back}>
-            ← Back to Giveaway Home
+            ← Back to all giveaways
           </Link>
-        </div>
+        </aside>
       </div>
 
-      {/* Support link */}
       <div className={styles.support}>
         <LifeBuoy size={16} aria-hidden="true" />
         <span>Need help with this giveaway?</span>
-        <Link to="/#how-it-works">Visit the how-it-works guide</Link>
+        <Link to="/legal#terms">Read the terms &amp; important information</Link>
         <span className={styles.supportNote}>
           (Direct support channels are backend-pending.)
         </span>

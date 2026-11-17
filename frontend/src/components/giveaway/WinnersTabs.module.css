@@ -15,9 +15,9 @@
 .tablist {
   display: inline-flex;
   gap: 0.2rem;
-  padding: 0.28rem;
-  border-radius: var(--vl-radius-pill);
-  background: rgba(16, 17, 29, 0.8);
+  padding: 0.25rem;
+  border-radius: var(--vl-radius-sm);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--vl-border);
 }
 
@@ -25,23 +25,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 0.55rem 1.2rem;
-  border: 0;
-  border-radius: var(--vl-radius-pill);
+  min-height: 38px;
+  padding: 0 1.1rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--vl-radius-sm) - 3px);
   background: transparent;
   color: var(--vl-text-muted);
   font-family: inherit;
-  font-size: var(--vl-fs-xs);
-  font-weight: 650;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-ui);
   cursor: pointer;
   transition:
     background-color var(--vl-speed) var(--vl-ease-out),
-    color var(--vl-speed) var(--vl-ease-out);
+    color var(--vl-speed) var(--vl-ease-out),
+    border-color var(--vl-speed) var(--vl-ease-out);
 }
 .tab:hover {
   color: var(--vl-text);
-  background-color: rgba(255, 255, 255, 0.05);
 }
 .tab:focus-visible {
   outline: none;
@@ -49,13 +49,12 @@
 }
 
 .tabActive {
-  background-image: var(--vl-grad-cta);
-  color: #fff;
-  box-shadow: var(--vl-shadow-glow);
+  color: var(--vl-text);
+  background-color: var(--vl-surface-raised);
+  border-color: var(--vl-border);
 }
 .tabActive:hover {
-  color: #fff;
-  background-image: var(--vl-grad-cta);
+  color: var(--vl-text);
 }
 
 /* ---- previous winners grid ---- */
@@ -66,10 +65,15 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  align-items: stretch;
 }
 
 .prevItem {
+  display: flex;
   min-width: 0;
+}
+.prevItem > * {
+  width: 100%;
 }
 
 @media (max-width: 1199.98px) {
@@ -80,7 +84,7 @@
 
 @media (max-width: 575.98px) {
   .prevGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .tablist {
     width: 100%;
@@ -88,7 +92,6 @@
   .tab {
     flex: 1;
     min-height: 44px;
-    text-align: center;
     padding-inline: 0.6rem;
   }
 }

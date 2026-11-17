@@ -1,65 +1,76 @@
+/* ============================================================================
+   StatusBadge — quiet, editorial status labels (no neon fills)
+   ==========================================================================*/
+
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.32rem 0.75rem;
-  border-radius: var(--vl-radius-pill);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  gap: 0.42rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: var(--vl-radius-xs);
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-strong);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid transparent;
+  border: 1px solid var(--vl-border-strong);
+  background-color: rgba(10, 10, 12, 0.82);
+  color: var(--vl-text-body);
   white-space: nowrap;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
-  animation: pulse 1.8s var(--vl-ease) infinite;
+  animation: pulse 2.4s var(--vl-ease) infinite;
 }
 @keyframes pulse {
   0%,
   100% {
     opacity: 1;
-    transform: scale(1);
   }
   50% {
-    opacity: 0.45;
-    transform: scale(0.8);
+    opacity: 0.35;
   }
 }
 
 .active {
-  color: #7bf3b8;
-  background: rgba(41, 196, 126, 0.14);
-  border-color: rgba(41, 196, 126, 0.4);
+  color: #9fe8c9;
+  border-color: rgba(87, 201, 155, 0.34);
+  background-color: rgba(12, 34, 28, 0.72);
 }
 
+/* Ending soon is scarcity — the one place champagne is used */
 .urgent {
-  color: var(--vl-gold-400);
-  background: rgba(255, 205, 117, 0.12);
-  border-color: rgba(255, 205, 117, 0.45);
+  color: var(--vl-gold-300);
+  border-color: rgba(201, 169, 106, 0.42);
+  background-color: rgba(38, 29, 12, 0.72);
 }
 .urgent .dot {
-  background: var(--vl-green-500);
+  background: var(--vl-gold-400);
 }
 
 .upcoming {
-  color: #8fb7ff;
-  background: rgba(1, 69, 194, 0.22);
-  border-color: rgba(92, 140, 255, 0.45);
+  color: var(--vl-violet-300);
+  border-color: rgba(124, 92, 255, 0.32);
+  background-color: rgba(20, 16, 40, 0.72);
 }
 
 .ended {
   color: var(--vl-text-muted);
-  background: rgba(154, 157, 174, 0.1);
-  border-color: rgba(154, 157, 174, 0.3);
+  border-color: var(--vl-border);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .cancelled {
-  color: #ff9aa8;
-  background: rgba(240, 87, 109, 0.12);
-  border-color: rgba(240, 87, 109, 0.4);
+  color: #e9a7ad;
+  border-color: rgba(228, 115, 127, 0.32);
+  background-color: rgba(40, 16, 19, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
 }

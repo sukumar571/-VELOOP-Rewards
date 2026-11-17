@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fontsource-variable/inter';
+import '@fontsource-variable/fraunces';
 import './styles/variables.css';
 import './styles/global.css';
 import App from './App.jsx';

@@ -1,0 +1,224 @@
+/* ============================================================================
+   FeaturedRewards — editorial grid with varied proportions
+   Desktop: one 7-col feature + two 5-col companions. Narrower viewports
+   collapse to a single even grid so nothing is squeezed.
+   ==========================================================================*/
+
+.section {
+  padding-block: var(--vl-section-gap);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(1rem, 1.4vw, 1.5rem);
+}
+
+.cell {
+  min-width: 0;
+  display: flex;
+}
+
+/* Default: equal thirds for anything past the first three */
+.cell {
+  grid-column: span 4;
+}
+
+/* Feature */
+.cell0 {
+  grid-column: span 7;
+}
+.cell1 {
+  grid-column: span 5;
+}
+.cell2 {
+  grid-column: span 5;
+}
+
+/* Degrade gracefully for smaller collections */
+.grid[data-count='1'] .cell0 {
+  grid-column: 1 / -1;
+}
+.grid[data-count='2'] .cell0 {
+  grid-column: span 7;
+}
+.grid[data-count='2'] .cell1 {
+  grid-column: span 5;
+}
+
+/* ---- Card ---- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  background-color: var(--vl-card);
+  transition:
+    transform var(--vl-speed-slow) var(--vl-ease-out),
+    border-color var(--vl-speed) var(--vl-ease-out),
+    box-shadow var(--vl-speed-slow) var(--vl-ease-out);
+}
+.card:hover,
+.card:focus-within {
+  transform: translateY(-3px);
+  border-color: var(--vl-border-strong);
+  box-shadow: var(--vl-shadow);
+}
+
+.media {
+  position: relative;
+  border-bottom: 1px solid var(--vl-border);
+}
+.media :global(img) {
+  transition: transform 700ms var(--vl-ease-out);
+}
+.card:hover .media :global(img) {
+  transform: scale(1.03);
+}
+
+.badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+  flex: 1;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--vl-font-display);
+  font-size: clamp(1.15rem, 0.9vw + 1rem, 1.6rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--vl-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cardFeature .title {
+  font-size: clamp(1.35rem, 1.4vw + 1rem, 2rem);
+}
+.titleLink {
+  color: inherit;
+}
+.titleLink:hover {
+  color: var(--vl-gold-300);
+}
+/* Whole-card navigation without nesting interactive elements */
+.titleLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.titleLink:focus-visible {
+  outline: none;
+}
+.card:has(.titleLink:focus-visible) {
+  outline: 2px solid var(--vl-violet-400);
+  outline-offset: 2px;
+}
+
+.tagline {
+  margin: 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.55;
+  color: var(--vl-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.5rem;
+  margin: auto 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--vl-border);
+}
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+}
+.metaItem dt {
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.metaItem dd {
+  margin: 0;
+  font-size: var(--vl-fs-sm);
+  color: var(--vl-text-body);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+.foot :global(.vl-btn) {
+  position: relative;
+  z-index: 2;
+}
+.foot :global(.vl-btn svg) {
+  transition: transform var(--vl-speed) var(--vl-ease-out);
+}
+.foot :global(.vl-btn:hover svg) {
+  transform: translateX(3px);
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(1rem, 1.4vw, 1.5rem);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1199.98px) {
+  .cell0 {
+    grid-column: span 12;
+  }
+  .cell1,
+  .cell2 {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 899.98px) {
+  .cell0,
+  .cell1,
+  .cell2,
+  .cell {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card:hover,
+  .media :global(img),
+  .card:hover .media :global(img) {
+    transform: none;
+  }
+}

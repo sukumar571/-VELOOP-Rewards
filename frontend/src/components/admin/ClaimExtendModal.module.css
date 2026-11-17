@@ -1,22 +1,25 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 6, 21, 0.85);
-  backdrop-filter: blur(6px);
+  background: var(--vl-scrim);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1.5rem;
+  padding: clamp(0.85rem, 3vw, 1.5rem);
 }
 
 .modal {
   width: 100%;
   max-width: 480px;
-  background: var(--vl-surface-2);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  background: var(--vl-surface);
   border: 1px solid var(--vl-border-strong);
   border-radius: var(--vl-radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--vl-shadow-lg);
   display: flex;
   flex-direction: column;
 }
@@ -40,8 +43,10 @@
 }
 
 .header h2 {
-  font-size: 1.15rem;
-  font-weight: 750;
+  font-family: var(--vl-font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   margin: 0;
 }
 
@@ -61,9 +66,9 @@
 }
 
 .errorBanner {
-  background: rgba(240, 87, 109, 0.15);
-  border: 1px solid rgba(240, 87, 109, 0.35);
-  color: var(--vl-red-500);
+  background: rgba(228, 115, 127, 0.1);
+  border: 1px solid rgba(228, 115, 127, 0.36);
+  color: #f6c3c8;
   border-radius: var(--vl-radius-sm);
   padding: 0.75rem 1rem;
   display: flex;

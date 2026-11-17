@@ -1,172 +1,128 @@
+/* ============================================================================
+   Giveaway detail — premium product page
+   Left: gallery + information. Right: summary rail with the entry action.
+   ==========================================================================*/
+
 .page {
-  padding-top: 1.5rem;
-  padding-bottom: 3rem;
+  padding-block: 1.25rem var(--vl-section-gap);
 }
 
+/* ---- Breadcrumb ---- */
 .crumbs {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 1.4rem 0 0.4rem;
-  font-size: 0.84rem;
+  padding: 0.5rem 0 1.5rem;
+  font-size: var(--vl-fs-xs);
   color: var(--vl-text-muted);
 }
 .crumbs a {
   color: var(--vl-text-muted);
 }
 .crumbs a:hover {
-  color: var(--vl-violet-300);
-}
-.crumbs span {
   color: var(--vl-text);
-  font-weight: 600;
+}
+.crumbs > span {
+  color: var(--vl-text-body);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 32ch;
 }
 
+/* ---- Layout ---- */
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
   align-items: start;
-  padding-bottom: 2rem;
 }
 
-.colVisual,
-.colFacts {
+.main,
+.rail {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: clamp(1rem, 1.6vw, 1.35rem);
 }
 
-.visual {
-  /* Must stay positioned (relative) so the decorative glow inside PrizeVisual
-     is clipped by its overflow:hidden — a static box lets the glow escape and
-     widens the page (horizontal scrollbar). Not sticky either: a sticky visual
-     would overlap the "About this prize" content that follows it in the column. */
-  position: relative;
-}
-
-.panel {
-  padding: 1.5rem 1.6rem;
-}
-
-.badgeRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-}
-
-.title {
+/* ---- Gallery ---- */
+.gallery {
   margin: 0;
-  font-size: clamp(1.5rem, 2.4vw + 0.6rem, 2.1rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  color: var(--vl-text);
-}
-
-.tagline {
-  margin: 0.5rem 0 1.25rem;
-  color: var(--vl-text-muted);
-  font-size: 0.95rem;
-}
-
-/* ---- Facts ---- */
-.facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
-  margin: 0 0 1.35rem;
-}
-
-.fact {
-  padding: 0.8rem 0.9rem;
-  border-radius: var(--vl-radius);
-  background: rgba(131, 69, 240, 0.08);
   border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  overflow: hidden;
+  background-color: var(--vl-card);
 }
-.fact dt {
+
+.galleryFrame {
+  position: relative;
+  border-bottom: 1px solid var(--vl-border);
+}
+.galleryFrame :global(img) {
+  transition: transform 800ms var(--vl-ease-out);
+}
+.gallery:hover .galleryFrame :global(img) {
+  transform: scale(1.02);
+}
+
+.galleryCaption {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1.1rem;
+}
+
+.captionCategory {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--vl-text-muted);
 }
-.fact dt svg {
-  color: var(--vl-violet-300);
-  flex: none;
-}
-.fact dd {
-  margin: 0.4rem 0 0;
-  font-size: 1.02rem;
-  font-weight: 800;
-  color: var(--vl-text);
+
+.captionMeta {
+  font-size: var(--vl-fs-xs);
+  color: var(--vl-text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---- Entry panel ---- */
-.entry {
-  padding: 1.1rem 1.2rem;
-  border-radius: var(--vl-radius);
-  background: linear-gradient(120deg, rgba(131, 69, 240, 0.12), rgba(68, 75, 251, 0.08));
-  border: 1px solid var(--vl-border-strong);
+/* ---- Information panels ---- */
+.panel {
+  padding: clamp(1.15rem, 2vw, 1.6rem);
 }
 
-.entryTitle {
+.panelTitle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0 0.8rem;
-  font-size: 1.05rem;
-  font-weight: 750;
-  color: var(--vl-text);
+  margin: 0 0 0.85rem;
 }
-.entryTitle svg {
-  color: var(--vl-violet-300);
+.panelTitle svg {
+  color: var(--vl-text-muted);
   flex: none;
 }
 
-.entryNote {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-  margin: 1rem 0 0;
-  font-size: 0.84rem;
-  line-height: 1.55;
-  color: var(--vl-text-muted);
-}
-.entryNote svg {
-  flex: none;
-  margin-top: 0.12rem;
-  color: var(--vl-violet-300);
-}
-
-.closedNote {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--vl-text-muted);
-}
-
-/* ---- About column ---- */
 .desc {
-  font-size: 0.98rem;
-  line-height: 1.7;
+  margin: 0;
+  font-size: 0.975rem;
+  line-height: 1.75;
   color: var(--vl-text-body);
+  max-width: 68ch;
 }
 
-.rulesTitle {
-  margin: 1.6rem 0 0.8rem;
-  font-size: 1rem;
-  font-weight: 750;
-  color: var(--vl-text);
+.subTitle {
+  margin: 1.5rem 0 0.7rem;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-strong);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted);
 }
 
 .rules {
@@ -180,66 +136,246 @@
   display: flex;
   gap: 0.6rem;
   align-items: flex-start;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.6;
   color: var(--vl-text-muted);
 }
 .rules svg {
   flex: none;
-  margin-top: 0.15rem;
+  margin-top: 0.18rem;
   color: var(--vl-green-500);
+}
+
+/* ---- Transparency table ---- */
+.transparency {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem 1.5rem;
+  margin: 0;
+}
+.transparency > div {
+  min-width: 0;
+}
+.transparency dt {
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.transparency dd {
+  margin: 0.3rem 0 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.5;
+  color: var(--vl-text-body);
+}
+.capitalize {
+  text-transform: capitalize;
+}
+
+.transparencyNote {
+  margin: 1.1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--vl-border);
+  font-size: var(--vl-fs-xs);
+  line-height: 1.65;
+  color: var(--vl-text-faint);
+  max-width: 70ch;
+}
+
+/* ---- Summary rail ---- */
+.summary {
+  padding: clamp(1.15rem, 2vw, 1.5rem);
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--vl-font-display);
+  font-size: clamp(1.6rem, 1.6vw + 1.1rem, 2.3rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  color: var(--vl-text);
+}
+
+.tagline {
+  margin: 0.55rem 0 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.6;
+  color: var(--vl-text-muted);
+}
+
+.countdownBlock {
+  margin-top: 1.15rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius);
+  background-color: var(--vl-surface-2);
+}
+.countdownLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+
+/* ---- Facts ---- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.15rem 0 0;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--vl-border);
+}
+.fact {
+  min-width: 0;
+}
+.fact dt {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.fact dt svg {
+  flex: none;
+}
+.fact dd {
+  margin: 0.35rem 0 0;
+  font-size: 0.98rem;
+  font-weight: var(--vl-weight-strong);
+  color: var(--vl-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.entryWrap {
+  margin-top: 1.25rem;
+}
+
+.closedNote {
+  margin: 1rem 0 0;
+  font-size: var(--vl-fs-sm);
+  color: var(--vl-text-muted);
+}
+
+/* ---- Side panels ---- */
+.sidePanel {
+  padding: clamp(1.1rem, 1.8vw, 1.4rem);
+}
+
+.sidePanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+}
+.sidePanelTitle svg {
+  color: var(--vl-text-muted);
+  flex: none;
+}
+
+.claimBlock {
+  margin-bottom: 1rem;
 }
 
 .winners {
   display: grid;
-  gap: 0.8rem;
-}
-
-.claimBlock {
-  margin-bottom: 1.1rem;
+  gap: 0.7rem;
 }
 
 .back {
   align-self: flex-start;
-  font-weight: 700;
-  font-size: 0.92rem;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-ui);
+  color: var(--vl-text-muted);
+}
+.back:hover {
+  color: var(--vl-text);
 }
 
-/* ---- Support link strip ---- */
+/* ---- Support strip ---- */
 .support {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  padding: 0.9rem 1.1rem;
-  border-radius: var(--vl-radius);
+  gap: 0.55rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding: 0.95rem 1.15rem;
   border: 1px solid var(--vl-border);
-  background: rgba(131, 69, 240, 0.06);
-  font-size: 0.88rem;
+  border-radius: var(--vl-radius);
+  background-color: var(--vl-bg-2);
+  font-size: var(--vl-fs-sm);
   color: var(--vl-text-body);
 }
 .support svg {
-  color: var(--vl-violet-300);
+  color: var(--vl-text-faint);
   flex: none;
 }
+.support a {
+  color: var(--vl-text);
+  text-decoration: underline;
+  text-decoration-color: var(--vl-border-strong);
+  text-underline-offset: 0.22em;
+}
+.support a:hover {
+  text-decoration-color: var(--vl-gold-600);
+}
 .supportNote {
-  color: var(--vl-text-muted);
-  font-size: 0.8rem;
+  color: var(--vl-text-faint);
+  font-size: var(--vl-fs-xs);
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 991.98px) {
+@media (max-width: 1023.98px) {
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* On narrow screens the summary (and therefore the entry action) comes first */
+  .rail {
+    order: -1;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .transparency {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 575.98px) {
   .facts {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .panel {
-    padding: 1.15rem 1.1rem;
+  .transparency {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel,
+  .summary {
+    padding: 1.1rem;
+  }
+  .crumbs > span {
+    max-width: 18ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery:hover .galleryFrame :global(img) {
+    transform: none;
   }
 }

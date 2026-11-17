@@ -5,9 +5,9 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgba(3, 6, 21, 0.72);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(5, 5, 7, 0.78);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   animation: fade 160ms var(--vl-ease);
 }
 
@@ -17,9 +17,10 @@
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
   border-radius: var(--vl-radius-lg);
-  background: linear-gradient(180deg, var(--vl-surface-2) 0%, var(--vl-surface) 100%);
+  background-color: var(--vl-surface);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
   border: 1px solid var(--vl-border-strong);
-  box-shadow: var(--vl-shadow);
+  box-shadow: var(--vl-shadow-lg);
   animation: pop 180ms var(--vl-ease);
 }
 
@@ -28,24 +29,26 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem 1.3rem;
+  padding: 1.1rem 1.25rem;
   border-bottom: 1px solid var(--vl-border);
 }
 
 .title {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-family: var(--vl-font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   color: var(--vl-text);
 }
 
 .close {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   flex: none;
-  border-radius: 50%;
+  border-radius: var(--vl-radius-sm);
   border: 1px solid var(--vl-border);
   background: transparent;
   color: var(--vl-text-muted);
@@ -54,18 +57,18 @@
 }
 .close:hover {
   color: var(--vl-text);
-  border-color: var(--vl-violet-300);
+  border-color: var(--vl-border-strong);
 }
 
 .body {
-  padding: 1.3rem;
+  padding: 1.25rem;
 }
 
 .foot {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  padding: 1.1rem 1.3rem;
+  padding: 1.1rem 1.25rem;
   border-top: 1px solid var(--vl-border);
 }
 
@@ -80,7 +83,7 @@
 @keyframes pop {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;

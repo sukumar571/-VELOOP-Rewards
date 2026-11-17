@@ -22,6 +22,7 @@ import {
   changeGiveawayStatus,
 } from '../../services/adminService.js';
 import GiveawayFormModal from '../../components/admin/GiveawayFormModal.jsx';
+import Modal from '../../components/common/Modal.jsx';
 import styles from './AdminGiveawaysPage.module.css';
 
 const ALLOWED_TRANSITIONS = {
@@ -337,66 +338,74 @@ export default function AdminGiveawaysPage() {
         onSave={handleSaveGiveaway}
       />
 
-      {/* Transition Modal */}
-      {transitionTarget && (
-        <div className={styles.modalOverlay} onClick={() => setTransitionTarget(null)}>
-          <div className={`${styles.transitionModal} vl-card`} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.transitionHeader}>
-              <h3>Advance Giveaway Status</h3>
-              <button type="button" onClick={() => setTransitionTarget(null)} className={styles.closeBtn}>
-                &times;
-              </button>
+      {/* Transition dialog — shared accessible Modal (focus trap, Escape, scroll lock) */}
+      <Modal
+        open={Boolean(transitionTarget)}
+        onClose={() => setTransitionTarget(null)}
+        title="Advance giveaway status"
+        titleId="vl-transition-title"
+        footer={
+          <>
+            <button
+              type="button"
+              className="vl-btn vl-btn-ghost"
+              onClick={() => setTransitionTarget(null)}
+              disabled={transitionBusy}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="vl-transition-form"
+              className="vl-btn vl-btn-primary"
+              disabled={transitionBusy}
+            >
+              {transitionBusy ? 'Advancing…' : 'Confirm transition'}
+            </button>
+          </>
+        }
+      >
+        {transitionTarget ? (
+          <form
+            id="vl-transition-form"
+            onSubmit={handleExecuteTransition}
+            className={styles.transitionForm}
+          >
+            <p className={styles.transitionLead}>
+              Moving <strong>“{transitionTarget.title}”</strong> from{' '}
+              <code>{transitionTarget.status}</code> to the state below. The change is written to the
+              audit trail.
+            </p>
+
+            <div className={styles.field}>
+              <label htmlFor="tr-target">Target state</label>
+              <select
+                id="tr-target"
+                value={transitionStatus}
+                onChange={(e) => setTransitionStatus(e.target.value)}
+                required
+              >
+                {(ALLOWED_TRANSITIONS[transitionTarget.status] || []).map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
             </div>
-            <form onSubmit={handleExecuteTransition} className={styles.transitionForm}>
-              <p className={styles.transitionLead}>
-                Moving <strong>"{transitionTarget.title}"</strong> from current status{' '}
-                <code>{transitionTarget.status}</code>.
-              </p>
 
-              <div className={styles.field}>
-                <label htmlFor="tr-target">Target State</label>
-                <select
-                  id="tr-target"
-                  value={transitionStatus}
-                  onChange={(e) => setTransitionStatus(e.target.value)}
-                  required
-                >
-                  {(ALLOWED_TRANSITIONS[transitionTarget.status] || []).map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.field}>
-                <label htmlFor="tr-reason">Audit Reason (Optional)</label>
-                <input
-                  id="tr-reason"
-                  type="text"
-                  placeholder="e.g. Entry window closed on schedule"
-                  value={transitionReason}
-                  onChange={(e) => setTransitionReason(e.target.value)}
-                />
-              </div>
-
-              <div className={styles.transitionActions}>
-                <button
-                  type="button"
-                  className="vl-btn vl-btn-ghost"
-                  onClick={() => setTransitionTarget(null)}
-                  disabled={transitionBusy}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="vl-btn vl-btn-primary" disabled={transitionBusy}>
-                  {transitionBusy ? 'Advancing...' : 'Confirm Transition'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className={styles.field}>
+              <label htmlFor="tr-reason">Audit reason (optional)</label>
+              <input
+                id="tr-reason"
+                type="text"
+                placeholder="e.g. Entry window closed on schedule"
+                value={transitionReason}
+                onChange={(e) => setTransitionReason(e.target.value)}
+              />
+            </div>
+          </form>
+        ) : null}
+      </Modal>
     </div>
   );
 }

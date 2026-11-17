@@ -18,13 +18,13 @@ export default function Footer() {
           <p className={`vl-muted ${styles.blurb}`}>{FOOTER.blurb}</p>
           <p className={styles.trustLine}>
             <ShieldCheck size={16} aria-hidden="true" />
-            Fair, audited draws — winners selected from closed entry snapshots.
+            Winners are drawn from closed entry snapshots and published with masked identities.
           </p>
         </div>
 
         {FOOTER.columns.map((col) => (
           <nav key={col.title} className={styles.col} aria-label={col.title}>
-            <h3 className={styles.colTitle}>{col.title}</h3>
+            <h2 className={styles.colTitle}>{col.title}</h2>
             <ul>
               {col.links.map((link) => (
                 <li key={link.to + link.label}>
@@ -38,7 +38,16 @@ export default function Footer() {
 
       <div className={`container ${styles.bottom}`}>
         <span>© {year} VELOOP Rewards. All rights reserved.</span>
-        <span className={styles.faint}>Giveaway terms follow the official VELOOP programme rules.</span>
+
+        <ul className={styles.legal}>
+          {FOOTER.legal.map((link) => (
+            <li key={link.to}>
+              <Link to={link.to}>{link.label}</Link>
+            </li>
+          ))}
+        </ul>
+
+        <span className={styles.faint}>{FOOTER.note}</span>
       </div>
     </footer>
   );

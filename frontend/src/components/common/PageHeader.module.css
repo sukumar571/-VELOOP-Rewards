@@ -1,16 +1,38 @@
+/* ============================================================================
+   PageHeader — editorial page masthead (left aligned, serif, hairline accent)
+   ==========================================================================*/
+
 .wrap {
-  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(1.75rem, 4vw, 2.75rem);
-  text-align: center;
-  max-width: 46rem;
-  margin-inline: auto;
+  position: relative;
+  padding: clamp(2.5rem, 5vw, 4.25rem) 0 clamp(1.5rem, 3vw, 2.25rem);
+  max-width: 52rem;
+}
+
+/* Small champagne rule above the eyebrow — an editorial flourish, not a badge */
+.wrap::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 1px;
+  margin-bottom: 1.15rem;
+  background-image: var(--vl-grad-gold);
+  opacity: 0.85;
 }
 
 .title {
-  margin: 0.75rem 0 0;
-  font-size: clamp(1.9rem, 3.4vw + 0.6rem, 3.1rem);
+  margin: 0.7rem 0 0;
+  font-size: clamp(2.1rem, 3.4vw + 0.6rem, 3.4rem);
+  line-height: 1.02;
 }
 
 .sub {
-  margin: 1rem auto 0;
-  max-width: 60ch;
+  margin: 1.05rem 0 0;
+  max-width: 58ch;
+  color: var(--vl-text-muted);
+}
+
+@media (max-width: 575.98px) {
+  .wrap {
+    padding-top: 2rem;
+  }
 }

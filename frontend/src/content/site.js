@@ -1,6 +1,6 @@
 /**
- * Static marketing copy & navigation structure, transcribed from the project
- * design references (Ref_01 hero, Ref_02 page sections). Not backend data.
+ * Static marketing copy & navigation structure.
+ * Not backend data: nothing here describes a prize, price, winner or statistic.
  */
 
 export const NAV_LINKS = [
@@ -11,21 +11,22 @@ export const NAV_LINKS = [
 ];
 
 export const HERO = {
-  marquee:
-    '✦  Exclusive draws open now  ✦  Premium prizes every season  ✦  Verified entries, transparent draws  ✦  Rewards, reimagined  ✦  ',
   badge: 'VELOOP Rewards · Season 04',
-  titlePlain: 'Unlock',
-  titleGradient: 'Extraordinary Rewards.',
-  subtitle: 'Discover exclusive giveaways. Experience rewards differently.',
+  titleLineOne: 'Exceptional Rewards.',
+  titleLineTwo: 'Extraordinary Possibilities.',
+  subtitle:
+    'Discover exclusive rewards, explore premium giveaways, and experience a smarter way to participate.',
   cta: { label: 'Explore Giveaways', to: '/giveaways' },
-  ctaSecondary: { label: 'How It Works', to: '/#how-it-works' },
-  pills: [
-    { icon: 'ShieldCheck', title: 'Verified entry', sub: 'Checked before every charge' },
-    { icon: 'Zap', title: 'Instant confirmation', sub: 'Enter in a single tap' },
-    { icon: 'Gift', title: 'Premium prizes', sub: 'Devices, vouchers & more' },
+  ctaSecondary: { label: 'Discover How It Works', to: '/#how-it-works' },
+  /** Each statement is a property of the entry flow, not a marketing claim. */
+  assurances: [
+    'Server-validated entries',
+    'One charge per entry',
+    'Masked winner identities',
   ],
 };
 
+/** The four real stages of an entry (consumed by the homepage steps). */
 export const STEPS = [
   {
     title: 'Create your account',
@@ -33,27 +34,62 @@ export const STEPS = [
     icon: 'UserPlus',
   },
   {
-    title: 'Complete tasks',
-    text: 'Finish simple tasks to earn extra entries towards live giveaways.',
+    title: 'Choose your draw',
+    text: 'Browse open giveaways and open any card to see its prize, entry fee and closing date.',
     icon: 'ListChecks',
   },
   {
     title: 'Secure your entry',
-    text: 'Pay your entry fee in VEs, SVEs or Tokens — every entry is a fair chance.',
+    text: 'The server validates lifecycle, quota, eligibility and balance before the entry fee is charged.',
     icon: 'Ticket',
   },
   {
-    title: 'Win rewards',
-    text: 'Winners are selected randomly from the closed entry snapshot and announced publicly.',
+    title: 'Wait for the draw',
+    text: 'Winners are selected from the closed entry snapshot and announced with masked identities.',
     icon: 'Trophy',
   },
 ];
 
 /**
- * Trust points. Each one describes behaviour the application actually
- * implements (entry validation, idempotent charging, masked winners, claim
- * windows) — no invented guarantees, statistics or user counts.
+ * Why VELOOP — every line maps to behaviour the application implements:
+ * server-authoritative pricing, eligibility resolution, idempotent charging,
+ * ledger + audit records, masked identities and role-protected admin surfaces.
  */
+export const EXPERIENCE = {
+  eyebrow: 'Why VELOOP',
+  title: 'Built on record, not on promises.',
+  subtitle:
+    'Five properties of the platform you can verify yourself — in the entry flow, on the draw page, and in the records every entry leaves behind.',
+  items: [
+    {
+      icon: 'Scale',
+      title: 'Transparent participation',
+      text: 'Entry currency, fee, closing date and draw rules are shown before you enter. Nothing changes after you press the button.',
+    },
+    {
+      icon: 'ShieldCheck',
+      title: 'Verified eligibility',
+      text: 'Lifecycle state, entry quota, account eligibility and balance are resolved on the server at the moment of entry — never in the browser.',
+    },
+    {
+      icon: 'ReceiptText',
+      title: 'Clear reward information',
+      text: 'Every draw lists its prize tier and winner count. Policy that is not yet confirmed is marked pending instead of being presented as fact.',
+    },
+    {
+      icon: 'ListChecks',
+      title: 'Reliable participation records',
+      text: 'Each entry is written with an idempotency key and a ledger row, so a double-click or a retry is never charged twice.',
+    },
+    {
+      icon: 'Lock',
+      title: 'Secure account experience',
+      text: 'Sign-in issues a verified credential that the API checks on every request, and administrative surfaces require an admin role on the server.',
+    },
+  ],
+};
+
+/** Kept for components that still render the trust strip (winners page). */
 export const TRUST = [
   {
     icon: 'Scale',
@@ -93,9 +129,22 @@ export const FOOTER = {
       title: 'Programme',
       links: [
         { label: 'How it works', to: '/#how-it-works' },
-        { label: 'Fairness & trust', to: '/#trust' },
+        { label: 'Fairness & trust', to: '/#how-it-works' },
         { label: 'Ending soon', to: '/giveaways?filter=ending_soon' },
       ],
     },
+    {
+      title: 'Support',
+      links: [
+        { label: 'Your balance', to: '/earn' },
+        { label: 'Entry & fees', to: '/giveaways' },
+        { label: 'Terms & privacy', to: '/legal' },
+      ],
+    },
   ],
+  legal: [
+    { label: 'Terms & conditions', to: '/legal#terms' },
+    { label: 'Privacy policy', to: '/legal#privacy' },
+  ],
+  note: 'Giveaway terms follow the official VELOOP programme rules.',
 };

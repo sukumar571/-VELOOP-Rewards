@@ -1,32 +1,36 @@
+/* ============================================================================
+   Skeleton — neutral graphite shimmer (no accent tint, no layout jitter)
+   ==========================================================================*/
+
+.card,
+.row,
+.blocks {
+  border-radius: var(--vl-radius);
+  border: 1px solid var(--vl-border);
+  background-color: var(--vl-surface-2);
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0.045) 50%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.8s var(--vl-ease) infinite;
+}
+
 .card {
   height: 340px;
-  border-radius: var(--vl-radius-lg);
-  background:
-    linear-gradient(100deg, rgba(200, 88, 250, 0.06) 30%, rgba(200, 88, 250, 0.14) 50%, rgba(200, 88, 250, 0.06) 70%),
-    var(--vl-surface);
-  border: 1px solid var(--vl-border);
-  background-size: 220% 100%;
-  animation: shimmer 1.6s var(--vl-ease) infinite;
 }
 
 .row {
-  height: 16px;
-  width: 100%;
-  border-radius: 8px;
-  background:
-    linear-gradient(100deg, rgba(200, 88, 250, 0.05) 30%, rgba(200, 88, 250, 0.12) 50%, rgba(200, 88, 250, 0.05) 70%);
-  background-size: 220% 100%;
-  animation: shimmer 1.6s var(--vl-ease) infinite;
+  height: 14px;
+  border-color: transparent;
+  background-color: rgba(255, 255, 255, 0.045);
 }
 
 .blocks {
   height: 64px;
-  width: 100%;
-  border-radius: var(--vl-radius);
-  background:
-    linear-gradient(100deg, rgba(200, 88, 250, 0.05) 30%, rgba(200, 88, 250, 0.12) 50%, rgba(200, 88, 250, 0.05) 70%);
-  background-size: 220% 100%;
-  animation: shimmer 1.6s var(--vl-ease) infinite;
 }
 
 @keyframes shimmer {
@@ -43,5 +47,6 @@
   .row,
   .blocks {
     animation: none;
+    background-image: none;
   }
 }

@@ -1,0 +1,86 @@
+/* ============================================================================
+   Experience — numbered editorial list (no card wall)
+   ==========================================================================*/
+
+.section {
+  padding-block: var(--vl-section-gap);
+  border-top: 1px solid var(--vl-border);
+}
+
+.intro {
+  max-width: 62ch;
+  margin: -1rem 0 2.5rem;
+  font-size: var(--vl-fs-lead);
+  line-height: 1.65;
+  color: var(--vl-text-muted);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(2rem, 4vw, 4rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--vl-border);
+}
+
+.index {
+  flex: none;
+  font-family: var(--vl-font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--vl-gold-500);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15rem;
+}
+
+.body {
+  min-width: 0;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-family: var(--vl-font);
+  font-size: 1.0313rem;
+  font-weight: var(--vl-weight-strong);
+  letter-spacing: -0.01em;
+  color: var(--vl-text);
+}
+.title svg {
+  flex: none;
+  color: var(--vl-text-muted);
+}
+
+.text {
+  margin: 0.5rem 0 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.7;
+  color: var(--vl-text-muted);
+}
+
+@media (max-width: 899.98px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+  .intro {
+    margin-bottom: 1.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .item {
+    gap: 0.85rem;
+    padding: 1.25rem 0;
+  }
+}

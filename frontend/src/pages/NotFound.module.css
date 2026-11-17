@@ -4,30 +4,32 @@
   align-items: center;
   text-align: center;
   gap: 0.6rem;
-  padding: clamp(4rem, 12vh, 8rem) 1rem 5rem;
+  padding: clamp(3.5rem, 11vh, 7rem) 1rem 5rem;
 }
 
 .icon {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: rgba(131, 69, 240, 0.15);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--vl-radius);
+  background-color: var(--vl-surface-2);
   border: 1px solid var(--vl-border-strong);
-  color: var(--vl-violet-300);
+  color: var(--vl-text-muted);
   margin-bottom: 0.5rem;
 }
 
 .text {
   max-width: 48ch;
   margin: 0;
+  font-size: var(--vl-fs-lead);
+  color: var(--vl-text-muted);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.8rem;
-  margin-top: 1.4rem;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }

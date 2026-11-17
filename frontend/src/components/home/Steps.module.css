@@ -1,0 +1,68 @@
+/* ============================================================================
+   Steps — four columns, hairline rules, serif numerals
+   ==========================================================================*/
+
+.section {
+  padding-block: var(--vl-section-gap);
+  border-top: 1px solid var(--vl-border);
+  background-color: var(--vl-bg-2);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--vl-border);
+}
+
+.num {
+  font-family: var(--vl-font-display);
+  font-size: clamp(1.6rem, 2vw, 2.1rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--vl-text-faint);
+}
+
+.title {
+  margin: 0.9rem 0 0;
+  font-family: var(--vl-font);
+  font-size: 1rem;
+  font-weight: var(--vl-weight-strong);
+  letter-spacing: -0.01em;
+  color: var(--vl-text);
+}
+
+.text {
+  margin: 0.5rem 0 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.7;
+  color: var(--vl-text-muted);
+}
+
+.cta {
+  margin: 2.5rem 0 0;
+}
+
+@media (max-width: 1023.98px) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+  .cta :global(.vl-btn) {
+    width: 100%;
+  }
+}

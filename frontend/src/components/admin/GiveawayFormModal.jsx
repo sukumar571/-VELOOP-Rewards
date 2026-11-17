@@ -36,6 +36,21 @@ export default function GiveawayFormModal({ giveaway, isOpen, onClose, onSave })
 
   const isEdit = Boolean(giveaway?.id);
 
+  // Escape closes the dialog; body scroll is locked while it is open.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, onClose]);
+
   useEffect(() => {
     if (giveaway) {
       setValues({
@@ -143,10 +158,18 @@ export default function GiveawayFormModal({ giveaway, isOpen, onClose, onSave })
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={`${styles.modal} vl-card`} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`${styles.modal} vl-card`}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="vl-giveaway-form-title"
+      >
         <div className={styles.header}>
-          <h2>{isEdit ? 'Edit Giveaway Configuration' : 'Create New Giveaway'}</h2>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
+          <h2 id="vl-giveaway-form-title">
+            {isEdit ? 'Edit giveaway configuration' : 'Create new giveaway'}
+          </h2>
+          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close dialog">
             <X size={20} />
           </button>
         </div>

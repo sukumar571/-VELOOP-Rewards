@@ -1,78 +1,329 @@
+/* ============================================================================
+   Giveaways listing — premium discovery
+   ==========================================================================*/
+
 .page {
-  padding-block: clamp(1.5rem, 3vw, 2.5rem) var(--vl-space-8);
+  padding-bottom: var(--vl-section-gap);
 }
 
-/* Sticky glass filter bar, kept clear of the fixed header */
+.stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -0.5rem 0 2rem;
+  font-size: var(--vl-fs-xs);
+  color: var(--vl-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.statsDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-green-500);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Featured band                                                              */
+/* -------------------------------------------------------------------------- */
+.featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  overflow: hidden;
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  background-color: var(--vl-card);
+  box-shadow: var(--vl-shadow-sm);
+}
+
+.featuredMedia {
+  position: relative;
+  border-right: 1px solid var(--vl-border);
+  min-width: 0;
+}
+.featuredMedia :global(img) {
+  transition: transform 700ms var(--vl-ease-out);
+}
+.featured:hover .featuredMedia :global(img) {
+  transform: scale(1.02);
+}
+
+.featuredBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+}
+
+.featuredBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  min-width: 0;
+}
+
+.featuredEyebrow {
+  margin: 0;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vl-gold-500);
+}
+
+.featuredTitle {
+  margin: 0;
+  font-family: var(--vl-font-display);
+  font-size: clamp(1.5rem, 1.6vw + 1.1rem, 2.15rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--vl-text);
+}
+.featuredTitle a {
+  color: inherit;
+}
+.featuredTitle a:hover {
+  color: var(--vl-gold-300);
+}
+
+.featuredTagline {
+  margin: 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.6;
+  color: var(--vl-text-muted);
+}
+
+.featuredFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin: 0.65rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--vl-border);
+}
+.featuredFacts dt {
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+.featuredFacts dd {
+  margin: 0.25rem 0 0;
+  font-size: var(--vl-fs-sm);
+  color: var(--vl-text-body);
+}
+
+.featuredFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Toolbar                                                                    */
+/* -------------------------------------------------------------------------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.25rem;
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-sm);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 38px;
+  padding: 0 0.9rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--vl-radius-sm) - 3px);
+  background: transparent;
+  color: var(--vl-text-muted);
+  font-family: inherit;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-ui);
+  cursor: pointer;
+  transition:
+    color var(--vl-speed) var(--vl-ease-out),
+    background-color var(--vl-speed) var(--vl-ease-out);
+}
+.tab:hover {
+  color: var(--vl-text);
+}
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--vl-focus-ring);
+}
+.tabActive {
+  color: var(--vl-text);
+  background-color: var(--vl-surface-raised);
+  border-color: var(--vl-border);
+}
+.tabCount {
+  font-size: var(--vl-fs-2xs);
+  color: var(--vl-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.tabActive .tabCount {
+  color: var(--vl-gold-400);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-sm);
+  background-color: rgba(10, 10, 12, 0.7);
+  transition: border-color var(--vl-speed) var(--vl-ease-out);
+}
+.search:focus-within {
+  border-color: var(--vl-violet-500);
+  box-shadow: var(--vl-focus-ring);
+}
+.searchInput {
+  width: clamp(11rem, 18vw, 16rem);
+  border: 0;
+  background: transparent;
+  color: var(--vl-text);
+  font-family: inherit;
+  font-size: var(--vl-fs-sm);
+  outline: none;
+}
+.searchInput::placeholder {
+  color: var(--vl-text-faint);
+}
+
+.sortSelect {
+  min-height: 42px;
+  padding: 0 2rem 0 0.75rem;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-sm);
+  background-color: rgba(10, 10, 12, 0.7);
+  color: var(--vl-text-body);
+  font-family: inherit;
+  font-size: var(--vl-fs-sm);
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Category chips                                                             */
+/* -------------------------------------------------------------------------- */
 .chips {
-  position: sticky;
-  top: calc(var(--vl-nav-h) + 0.5rem);
-  z-index: 20;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 0.4rem;
-  padding: 0.45rem;
-  margin-bottom: var(--vl-space-6);
-  border-radius: var(--vl-radius-pill);
-  background-color: rgba(16, 17, 29, 0.78);
-  border: 1px solid var(--vl-border);
-  box-shadow: var(--vl-shadow-sm), var(--vl-inset-highlight);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  margin-bottom: 1.75rem;
 }
 
 .chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px; /* touch-friendly filter target */
-  padding: 0.5rem 1.05rem;
+  min-height: 34px;
+  padding: 0 0.8rem;
+  border: 1px solid var(--vl-border);
   border-radius: var(--vl-radius-pill);
-  border: 1px solid transparent;
   background: transparent;
   color: var(--vl-text-muted);
   font-family: inherit;
   font-size: var(--vl-fs-xs);
-  font-weight: 650;
+  font-weight: var(--vl-weight-ui);
   cursor: pointer;
   transition:
-    background-color var(--vl-speed) var(--vl-ease-out),
-    border-color var(--vl-speed) var(--vl-ease-out),
     color var(--vl-speed) var(--vl-ease-out),
-    box-shadow var(--vl-speed) var(--vl-ease-out);
+    border-color var(--vl-speed) var(--vl-ease-out),
+    background-color var(--vl-speed) var(--vl-ease-out);
 }
 .chip:hover {
   color: var(--vl-text);
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: var(--vl-border);
+  border-color: var(--vl-border-strong);
 }
 .chip:focus-visible {
   outline: none;
   box-shadow: var(--vl-focus-ring);
 }
 .chipActive {
-  background-image: var(--vl-grad-cta);
-  border-color: transparent;
-  color: #fff;
-  box-shadow: var(--vl-shadow-glow);
-}
-.chipActive:hover {
-  color: #fff;
-  background-image: var(--vl-grad-cta);
+  color: var(--vl-text);
+  border-color: rgba(201, 169, 106, 0.45);
+  background-color: rgba(201, 169, 106, 0.08);
 }
 
-/* Same 4 → 3 → 2 → 1 rhythm as the prize collection so cards match across
-   pages on every breakpoint. */
+/* -------------------------------------------------------------------------- */
+/* Grid                                                                       */
+/* -------------------------------------------------------------------------- */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
-  gap: var(--vl-space-4);
+  gap: clamp(1rem, 1.4vw, 1.5rem);
 }
 
+.gridItem {
+  display: flex;
+  min-width: 0;
+}
+.gridItem > * {
+  width: 100%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pagination                                                                 */
+/* -------------------------------------------------------------------------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--vl-border);
+}
+
+.pageLabel {
+  font-size: var(--vl-fs-xs);
+  color: var(--vl-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive                                                                 */
+/* -------------------------------------------------------------------------- */
 @media (max-width: 1199.98px) {
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .featured {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .featuredMedia {
+    border-right: 0;
+    border-bottom: 1px solid var(--vl-border);
   }
 }
 
@@ -82,28 +333,38 @@
   }
 }
 
+@media (max-width: 767.98px) {
+  .toolbar {
+    align-items: stretch;
+  }
+  .tabs {
+    width: 100%;
+  }
+  .tab {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 0.4rem;
+  }
+  .tools {
+    width: 100%;
+  }
+  .search {
+    flex: 1;
+  }
+  .searchInput {
+    width: 100%;
+  }
+}
+
 @media (max-width: 575.98px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--vl-space-3);
   }
-}
-
-.gridItem {
-  min-width: 0;
-  display: flex;
-  align-items: stretch;
-}
-.gridItem > * {
-  width: 100%;
-}
-
-@media (max-width: 575.98px) {
   .chips {
-    border-radius: var(--vl-radius-lg);
-    justify-content: flex-start;
-    overflow-x: auto;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
     scrollbar-width: none;
   }
   .chips::-webkit-scrollbar {
@@ -111,5 +372,18 @@
   }
   .chip {
     flex: none;
+    min-height: 40px;
+  }
+  .sortWrap {
+    flex: 1;
+  }
+  .sortSelect {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured:hover .featuredMedia :global(img) {
+    transform: none;
   }
 }

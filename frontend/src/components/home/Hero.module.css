@@ -1,0 +1,293 @@
+/* ============================================================================
+   Hero — cinematic editorial opening
+   Atmosphere: two quiet light pools + one hairline. No illustration, no glow
+   spam. Left column carries the promise; right column carries the live draw.
+   ==========================================================================*/
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(3rem, 6vw, 5.5rem) clamp(3.5rem, 7vw, 6.5rem);
+  border-bottom: 1px solid var(--vl-border);
+}
+
+/* Atmospheric lighting — restrained */
+.lightA {
+  position: absolute;
+  top: -32%;
+  right: -12%;
+  width: min(900px, 78vw);
+  height: min(900px, 78vw);
+  background: radial-gradient(closest-side, rgba(124, 92, 255, 0.18) 0%, transparent 72%);
+  pointer-events: none;
+}
+.lightB {
+  position: absolute;
+  bottom: -40%;
+  left: -18%;
+  width: min(760px, 70vw);
+  height: min(760px, 70vw);
+  background: radial-gradient(closest-side, rgba(201, 169, 106, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hairline {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.05) 30%, transparent);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+/* ---- Copy column ---- */
+.copy {
+  min-width: 0;
+  max-width: 40rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 clamp(1.2rem, 2vw, 1.75rem);
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vl-text-muted);
+}
+.badgeDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--vl-gold-500);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--vl-font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 4.4vw + 0.9rem, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: var(--vl-text);
+}
+.titleLine {
+  display: block;
+}
+.titleAccent {
+  background-image: var(--vl-grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--vl-gold-400);
+}
+
+.sub {
+  margin: clamp(1.2rem, 2vw, 1.6rem) 0 0;
+  max-width: 34rem;
+  font-size: var(--vl-fs-lead);
+  line-height: 1.65;
+  color: var(--vl-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(1.6rem, 2.6vw, 2.25rem);
+}
+
+.assurances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: clamp(1.6rem, 2.4vw, 2.1rem) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--vl-fs-sm);
+  color: var(--vl-text-body);
+}
+.assurances li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.assurances li::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--vl-gold-600);
+}
+
+.liveLine {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 1.35rem 0 0;
+  font-size: var(--vl-fs-xs);
+  color: var(--vl-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-green-500);
+}
+.sep {
+  color: var(--vl-border-strong);
+}
+
+/* ---- Featured panel ---- */
+.visualCol {
+  min-width: 0;
+}
+
+.visualLabel {
+  margin: 0 0 0.75rem;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vl-text-faint);
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  background-color: var(--vl-card);
+  box-shadow: var(--vl-shadow);
+}
+
+.mediaWrap {
+  position: relative;
+  border-bottom: 1px solid var(--vl-border);
+}
+.mediaWrap :global(img) {
+  transition: transform 700ms var(--vl-ease-out);
+}
+.panel:hover .mediaWrap :global(img) {
+  transform: scale(1.02);
+}
+
+.panelBody {
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.panelTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--vl-font-display);
+  font-size: clamp(1.35rem, 1.2vw + 1.1rem, 1.75rem);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: var(--vl-text);
+}
+.panelTitle a {
+  color: inherit;
+}
+.panelTitle a:hover {
+  color: var(--vl-gold-300);
+}
+
+.panelTagline {
+  margin: 0.45rem 0 0;
+  font-size: var(--vl-fs-sm);
+  line-height: 1.55;
+  color: var(--vl-text-muted);
+}
+
+.panelFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.05rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--vl-border);
+}
+
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-ui);
+  color: var(--vl-text);
+  border-bottom: 1px solid var(--vl-border-strong);
+  padding-bottom: 0.1rem;
+  transition: gap var(--vl-speed) var(--vl-ease-out), color var(--vl-speed) var(--vl-ease-out);
+}
+.panelLink:hover {
+  gap: 0.6rem;
+  color: var(--vl-gold-400);
+  border-color: var(--vl-gold-600);
+}
+
+.panelState {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  padding: 1.5rem;
+}
+
+.panelEmpty {
+  margin: 0;
+  font-size: var(--vl-fs-sm);
+  color: var(--vl-text-muted);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 991.98px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+  .copy {
+    max-width: none;
+  }
+  .visualCol {
+    max-width: 32rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero {
+    padding-block: 2.25rem 3rem;
+  }
+  .actions :global(.vl-btn) {
+    width: 100%;
+  }
+  .panelBody {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mediaWrap :global(img),
+  .panel:hover .mediaWrap :global(img) {
+    transform: none;
+  }
+}

@@ -1,8 +1,6 @@
-/* HomePage keeps only section spacing — every block styles itself. */
-.how {
-  padding-block: var(--vl-section-gap);
-}
+/* HomePage — section-level composition only; each block styles itself. */
 
 .winners {
-  padding-block: 0 var(--vl-section-gap);
+  padding-block: var(--vl-section-gap);
+  border-top: 1px solid var(--vl-border);
 }

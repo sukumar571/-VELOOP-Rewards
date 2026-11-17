@@ -5,8 +5,8 @@
   gap: 1rem;
   padding: 1.05rem 1.2rem;
   transition:
-    border-color var(--vl-speed) var(--vl-ease),
-    transform var(--vl-speed) var(--vl-ease);
+    border-color var(--vl-speed) var(--vl-ease-out),
+    transform var(--vl-speed) var(--vl-ease-out);
 }
 .card:hover {
   border-color: var(--vl-border-strong);
@@ -17,20 +17,17 @@
   display: grid;
   place-items: center;
   align-self: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   flex: none;
-  border-radius: 50%;
-  font-weight: 800;
-  font-size: 1rem;
-  color: #fff;
-  background: var(--vl-grad-cta);
-  box-shadow: var(--vl-shadow-glow);
+  border-radius: var(--vl-radius-sm);
+  color: var(--vl-gold-400);
+  background-color: rgba(201, 169, 106, 0.1);
+  border: 1px solid rgba(201, 169, 106, 0.28);
 }
 [data-compact='true'] .avatar {
-  width: 44px;
-  height: 44px;
-  font-size: 0.9rem;
+  width: 42px;
+  height: 42px;
 }
 
 .info {
@@ -44,8 +41,8 @@
   align-items: center;
   gap: 0.4rem;
   margin: 0;
-  font-size: 1rem;
-  font-weight: 750;
+  font-size: var(--vl-fs-body);
+  font-weight: var(--vl-weight-strong);
   color: var(--vl-text);
 }
 
@@ -58,43 +55,47 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin: 0.3rem 0 0;
+  align-self: flex-start;
+  margin: 0.35rem 0 0;
   padding: 0.15rem 0.55rem;
-  border-radius: var(--vl-radius-pill);
-  background: rgba(131, 69, 240, 0.14);
+  border-radius: var(--vl-radius-xs);
+  background-color: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--vl-border);
-  font-size: 0.74rem;
-  font-weight: 700;
+  font-family: var(--vl-font-mono);
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
   letter-spacing: 0.04em;
-  color: var(--vl-violet-300);
-  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  color: var(--vl-text-muted);
 }
 
 .prize {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  margin: 0.3rem 0 0;
-  font-size: 0.88rem;
+  margin: 0.4rem 0 0;
+  font-size: var(--vl-fs-sm);
+  font-weight: var(--vl-weight-ui);
   color: var(--vl-gold-400);
-  font-weight: 600;
 }
 .prize svg {
   flex: none;
 }
 
 .meta {
-  margin: 0.25rem 0 0.55rem;
-  font-size: 0.8rem;
+  margin: 0.3rem 0 0.6rem;
+  font-size: var(--vl-fs-xs);
   color: var(--vl-text-muted);
 }
 
 .giveawayLink {
-  color: var(--vl-violet-300);
-  font-weight: 600;
+  color: var(--vl-text-body);
+  text-decoration: underline;
+  text-decoration-color: var(--vl-border-strong);
+  text-underline-offset: 0.22em;
 }
 .giveawayLink:hover {
-  color: var(--vl-gold-500);
+  color: var(--vl-text);
+  text-decoration-color: var(--vl-gold-600);
 }
 
 .status {
@@ -103,11 +104,17 @@
   margin-top: auto;
   padding: 0.2rem 0.6rem;
   border-radius: var(--vl-radius-pill);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: var(--vl-fs-2xs);
+  font-weight: var(--vl-weight-ui);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #7bf3b8;
-  background: rgba(41, 196, 126, 0.13);
-  border: 1px solid rgba(41, 196, 126, 0.35);
+  color: #9fe8c9;
+  background-color: rgba(87, 201, 155, 0.1);
+  border: 1px solid rgba(87, 201, 155, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
 }

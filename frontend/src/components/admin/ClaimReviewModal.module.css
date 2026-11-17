@@ -1,25 +1,26 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 6, 21, 0.85);
-  backdrop-filter: blur(6px);
+  background: var(--vl-scrim);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1.5rem;
+  padding: clamp(0.85rem, 3vw, 1.5rem);
 }
 
 .modal {
   width: 100%;
   max-width: 620px;
-  background: var(--vl-surface-2);
+  background: var(--vl-surface);
   border: 1px solid var(--vl-border-strong);
   border-radius: var(--vl-radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--vl-shadow-lg);
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: calc(100dvh - 2rem);
 }
 
 .header {
@@ -41,8 +42,10 @@
 }
 
 .header h2 {
-  font-size: 1.15rem;
-  font-weight: 750;
+  font-family: var(--vl-font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   margin: 0;
 }
 
@@ -63,9 +66,9 @@
 }
 
 .errorBanner {
-  background: rgba(240, 87, 109, 0.15);
-  border: 1px solid rgba(240, 87, 109, 0.35);
-  color: var(--vl-red-500);
+  background: rgba(228, 115, 127, 0.1);
+  border: 1px solid rgba(228, 115, 127, 0.36);
+  color: #f6c3c8;
   border-radius: var(--vl-radius-sm);
   padding: 0.75rem 1rem;
   display: flex;
@@ -143,9 +146,10 @@
 }
 
 .countryBadge {
-  background: rgba(131, 69, 240, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--vl-border);
   padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  border-radius: var(--vl-radius-xs);
 }
 
 .emptyFulfillment {
@@ -201,29 +205,35 @@
   width: fit-content;
 }
 
+.statusChip {
+  border: 1px solid var(--vl-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .status_NOT_SUBMITTED {
-  background: rgba(255, 195, 80, 0.2);
   color: var(--vl-gold-400);
+  border-color: rgba(201, 169, 106, 0.26);
+  background: rgba(201, 169, 106, 0.07);
 }
 
 .status_SUBMITTED {
-  background: rgba(68, 75, 251, 0.2);
-  color: #7279ff;
+  color: var(--vl-text-body);
 }
 
 .status_PROCESSING {
-  background: rgba(131, 69, 240, 0.2);
-  color: var(--vl-violet-300);
+  color: var(--vl-text-body);
 }
 
 .status_COMPLETED {
-  background: rgba(41, 196, 126, 0.2);
-  color: var(--vl-green-500);
+  color: #9fe8c9;
+  border-color: rgba(87, 201, 155, 0.3);
+  background: rgba(87, 201, 155, 0.08);
 }
 
 .status_EXPIRED {
-  background: rgba(240, 87, 109, 0.2);
-  color: var(--vl-red-500);
+  color: #f0a3ab;
+  border-color: rgba(228, 115, 127, 0.34);
+  background: rgba(228, 115, 127, 0.08);
 }
 
 @media (max-width: 600px) {
