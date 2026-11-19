@@ -20,4 +20,14 @@ const balancesQuery = z.object({
 /** GET /wallet/transactions?page=&limit= — the caller's own ledger history. */
 const transactionsQuery = z.object({ ...pagination });
 
-module.exports = { balancesQuery, transactionsQuery };
+/**
+ * POST /wallet/redeem — only the CODE is accepted. The currency and amount are
+ * decided by the server-side catalogue, so a client cannot ask for more.
+ */
+const redeemBody = z
+  .object({
+    code: z.string().trim().min(3).max(40),
+  })
+  .strict();
+
+module.exports = { balancesQuery, transactionsQuery, redeemBody };

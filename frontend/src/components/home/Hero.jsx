@@ -1,67 +1,71 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, Gift, Gem, ShieldCheck, Lock } from 'lucide-react';
 import { useAsync } from '../../hooks/useAsync.js';
-import { getFeaturedGiveaways, getProgrammeStats } from '../../services/giveawayService.js';
-import { HERO } from '../../content/site.js';
-import { getPrizeType } from '../../config/prizeTypes.js';
+import { getProgrammeStats } from '../../services/giveawayService.js';
+import { HOME_HERO } from '../../content/site.js';
+import { asset } from '../../utils/assets.js';
 import { formatCount } from '../../utils/format.js';
-import PrizeMedia from './PrizeMedia.jsx';
-import StatusBadge from '../common/StatusBadge.jsx';
-import Countdown from '../common/Countdown.jsx';
-import FeeBadges from '../common/FeeBadges.jsx';
-import Skeleton from '../common/Skeleton.jsx';
 import styles from './Hero.module.css';
 
+const ASSURANCE_ICONS = { Gem, ShieldCheck, Lock };
+
 /**
- * Homepage hero — cinematic, asymmetric editorial layout.
+ * Homepage hero — editorial promise on the left, product collection on the
+ * right.
  *
- * The right column is a live featured-draw panel built from the giveaway
- * service (no invented numbers, no decorative product illustration). When a
- * real prize photograph is added to src/assets/, PrizeMedia swaps it in.
+ * The artwork is the supplied collection photograph (src/assets/
+ * hero-collection.webp). The live programme figures below the actions come
+ * from the giveaway service; nothing on this hero is an invented statistic.
  */
 export default function Hero() {
-  const { data: featured, loading, error } = useAsync(getFeaturedGiveaways, []);
   const { data: stats } = useAsync(getProgrammeStats, []);
-
-  const lead = featured?.[0] ?? null;
-  const category = lead ? getPrizeType(lead.prizeType).label : 'Prize';
+  const art = asset('hero-collection');
 
   return (
     <section className={styles.hero} aria-labelledby="hero-heading">
-      <span className={styles.lightA} aria-hidden="true" />
-      <span className={styles.lightB} aria-hidden="true" />
-      <span className={styles.hairline} aria-hidden="true" />
+      <span className={styles.glow} aria-hidden="true" />
 
       <div className={`container ${styles.inner}`}>
         <div className={styles.copy}>
           <p className={styles.badge}>
-            <span className={styles.badgeDot} aria-hidden="true" />
-            {HERO.badge}
+            <Gift size={14} aria-hidden="true" />
+            {HOME_HERO.badge}
           </p>
 
           <h1 id="hero-heading" className={styles.title}>
-            <span className={styles.titleLine}>{HERO.titleLineOne}</span>
+            <span className={styles.titleLine}>{HOME_HERO.titleLineOne}</span>
             <span className={`${styles.titleLine} ${styles.titleAccent}`}>
-              {HERO.titleLineTwo}
+              {HOME_HERO.titleLineTwo}
             </span>
           </h1>
 
-          <p className={styles.sub}>{HERO.subtitle}</p>
+          <p className={styles.kicker}>{HOME_HERO.kicker}</p>
+          <p className={styles.sub}>{HOME_HERO.subtitle}</p>
 
           <div className={styles.actions}>
-            <Link to={HERO.cta.to} className="vl-btn vl-btn-cta vl-btn-lg">
-              {HERO.cta.label}
+            <Link to={HOME_HERO.cta.to} className={`vl-btn vl-btn-gold vl-btn-lg ${styles.cta}`}>
+              {HOME_HERO.cta.label}
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
-            <Link to={HERO.ctaSecondary.to} className="vl-btn vl-btn-outline vl-btn-lg">
-              {HERO.ctaSecondary.label}
+            <Link
+              to={HOME_HERO.ctaSecondary.to}
+              className={`vl-btn vl-btn-outline vl-btn-lg ${styles.cta}`}
+            >
+              {HOME_HERO.ctaSecondary.label}
+              <ChevronDown size={16} aria-hidden="true" />
             </Link>
           </div>
 
           <ul className={styles.assurances}>
-            {HERO.assurances.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
+            {HOME_HERO.assurances.map(({ icon, label }) => {
+              const Icon = ASSURANCE_ICONS[icon] ?? Gem;
+              return (
+                <li key={label} className={styles.assurance}>
+                  <Icon size={18} strokeWidth={1.6} aria-hidden="true" />
+                  {label}
+                </li>
+              );
+            })}
           </ul>
 
           {stats ? (
@@ -76,58 +80,20 @@ export default function Hero() {
           ) : null}
         </div>
 
-        <div className={styles.visualCol}>
-          <p className={styles.visualLabel}>Featured draw</p>
-
-          <div className={styles.panel}>
-            {loading ? (
-              <div className={styles.panelState} aria-busy="true">
-                <Skeleton variant="card" />
-              </div>
-            ) : lead ? (
-              <>
-                <HeroMediaSlot giveaway={lead} category={category} />
-                <div className={styles.panelBody}>
-                  <div className={styles.panelTop}>
-                    <StatusBadge status={lead.status} endingSoon={lead.endingSoon} />
-                    <Countdown endsAt={lead.endsAt} variant="chip" />
-                  </div>
-                  <h2 className={styles.panelTitle}>
-                    <Link to={`/giveaways/${lead.slug}`}>{lead.title}</Link>
-                  </h2>
-                  <p className={styles.panelTagline}>{lead.tagline}</p>
-                  <div className={styles.panelFoot}>
-                    <FeeBadges entry={lead.entry} />
-                    <Link to={`/giveaways/${lead.slug}`} className={styles.panelLink}>
-                      View giveaway
-                      <ArrowRight size={15} aria-hidden="true" />
-                    </Link>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className={styles.panelState}>
-                <p className={styles.panelEmpty}>
-                  {error
-                    ? 'Live draws are unavailable right now.'
-                    : 'No draw is open for entry at this moment.'}
-                </p>
-                <Link to="/giveaways" className="vl-btn vl-btn-outline vl-btn-sm">
-                  Browse giveaways
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
+        <figure className={styles.stage}>
+          {art ? (
+            <img
+              className={styles.art}
+              src={art}
+              alt=""
+              width={900}
+              height={900}
+              decoding="async"
+              fetchPriority="high"
+            />
+          ) : null}
+        </figure>
       </div>
     </section>
-  );
-}
-
-function HeroMediaSlot({ giveaway, category }) {
-  return (
-    <div className={styles.mediaWrap}>
-      <PrizeMedia giveaway={giveaway} categoryLabel={category} ratio="landscape" priority />
-    </div>
   );
 }

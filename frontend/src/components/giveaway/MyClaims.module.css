@@ -19,8 +19,11 @@
   margin-top: 1.25rem;
   padding: 1rem 1.15rem;
   border-radius: var(--vl-radius);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   background-color: var(--vl-bg-2);
+  background-image: linear-gradient(var(--vl-bg-2), var(--vl-bg-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 .signInText {
   display: flex;

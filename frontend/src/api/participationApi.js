@@ -2,6 +2,7 @@
  *  Identity is derived from the verified token by the server; the body NEVER
  *  carries a userId, fee, amount or balance. */
 import { get, post } from './client.js';
+import { clientReferences } from '../utils/deviceRef.js';
 
 /** GET /giveaways/:id/my-status (authenticated). */
 export async function myStatus(giveawayId) {
@@ -26,6 +27,9 @@ export async function join(giveawayId, { entries = 1, currency, prizeId } = {}) 
   const body = { entries };
   if (currency) body.currency = currency;
   if (prizeId) body.prizeId = prizeId;
+  // Draws with participation.requireDeviceReference refuse a join that carries
+  // neither reference; these are opaque random ids, never a fingerprint.
+  Object.assign(body, clientReferences());
   const { data } = await post(`/giveaways/${giveawayId}/join`, body, {
     idempotencyKey: makeIdempotencyKey(),
   });

@@ -66,11 +66,14 @@ describe('redeemCode — demo wallet top-up', () => {
     expect(res.message).toMatch(/sign in/i);
   });
 
-  it('refuses to fabricate a top-up when the real API is wired up', async () => {
+  it('never fabricates a top-up locally when the real API is wired up', async () => {
     setMockEnabled(false);
+    const before = _store.getBalance('VE');
+    // No API answers in this test, so the server-side redemption cannot succeed —
+    // and the local demo store must stay untouched.
     const res = await redeemCode('MEGA1000');
     expect(res.ok).toBe(false);
-    expect(res.message).toMatch(/real VELOOP platform/i);
+    expect(_store.getBalance('VE')).toBe(before);
   });
 });
 

@@ -75,9 +75,12 @@
   justify-content: space-between;
   padding: 0.75rem 0.85rem;
   background: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   font-size: 0.88rem;
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .configKey {
@@ -116,8 +119,11 @@
   gap: 0.35rem;
   padding: 0.85rem;
   background: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .currencyHeader {

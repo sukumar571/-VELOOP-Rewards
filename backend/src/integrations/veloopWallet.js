@@ -219,6 +219,23 @@ async function reverse({ userId, currency, amount, idempotencyKey, reference, ex
   };
 }
 
+/**
+ * Credits a promo/top-up. Only the `dev` adapter supports this, because only the
+ * dev adapter's balance belongs to this application; an `http` provider or a
+ * disabled wallet refuses rather than pretending money moved.
+ */
+async function credit({ userId, currency, amount, upsert = true } = {}) {
+  const cfg = config.wallet;
+  if (cfg.mode !== 'dev') throw notConfigured();
+  const res = await DevWalletBalance.credit({ userId, currency, amount, upsert });
+  return {
+    status: 'SUCCESS',
+    externalTransactionId: `devpromo_${crypto.randomUUID()}`,
+    balanceBefore: res ? res.balanceBefore : null,
+    balanceAfter: res ? res.balanceAfter : null,
+  };
+}
+
 /** True only when a balance/charge call could actually be made right now. */
 function isConfigured() {
   const cfg = config.wallet;
@@ -226,4 +243,4 @@ function isConfigured() {
   return cfg.mode === 'http' && Boolean(cfg.baseUrl && cfg.apiKey && cfg.balancePath && cfg.debitPath);
 }
 
-module.exports = { getBalance, debit, reverse, isConfigured, mode: () => config.wallet.mode };
+module.exports = { getBalance, debit, reverse, credit, isConfigured, mode: () => config.wallet.mode };

@@ -113,12 +113,17 @@
   text-transform: uppercase;
 }
 
+/* Photography is shown whole, never cropped: these are studio shots on a near-
+   black backdrop, so `contain` on a matching ground reads as one continuous
+   plate instead of a zoomed-in fragment (a portrait phone pair otherwise fills
+   the 4:3 plate with the empty gap between the two handsets). */
 .img {
   position: relative;
   z-index: 1;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background-color: #0a0a0b;
   transition: transform 640ms var(--vl-ease-out);
 }
 

@@ -71,6 +71,12 @@ const CODES = Object.freeze({
   IDEMPOTENCY_KEY_REQUIRED: { status: 400, message: 'This operation requires an idempotency key.' },
   IDEMPOTENCY_KEY_CONFLICT: { status: 409, message: 'This idempotency key was already used for a different request.' },
   IDEMPOTENCY_IN_PROGRESS: { status: 409, message: 'A request with this idempotency key is still being processed. Retry shortly.' },
+  // Code redemption credits the wallet, which is only honest with the in-database
+  // development adapter. With the external provider (or a disabled wallet) there is
+  // nothing this app may credit, so the operation is refused instead of faked.
+  REDEEM_UNAVAILABLE: { status: 503, message: 'Code redemption is not available in this deployment.' },
+  REDEEM_CODE_INVALID: { status: 422, message: 'That code is not valid.' },
+  REDEEM_CODE_ALREADY_REDEEMED: { status: 409, message: 'This code has already been redeemed on this account.' },
 
   // ---- winners & claims ------------------------------------------------------
   NOT_A_WINNER: { status: 404, message: 'No winning entry was found for this account.' },

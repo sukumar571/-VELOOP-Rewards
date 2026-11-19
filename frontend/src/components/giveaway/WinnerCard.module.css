@@ -1,15 +1,42 @@
+/* Champagne → steel edge (--vl-grad-edge), the same 1px gradient outline used
+   by the trust, "Why VELOOP" and giveaway cards. `.vl-card` supplies the surface
+   and radius, so the gradient only replaces its hairline border; the soft top
+   wash of .vl-card is kept as the first layer. */
+.card:global(.vl-card) {
+  --card-edge-gold: var(--vl-edge-gold);
+  --card-edge-gold-soft: var(--vl-edge-gold-soft);
+  --card-edge-silver-soft: var(--vl-edge-silver-soft);
+  --card-edge-silver: var(--vl-edge-silver);
+
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    linear-gradient(
+      120deg,
+      var(--card-edge-gold) 0%,
+      var(--card-edge-gold-soft) 34%,
+      var(--card-edge-silver-soft) 66%,
+      var(--card-edge-silver) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, padding-box, border-box;
+}
+
 .card {
   display: flex;
   align-items: stretch;
   flex: 1 1 auto;
   gap: 1rem;
   padding: 1.05rem 1.2rem;
-  transition:
-    border-color var(--vl-speed) var(--vl-ease-out),
-    transform var(--vl-speed) var(--vl-ease-out);
+  transition: transform var(--vl-speed) var(--vl-ease-out);
 }
 .card:hover {
-  border-color: var(--vl-border-strong);
+  --card-edge-gold: rgba(240, 220, 172, 1);
+  --card-edge-gold-soft: rgba(246, 238, 218, 0.68);
+  --card-edge-silver-soft: rgba(230, 235, 242, 0.64);
+  --card-edge-silver: rgba(212, 220, 230, 1);
+
   transform: translateY(-2px);
 }
 

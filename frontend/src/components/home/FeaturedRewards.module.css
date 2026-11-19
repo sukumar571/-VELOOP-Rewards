@@ -47,24 +47,45 @@
 }
 
 /* ---- Card ---- */
+/* Champagne → steel edge (--vl-grad-edge), the same 1px gradient outline used
+   by the trust and "Why VELOOP" panels: the border-box layer is the outline,
+   the padding-box layer paints the card surface. */
 .card {
+  --card-edge-gold: var(--vl-edge-gold);
+  --card-edge-gold-soft: var(--vl-edge-gold-soft);
+  --card-edge-silver-soft: var(--vl-edge-silver-soft);
+  --card-edge-silver: var(--vl-edge-silver);
+
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   overflow: hidden;
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-lg);
-  background-color: var(--vl-card);
+  background-image:
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    linear-gradient(
+      120deg,
+      var(--card-edge-gold) 0%,
+      var(--card-edge-gold-soft) 34%,
+      var(--card-edge-silver-soft) 66%,
+      var(--card-edge-silver) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   transition:
     transform var(--vl-speed-slow) var(--vl-ease-out),
-    border-color var(--vl-speed) var(--vl-ease-out),
     box-shadow var(--vl-speed-slow) var(--vl-ease-out);
 }
 .card:hover,
 .card:focus-within {
+  --card-edge-gold: rgba(240, 220, 172, 1);
+  --card-edge-gold-soft: rgba(246, 238, 218, 0.68);
+  --card-edge-silver-soft: rgba(230, 235, 242, 0.64);
+  --card-edge-silver: rgba(212, 220, 230, 1);
+
   transform: translateY(-3px);
-  border-color: var(--vl-border-strong);
   box-shadow: var(--vl-shadow);
 }
 
@@ -195,6 +216,34 @@
 }
 
 /* ---- Responsive ---- */
+/* Desktop: the varied editorial spans collapse into an even grid — three cards
+   per line, four once the viewport is wide enough to give each card room. */
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cell,
+  .cell0,
+  .cell1,
+  .cell2,
+  .grid[data-count='1'] .cell0,
+  .grid[data-count='2'] .cell0,
+  .grid[data-count='2'] .cell1 {
+    grid-column: auto;
+  }
+  /* The feature keeps the same type size as its neighbours in the even grid. */
+  .grid .title,
+  .grid .cardFeature .title {
+    font-size: clamp(1rem, 0.45vw + 0.65rem, 1.3rem);
+  }
+}
+
+@media (min-width: 1400px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1199.98px) {
   .cell0 {
     grid-column: span 12;

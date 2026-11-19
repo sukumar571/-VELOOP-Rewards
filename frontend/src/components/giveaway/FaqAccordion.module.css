@@ -48,11 +48,11 @@
   transition: color var(--vl-speed) var(--vl-ease-out);
 }
 .qBtn:hover {
-  color: var(--vl-violet-300);
+  color: var(--vl-gold-300);
 }
 .qBtn:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 2px var(--vl-violet-300);
+  box-shadow: inset 0 0 0 2px var(--vl-gold-300);
   border-radius: var(--vl-radius-lg);
 }
 
@@ -68,7 +68,7 @@
 }
 .open .chev {
   transform: rotate(180deg);
-  color: var(--vl-violet-300);
+  color: var(--vl-gold-300);
 }
 
 .panel {

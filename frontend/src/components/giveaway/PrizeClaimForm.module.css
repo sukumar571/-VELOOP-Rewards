@@ -128,7 +128,7 @@
   height: 52px;
   border-radius: 50%;
   background: var(--vl-grad-cta);
-  color: #fff;
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow);
 }
 .successTitle {

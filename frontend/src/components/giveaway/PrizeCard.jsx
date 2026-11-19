@@ -53,7 +53,7 @@ export default function PrizeCard({ giveaway }) {
 
         <Link
           to={`/giveaways/${slug}`}
-          className={`vl-btn ${status === 'active' ? 'vl-btn-cta' : 'vl-btn-outline'} ${styles.join}`}
+          className={`vl-btn vl-btn-cta ${styles.join}`}
           aria-label={`${actionLabel}: ${title}`}
         >
           {actionLabel}

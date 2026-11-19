@@ -169,6 +169,8 @@ Legend — 🔓 public · 🔑 any authenticated user · 🛡️ admin only.
 |  | `GET /api/v1/giveaways/:id/my-status` | 🔑 | The caller's entry state for one draw (joined, window open, winner, claim). |
 |  | `POST /api/v1/giveaways/:id/join` | 🔑 | **The only money-moving endpoint.** Body `{ entries?, currency?, prizeId?, deviceReference?, sessionReference? }` (strict — no `userId`/`amount`/`balance`/`status`). Identity from the token, never the body. Optional header `Idempotency-Key` (16-128 chars of `A-Za-z0-9_-`) makes a retried paid join replay instead of double-charge. `201` on success; returns the authoritative `participation`, server-resolved `pricing`, updated `balance` and a `replayed` flag. See §5. |
 |  | `GET /api/v1/wallet/balances` | 🔑 | Read-only view of the wallet. In `http` mode each balance is labelled by source/age/authoritativeness (from the external VELOOP provider). In `dev` mode the balances are **FICTIONAL** in-database fixtures (collection `DevWalletBalance`), reported `authoritative:true` with a `mode:'dev'` note that they are never real VELOOP funds. `503 WALLET_NOT_CONFIGURED` when nothing is knowable. |
+|  | `GET /api/v1/wallet/codes` | 🔑 | Promo-code catalogue with a `redeemed` flag per code for the caller. `redemptionAvailable:false` with an empty list when the wallet is not the in-database `dev` adapter (redemption would have nothing legitimate to credit). |
+|  | `POST /api/v1/wallet/redeem` | 🔑 | Body `{ code }` — strict; the currency and amount come from the server-side catalogue, never the request. One redemption per account (`CodeRedemption` unique index), audited, and credits the `dev` wallet adapter only; `http`/`disabled` mode answers `503 REDEEM_UNAVAILABLE`, a used code `409 REDEEM_CODE_ALREADY_REDEEMED`, an unknown one `422 REDEEM_CODE_INVALID`. |
 |  | `GET /api/v1/wallet/transactions` | 🔑 | The caller's **own** entry-fee ledger history (newest first, paginated `page`/`limit`). Read-only; identity comes from the token — there is no `userId` parameter. Each row exposes transactionId, type, direction, currency, amount, status (`PENDING`/`SUCCESS`/`FAILED`/`REVERSED`), balanceBefore/After (null when the provider returned none — never invented) and the giveaway/prize reference. Idempotency keys, device classes and internal request context are deliberately excluded. |
 
 ### 4.4 Claims — the winner's side
@@ -184,6 +186,7 @@ Legend — 🔓 public · 🔑 any authenticated user · 🛡️ admin only.
 | | Method & path | Description |
 | --- | --- | --- |
 |  | `GET /api/v1/admin/stats` | Aggregate counts + `asOf`. |
+|  | `GET /api/v1/admin/giveaways` | Operator list of **every** draw, published or draft (the public list hides drafts). Filters `status`, `published`, `search` (title/slug); sort `createdAt`/`startAt`/`endAt`/`participationCount` with `order`; paginated. Rows carry the operational fields the admin table needs (`published`, `stats.participationCount`) and no private config block. |
 |  | `POST /api/v1/admin/giveaways` | Create a draw (config blocks validated, allow-listed field writes). |
 |  | `PATCH /api/v1/admin/giveaways/:id` | Update configuration. `slug` is immutable; `status` changes go through the transition endpoint. |
 |  | `GET /api/v1/admin/giveaways/:id/config` | Full config incl. private blocks (admin view). |
@@ -209,6 +212,7 @@ Legend — 🔓 public · 🔑 any authenticated user · 🛡️ admin only.
 |  | `POST /api/v1/admin/fraud-events/:id/decision` | DISMISSED or CONFIRMED (terminal; a second decision → `409 FRAUD_EVENT_DECIDED`). |
 |  | `GET /api/v1/admin/audit-logs` | Audit trail (paginated, filters). |
 |  | `GET /api/v1/admin/audit-logs/:entityType/:entityId` | History for one entity. |
+|  | `GET /api/v1/admin/users` | Account directory for staff. Filters `status`, `role`, `search` (email, display name, public alias or `veloopId`); newest first, paginated. Credentials are **not** projected — `passwordHash` never leaves the server. |
 
 ### 4.6 Authenticated principal & local accounts
 

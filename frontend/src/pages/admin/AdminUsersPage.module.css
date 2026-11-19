@@ -37,10 +37,13 @@
   align-items: center;
   gap: 0.4rem;
   background: var(--vl-surface);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 0.45rem 0.75rem;
   min-width: 220px;
+  background-image: linear-gradient(var(--vl-surface), var(--vl-surface)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .searchIcon {
@@ -58,12 +61,15 @@
 
 .select {
   background: var(--vl-surface);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 0.5rem 0.85rem;
   color: var(--vl-text);
   font-size: 0.85rem;
   cursor: pointer;
+  background-image: linear-gradient(var(--vl-surface), var(--vl-surface)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .tableCard {
@@ -152,10 +158,13 @@
   font-weight: 600;
   padding: 0.15rem 0.45rem;
   background: var(--vl-bg);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: 4px;
   color: var(--vl-text-muted);
   text-transform: uppercase;
+  background-image: linear-gradient(var(--vl-bg), var(--vl-bg)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .dateCell {

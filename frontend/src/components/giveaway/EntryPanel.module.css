@@ -8,10 +8,13 @@
   padding: 1.2rem 1.25rem;
   border-radius: var(--vl-radius);
   background-color: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .heading {

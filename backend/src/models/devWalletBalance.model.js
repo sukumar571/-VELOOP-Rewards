@@ -69,11 +69,11 @@ devWalletBalanceSchema.statics.debit = async function debit({ userId, currency, 
  *
  * @returns {Promise<{balanceBefore:number, balanceAfter:number}|null>}
  */
-devWalletBalanceSchema.statics.credit = async function credit({ userId, currency, amount, session } = {}) {
+devWalletBalanceSchema.statics.credit = async function credit({ userId, currency, amount, session, upsert = false } = {}) {
   const gained = await this.findOneAndUpdate(
     { userId, currency },
     { $inc: { balance: amount } },
-    { new: true, session: session || null },
+    { new: true, upsert, setDefaultsOnInsert: true, session: session || null },
   ).lean();
   if (!gained) return null;
   return { balanceBefore: gained.balance - amount, balanceAfter: gained.balance };

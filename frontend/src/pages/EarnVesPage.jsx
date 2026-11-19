@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Ticket, Check, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getDemoCodes } from '../services/earnService.js';
+import { isMockEnabled } from '../config/env.js';
+import { fetchCodes, getDemoCodes } from '../services/earnService.js';
 import { CURRENCIES, formatAmount } from '../config/currencies.js';
 import PageHeader from '../components/common/PageHeader.jsx';
 import DemoNotice from '../components/common/DemoNotice.jsx';
@@ -21,7 +22,26 @@ export default function EarnVesPage() {
   const [result, setResult] = useState(null); // { type: 'ok' | 'err', text }
   const [tick, setTick] = useState(0); // re-read redeemed flags after a success
 
-  const codes = useMemo(() => getDemoCodes(), [tick, authenticated]);
+  // Demo codes live in the mock store; with the real API the catalogue (and the
+  // per-account "used" state) comes from the server.
+  const demoMode = isMockEnabled();
+  const [remote, setRemote] = useState({ redemptionAvailable: true, codes: [] });
+
+  useEffect(() => {
+    if (demoMode || !authenticated) return undefined;
+    let alive = true;
+    fetchCodes()
+      .then((res) => alive && setRemote(res))
+      .catch(() => alive && setRemote({ redemptionAvailable: false, codes: [] }));
+    return () => {
+      alive = false;
+    };
+  }, [demoMode, authenticated, tick]);
+
+  const codes = useMemo(
+    () => (demoMode ? getDemoCodes() : remote.codes),
+    [demoMode, remote, tick, authenticated],
+  );
 
   async function submit(e) {
     e.preventDefault();
@@ -127,7 +147,11 @@ export default function EarnVesPage() {
         <div className={styles.catalog}>
           <h2 className={styles.catalogTitle}>Demo codes</h2>
           <p className={styles.catalogHint}>
-            {authenticated ? 'Tap a code to fill it in, then Redeem.' : 'Sign in to redeem codes.'}
+            {!authenticated
+              ? 'Sign in to redeem codes.'
+              : remote.redemptionAvailable || demoMode
+                ? 'Tap a code to fill it in, then Redeem.'
+                : 'Code redemption is unavailable in this deployment.'}
           </p>
           <ul className={styles.codeList}>
             {codes.map((c) => (
@@ -153,14 +177,16 @@ export default function EarnVesPage() {
         </div>
       </div>
 
-      <div className={styles.noticeWrap}>
-        <DemoNotice variant="chip" text="Demo earning — codes credit a fictional in-browser wallet" />
-      </div>
+      {demoMode ? (
+        <div className={styles.noticeWrap}>
+          <DemoNotice variant="chip" text="Demo earning — codes credit a fictional in-browser wallet" />
+        </div>
+      ) : null}
       <p className={styles.note}>
-        This demo credits a fictional in-browser wallet only — it is <strong>not</strong> real
-        VELOOP currency. Real VEs are earned on the VELOOP platform (giveaway codes, tasks and
-        activity), which this build does not integrate; when the live API is connected this page
-        stops adding balance and says so.
+        Codes credit the <strong>development wallet</strong> for this account only — they are not
+        real VELOOP currency. Real VEs are earned on the VELOOP platform (giveaway codes, tasks and
+        activity); with the external wallet connected this page refuses to redeem rather than
+        inventing a balance.
       </p>
     </div>
   );

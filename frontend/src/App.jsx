@@ -8,6 +8,7 @@ import EarnVesPage from './pages/EarnVesPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
 
 import { ToastProvider } from './context/ToastContext.jsx';
 import AdminRoute from './components/admin/AdminRoute.jsx';
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="winners" element={<WinnersPage />} />
           <Route path="earn" element={<EarnVesPage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="account" element={<AccountPage />} />
           <Route path="legal" element={<LegalPage />} />
         </Route>
 

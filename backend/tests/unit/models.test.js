@@ -88,6 +88,7 @@ describe('model registry', () => {
     expect(Object.keys(models).sort()).toEqual(
       [
         'AuditLog',
+        'CodeRedemption',
         'DevWalletBalance',
         'FraudEvent',
         'Giveaway',

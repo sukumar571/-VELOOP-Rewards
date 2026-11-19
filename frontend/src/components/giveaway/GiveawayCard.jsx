@@ -60,7 +60,7 @@ export default function GiveawayCard({ giveaway, priority = false }) {
 
         <Link
           to={`/giveaways/${slug}`}
-          className={`vl-btn ${status === 'active' ? 'vl-btn-cta' : 'vl-btn-outline'} vl-btn-sm ${styles.cta}`}
+          className={`vl-btn vl-btn-cta vl-btn-sm ${styles.cta}`}
           aria-label={`View details: ${title}`}
         >
           View Details

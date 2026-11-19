@@ -65,7 +65,7 @@ video {
 }
 
 ::selection {
-  background: rgba(124, 92, 255, 0.36);
+  background: rgba(201, 169, 106, 0.32);
   color: var(--vl-text);
 }
 
@@ -238,12 +238,20 @@ a:hover {
 /* 4. Surfaces — cards & glass                                                */
 /* -------------------------------------------------------------------------- */
 
-/* Canonical card: graphite pane, hairline edge, whisper of top light. */
+/* Canonical card: graphite pane, champagne-to-steel edge, whisper of top light.
+   The edge is --vl-grad-edge painted as a border-box background layer, with the
+   card surface (plus the top-light wash) clipped to the padding box on top of
+   it — a 1px gradient outline that follows the corner radius. */
 .vl-card {
   position: relative;
   background-color: var(--vl-card);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 42%);
-  border: 1px solid var(--vl-border);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, padding-box, border-box;
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-lg);
   box-shadow: var(--vl-shadow-sm);
 }
@@ -267,9 +275,19 @@ a:hover {
   -webkit-backdrop-filter: blur(calc(var(--vl-glass-blur) + 6px)) saturate(120%);
 }
 
-/* Opt-in emphasis for the one surface that matters in a view */
+/* Opt-in emphasis for the one surface that matters in a view — brightens the
+   gradient edge instead of the old hairline colour. */
 .vl-card--lit {
-  border-color: var(--vl-border-strong);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    linear-gradient(
+      120deg,
+      rgba(240, 220, 172, 1) 0%,
+      rgba(246, 238, 218, 0.68) 34%,
+      rgba(230, 235, 242, 0.64) 66%,
+      rgba(212, 220, 230, 1) 100%
+    );
   box-shadow: var(--vl-shadow), var(--vl-inset-highlight);
 }
 
@@ -277,7 +295,12 @@ a:hover {
   padding: clamp(1.15rem, 2vw, 1.6rem);
   border-radius: var(--vl-radius);
   background: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--vl-surface-2), var(--vl-surface-2)),
+    var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .vl-divider {
@@ -365,37 +388,37 @@ a:hover {
 /* Variants */
 .vl-btn-primary {
   background-image: var(--vl-grad-primary);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow);
 }
 .vl-btn-primary:hover:not(:disabled) {
-  color: #fff;
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow-strong);
   filter: brightness(1.05);
 }
 
 .vl-btn-cta {
   background-image: var(--vl-grad-cta);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow);
 }
 .vl-btn-cta:hover:not(:disabled) {
-  color: #fff;
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow-strong);
   filter: brightness(1.06);
 }
 
 .vl-btn-outline {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-color: var(--vl-border-strong);
-  color: var(--vl-text);
+  background-color: rgba(201, 169, 106, 0.03);
+  border-color: rgba(201, 169, 106, 0.32);
+  color: var(--vl-gold-300);
 }
 .vl-btn-outline:hover:not(:disabled) {
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--vl-gold-300);
+  background-color: rgba(201, 169, 106, 0.1);
+  border-color: rgba(201, 169, 106, 0.55);
 }
 
 .vl-btn-ghost {
@@ -403,8 +426,8 @@ a:hover {
   padding-inline: 0.85rem;
 }
 .vl-btn-ghost:hover:not(:disabled) {
-  color: var(--vl-text);
-  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--vl-gold-300);
+  background-color: rgba(201, 169, 106, 0.09);
 }
 
 .vl-btn-danger {

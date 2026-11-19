@@ -59,11 +59,11 @@
 }
 .tabActive {
   background-image: var(--vl-grad-cta);
-  color: #fff;
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow);
 }
 .tabActive:hover {
-  color: #fff;
+  color: var(--vl-gold-ink);
   background-image: var(--vl-grad-cta);
 }
 

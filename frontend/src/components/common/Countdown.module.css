@@ -48,8 +48,11 @@
   padding: 0.65rem 0.5rem 0.55rem;
   border-radius: var(--vl-radius-sm);
   background-color: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   overflow: hidden;
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .value {
@@ -89,12 +92,27 @@
 }
 
 @media (max-width: 575.98px) {
+  /* Four tiles plus separators do not fit a phone width, so the row becomes a
+     four-column stretch: separators drop out and the tiles share the space. */
+  .blocks {
+    display: flex;
+    width: 100%;
+    gap: 0.3rem;
+  }
   .unit {
-    min-width: 54px;
-    padding: 0.5rem 0.35rem 0.45rem;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.5rem 0.2rem 0.45rem;
+  }
+  .value {
+    font-size: 1.15rem;
+  }
+  .label {
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
   }
   .sep {
-    font-size: 1rem;
+    display: none;
   }
   .chip {
     font-size: var(--vl-fs-xs);

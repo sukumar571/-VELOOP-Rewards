@@ -22,7 +22,7 @@
   height: 40px;
   border-radius: 50%;
   background: var(--vl-grad-gold, var(--vl-grad-primary));
-  color: #fff;
+  color: var(--vl-gold-ink);
 }
 
 .headText {

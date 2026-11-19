@@ -105,13 +105,16 @@
 .fieldFull select,
 .fieldFull textarea {
   background: var(--vl-bg);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 0.65rem 0.85rem;
   color: var(--vl-text);
   font-family: inherit;
   font-size: 0.92rem;
   transition: border-color var(--vl-speed) var(--vl-ease);
+  background-image: linear-gradient(var(--vl-bg), var(--vl-bg)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .field input:focus,

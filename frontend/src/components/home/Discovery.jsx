@@ -231,7 +231,7 @@ function DiscoveryCard({ giveaway }) {
 
         <Link
           to={`/giveaways/${slug}`}
-          className={`vl-btn ${status === 'active' ? 'vl-btn-cta' : 'vl-btn-outline'} vl-btn-sm ${styles.cta}`}
+          className={`vl-btn vl-btn-cta vl-btn-sm ${styles.cta}`}
           aria-label={`${status === 'active' ? 'View giveaway' : 'View details'}: ${title}`}
         >
           {status === 'active' ? 'View Giveaway' : 'View Details'}

@@ -81,13 +81,16 @@
 
 .infoCard {
   background: var(--vl-bg);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   font-size: 0.88rem;
+  background-image: linear-gradient(var(--vl-bg), var(--vl-bg)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .infoRow {
@@ -118,11 +121,14 @@
 
 .field input {
   background: var(--vl-bg);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 0.65rem 0.85rem;
   color: var(--vl-text);
   font-size: 0.95rem;
+  background-image: linear-gradient(var(--vl-bg), var(--vl-bg)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .fieldHint {
@@ -182,13 +188,16 @@
 
 .statsSummary {
   background: var(--vl-bg);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-sm);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   font-size: 0.88rem;
+  background-image: linear-gradient(var(--vl-bg), var(--vl-bg)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .statItem {

@@ -7,12 +7,16 @@
  *   • it only runs when the development mocks are active (isMockEnabled());
  *   • it credits the same fictional in-browser session wallet the join flow
  *     debits (sessionService._store) — no real VELOOP funds move;
- *   • when the real API is wired up, redeemCode() refuses and says so.
+ *   • with the real API, redeemCode() asks the server instead: redemption is
+ *     honoured only by the in-database `dev` wallet adapter, so an external or
+ *     disabled wallet answers REDEEM_UNAVAILABLE rather than faking a credit.
  * Real VEs are earned on the external VELOOP platform (codes, tasks, activity),
  * which this project does not integrate. Kept deliberately small so the /earn
- * page and its tests can rely on it with no network.
+ * page and its tests can rely on it with no network in demo mode.
  * ========================================================================= */
 import { isMockEnabled } from '../config/env.js';
+import * as walletApi from '../api/walletApi.js';
+import { ApiClientError } from '../api/client.js';
 import { _store, isAuthenticatedSync } from './sessionService.js';
 
 export const DEMO_DATA = true;
@@ -40,19 +44,51 @@ export function getDemoCodes() {
 }
 
 /**
+ * The catalogue for whichever data source is live: the local demo codes, or the
+ * server's promo catalogue (which also reports per-account redemption).
+ * Rejects when the API call fails so the page can say so honestly.
+ */
+export async function fetchCodes() {
+  if (isMockEnabled()) return { redemptionAvailable: true, codes: getDemoCodes() };
+  const payload = await walletApi.codes();
+  return {
+    redemptionAvailable: payload?.redemptionAvailable !== false,
+    codes: Array.isArray(payload?.codes) ? payload.codes : [],
+  };
+}
+
+/**
  * Redeem a demo code. Returns { ok, code, currency, amount, balance } on success
  * or { ok:false, message } on any rejection. Never fabricates a real top-up.
  */
 export async function redeemCode(rawCode) {
+  const normalized = String(rawCode || '').trim().toUpperCase();
+
+  // Real API: the server decides the credit (and refuses when the wallet is not
+  // the in-database dev adapter), so this client never invents a balance.
   if (!isMockEnabled()) {
-    return {
-      ok: false,
-      message:
-        'Earning VEs is handled by the real VELOOP platform — this build has no in-app wallet top-up.',
-    };
+    if (!normalized) return { ok: false, message: 'Enter a code to redeem.' };
+    try {
+      const payload = await walletApi.redeem(normalized);
+      return {
+        ok: true,
+        code: payload.code,
+        currency: payload.currency,
+        amount: payload.amount,
+        balance: payload.balance,
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        message:
+          err instanceof ApiClientError
+            ? err.message
+            : 'We could not redeem that code right now. Please try again.',
+      };
+    }
   }
 
-  const code = String(rawCode || '').trim().toUpperCase();
+  const code = normalized;
   if (!code) return delay({ ok: false, message: 'Enter a code to redeem.' });
 
   const reward = BY_CODE[code];

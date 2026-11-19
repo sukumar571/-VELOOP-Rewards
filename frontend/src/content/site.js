@@ -26,6 +26,27 @@ export const HERO = {
   ],
 };
 
+/**
+ * Homepage hero copy (home only — HERO above is still consumed by the
+ * legacy giveaway hero). Presentational text only: no numbers, prizes or
+ * claims that the application does not implement.
+ */
+export const HOME_HERO = {
+  badge: 'VELOOP Rewards · Exclusive Collection',
+  titleLineOne: 'Rewards Worth',
+  titleLineTwo: 'More Than You Imagine.',
+  kicker: 'Discover. Participate. Win.',
+  subtitle:
+    'Explore exclusive giveaways featuring premium smartphones, laptops, tablets, smartwatches and lifestyle tech. Your next favourite gadget could be just one entry away.',
+  cta: { label: 'Explore Giveaways', to: '/giveaways' },
+  ctaSecondary: { label: 'How It Works', to: '/#how-it-works' },
+  assurances: [
+    { icon: 'Gem', label: 'Premium gadgets' },
+    { icon: 'ShieldCheck', label: 'Exclusive giveaways' },
+    { icon: 'Lock', label: 'Transparent entries' },
+  ],
+};
+
 /** The four real stages of an entry (consumed by the homepage steps). */
 export const STEPS = [
   {

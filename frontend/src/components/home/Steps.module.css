@@ -17,10 +17,18 @@
   list-style: none;
 }
 
+/* Same champagne → steel edge as the trust cards: the border-box layer of
+   --vl-grad-edge is the 1px outline, the padding-box layer paints the surface. */
 .step {
   position: relative;
-  padding-top: 1.35rem;
-  border-top: 1px solid var(--vl-border);
+  padding: 1.35rem 1.3rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--vl-radius-lg);
+  background-image:
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .num {

@@ -69,8 +69,9 @@
   /* Light & gradients — restrained, never a full-bleed purple wash       */
   /* --------------------------------------------------------------------- */
   --vl-grad-brand: linear-gradient(96deg, #7c5cff 0%, #5566f0 100%);
-  --vl-grad-cta: linear-gradient(180deg, #7c5cff 0%, #5b3ad9 100%);
-  --vl-grad-primary: linear-gradient(180deg, #6b47f0 0%, #4f31c9 100%);
+  /* Filled controls follow the champagne identity: gold surface, ink label */
+  --vl-grad-cta: linear-gradient(180deg, #ecd7a6 0%, #c9a96a 100%);
+  --vl-grad-primary: linear-gradient(180deg, #e0c99d 0%, #b8914f 100%);
   --vl-grad-gold: linear-gradient(180deg, #f1e4c8 0%, #c9a96a 100%);
   --vl-grad-surface: linear-gradient(180deg, #1a1a1e 0%, #121214 100%);
   --vl-grad-hairline: linear-gradient(
@@ -78,6 +79,21 @@
     transparent 0%,
     rgba(255, 255, 255, 0.16) 50%,
     transparent 100%
+  );
+
+  /* Outlined-panel edge — champagne gold at the top-left corner running into
+     steel silver at the bottom-right. Consumed by the trust cards and the
+     "How it works" steps, which paint it as a border-box background layer. */
+  --vl-edge-gold: rgba(201, 169, 106, 1);
+  --vl-edge-gold-soft: rgba(224, 201, 157, 0.6);
+  --vl-edge-silver-soft: rgba(201, 208, 217, 0.55);
+  --vl-edge-silver: rgba(188, 197, 209, 1);
+  --vl-grad-edge: linear-gradient(
+    120deg,
+    var(--vl-edge-gold) 0%,
+    var(--vl-edge-gold-soft) 34%,
+    var(--vl-edge-silver-soft) 66%,
+    var(--vl-edge-silver) 100%
   );
 
   /* Ambient page light — a single quiet wash from the top */
@@ -154,8 +170,8 @@
   --vl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
   --vl-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.9);
   --vl-shadow-lg: 0 32px 72px -34px rgba(0, 0, 0, 0.95);
-  --vl-shadow-glow: 0 10px 26px -14px rgba(124, 92, 255, 0.55);
-  --vl-shadow-glow-strong: 0 16px 38px -16px rgba(124, 92, 255, 0.68);
+  --vl-shadow-glow: 0 10px 26px -14px rgba(201, 169, 106, 0.5);
+  --vl-shadow-glow-strong: 0 16px 38px -16px rgba(201, 169, 106, 0.66);
   --vl-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.045);
 
   /* --------------------------------------------------------------------- */
@@ -187,7 +203,7 @@
   --vl-gutter: clamp(1rem, 3vw, 2rem);
   --vl-nav-h: 72px;
   --vl-section-gap: clamp(3.5rem, 6vw, 6rem);
-  --vl-focus-ring: 0 0 0 3px rgba(124, 92, 255, 0.45);
+  --vl-focus-ring: 0 0 0 3px rgba(201, 169, 106, 0.42);
 }
 
 /* Colour-scheme hint for native controls / scrollbars */

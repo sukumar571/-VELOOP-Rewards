@@ -35,7 +35,7 @@
   flex: none;
   border-radius: 50%;
   background: var(--vl-grad-primary);
-  color: #fff;
+  color: var(--vl-gold-ink);
   box-shadow: var(--vl-shadow-glow);
   z-index: 1;
 }

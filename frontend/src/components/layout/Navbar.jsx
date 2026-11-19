@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, LogIn, LogOut, Wallet, ShieldCheck } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Wallet, ShieldCheck, UserRound } from 'lucide-react';
 import { NAV_LINKS } from '../../content/site.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { CURRENCIES, formatAmountValue } from '../../config/currencies.js';
@@ -42,65 +42,72 @@ export default function Navbar() {
           id="primary-navigation"
           data-open={open || undefined}
         >
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                [styles.link, isActive ? styles.linkActive : null]
-                  .filter(Boolean)
-                  .join(' ')
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          {authenticated && Array.isArray(user?.roles) && user.roles.includes('admin') && (
-            <Link to="/admin" className={`vl-btn vl-btn-outline ${styles.adminBtn}`}>
-              <ShieldCheck size={15} />
-              <span>Admin</span>
-            </Link>
-          )}
-          <Link to="/giveaways" className={`vl-btn vl-btn-primary ${styles.cta}`}>
-            Browse Giveaways
-            <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-
-          {authenticated ? (
-            <div className={styles.account} aria-label="Your balances">
-              <span className={styles.walletIcon} aria-hidden="true">
-                <Wallet size={15} />
-              </span>
-              <ul className={styles.balances}>
-                  {Object.values(CURRENCIES).map((c) => {
-                  const value = balances ? balances[c.code] : undefined;
-                  const known = typeof value === 'number';
-                  return (
-                    <li key={c.code} className={`${styles.balance} ${styles[c.accent]}`}>
-                      <span className={styles.balanceValue}>
-                        {known ? formatAmountValue(c.code, value) : '—'}
-                      </span>
-                      <span className={styles.balanceCur}>{c.label}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-              <button
-                type="button"
-                className={`vl-btn vl-btn-ghost ${styles.authBtn}`}
-                onClick={logout}
-                aria-label={`Sign out of ${user.name}`}
+          <div className={styles.links}>
+            {NAV_LINKS.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  [styles.link, isActive ? styles.linkActive : null].filter(Boolean).join(' ')
+                }
               >
-                <LogOut size={15} aria-hidden="true" />
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <Link to="/login" className={`vl-btn vl-btn-outline ${styles.authBtn}`}>
-              <LogIn size={15} aria-hidden="true" />
-              Sign in
-            </Link>
-          )}
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+
+          <div className={styles.actions}>
+            {authenticated && Array.isArray(user?.roles) && user.roles.includes('admin') && (
+              <Link to="/admin" className={`vl-btn vl-btn-outline ${styles.adminBtn}`}>
+                <ShieldCheck size={15} />
+                <span>Admin</span>
+              </Link>
+            )}
+
+            {authenticated ? (
+              <div className={styles.account} aria-label="Your balances">
+                <span className={styles.walletIcon} aria-hidden="true">
+                  <Wallet size={15} />
+                </span>
+                <ul className={styles.balances}>
+                  {Object.values(CURRENCIES).map((c) => {
+                    const value = balances ? balances[c.code] : undefined;
+                    const known = typeof value === 'number';
+                    return (
+                      <li key={c.code} className={`${styles.balance} ${styles[c.accent]}`}>
+                        <span className={styles.balanceValue}>
+                          {known ? formatAmountValue(c.code, value) : '—'}
+                        </span>
+                        <span className={styles.balanceCur}>{c.label}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <Link
+                  to="/account"
+                  className={`vl-btn vl-btn-ghost ${styles.authBtn}`}
+                  aria-label="Your account"
+                >
+                  <UserRound size={15} aria-hidden="true" />
+                  Account
+                </Link>
+                <button
+                  type="button"
+                  className={`vl-btn vl-btn-ghost ${styles.authBtn}`}
+                  onClick={logout}
+                  aria-label={`Sign out of ${user.name}`}
+                >
+                  <LogOut size={15} aria-hidden="true" />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className={`vl-btn vl-btn-gold ${styles.signIn}`}>
+                <LogIn size={15} aria-hidden="true" />
+                Sign in
+              </Link>
+            )}
+          </div>
         </nav>
 
         <button

@@ -128,7 +128,7 @@ export default function GiveawayDetailPage() {
           {/* Gallery */}
           <figure className={styles.gallery}>
             <div className={styles.galleryFrame}>
-              <PrizeMedia giveaway={giveaway} categoryLabel={category} ratio="wide" priority />
+              <PrizeMedia giveaway={giveaway} categoryLabel={category} ratio="landscape" priority />
             </div>
             <figcaption className={styles.galleryCaption}>
               <span className={styles.captionCategory}>

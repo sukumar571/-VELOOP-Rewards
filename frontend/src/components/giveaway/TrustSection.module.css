@@ -32,22 +32,43 @@
   padding: 0;
 }
 
+/* Champagne → steel edge (--vl-grad-edge): a 1px gradient outline that runs gold
+   at the top-left corner into silver at the bottom-right. Two background layers
+   give the border without an extra element — the padding-box layer paints the
+   card surface, the border-box layer is the visible hairline. */
 .item {
+  --trust-edge-gold: var(--vl-edge-gold);
+  --trust-edge-gold-soft: var(--vl-edge-gold-soft);
+  --trust-edge-silver-soft: var(--vl-edge-silver-soft);
+  --trust-edge-silver: var(--vl-edge-silver);
+
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   padding: 1.35rem 1.3rem 1.5rem;
   border-radius: var(--vl-radius-lg);
-  background-color: var(--vl-card);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--vl-card), var(--vl-card)),
+    linear-gradient(
+      120deg,
+      var(--trust-edge-gold) 0%,
+      var(--trust-edge-gold-soft) 34%,
+      var(--trust-edge-silver-soft) 66%,
+      var(--trust-edge-silver) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   box-shadow: var(--vl-shadow-sm);
-  transition:
-    border-color var(--vl-speed) var(--vl-ease-out),
-    transform var(--vl-speed-slow) var(--vl-ease-out);
+  transition: transform var(--vl-speed-slow) var(--vl-ease-out);
 }
 .item:hover {
+  --trust-edge-gold: rgba(240, 220, 172, 1);
+  --trust-edge-gold-soft: rgba(246, 238, 218, 0.68);
+  --trust-edge-silver-soft: rgba(230, 235, 242, 0.64);
+  --trust-edge-silver: rgba(212, 220, 230, 1);
+
   transform: translateY(-2px);
-  border-color: var(--vl-border-strong);
 }
 
 .icon {

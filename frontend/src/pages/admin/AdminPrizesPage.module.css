@@ -45,16 +45,18 @@
   gap: 1rem;
 }
 
+/* Controls share the row evenly; the labelled campaign field is taller, so
+   every control aligns on its bottom edge instead of its centre. */
 .filterRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 1rem;
 }
 
 .searchWrap {
-  flex: 1;
-  min-width: 240px;
+  flex: 2 1 15rem;
+  min-width: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -71,11 +73,14 @@
   width: 100%;
   padding-left: 36px;
   background: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   color: var(--vl-text);
   border-radius: var(--vl-radius-sm);
   height: 40px;
   font-size: 0.88rem;
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .searchInput:focus {
@@ -84,18 +89,22 @@
 }
 
 .selectWrap {
-  min-width: 180px;
+  flex: 1 1 11rem;
+  min-width: 0;
 }
 
 .selectInput {
   width: 100%;
   height: 40px;
   background: var(--vl-surface-2);
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   color: var(--vl-text);
   border-radius: var(--vl-radius-sm);
   padding: 0 0.75rem;
   font-size: 0.88rem;
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .selectInput:focus {
@@ -223,7 +232,7 @@
 }
 
 .actionBtn:hover {
-  border-color: var(--vl-violet-500);
+  border-color: var(--vl-gold-500);
   color: var(--vl-text);
 }
 

@@ -49,10 +49,13 @@
 /* ---- Gallery ---- */
 .gallery {
   margin: 0;
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius-lg);
   overflow: hidden;
   background-color: var(--vl-card);
+  background-image: linear-gradient(var(--vl-card), var(--vl-card)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .galleryFrame {
@@ -217,9 +220,12 @@
 .countdownBlock {
   margin-top: 1.15rem;
   padding: 0.9rem 1rem;
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius);
   background-color: var(--vl-surface-2);
+  background-image: linear-gradient(var(--vl-surface-2), var(--vl-surface-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 .countdownLabel {
   display: block;
@@ -317,11 +323,14 @@
   gap: 0.55rem;
   margin-top: clamp(1.5rem, 3vw, 2.25rem);
   padding: 0.95rem 1.15rem;
-  border: 1px solid var(--vl-border);
+  border: 1px solid transparent;
   border-radius: var(--vl-radius);
   background-color: var(--vl-bg-2);
   font-size: var(--vl-fs-sm);
   color: var(--vl-text-body);
+  background-image: linear-gradient(var(--vl-bg-2), var(--vl-bg-2)), var(--vl-grad-edge);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 .support svg {
   color: var(--vl-text-faint);

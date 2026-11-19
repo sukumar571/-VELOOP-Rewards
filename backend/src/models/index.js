@@ -26,6 +26,7 @@ const FraudEvent = require('./fraudEvent.model.js');
 const WalletReference = require('./walletReference.model.js');
 const DevWalletBalance = require('./devWalletBalance.model.js');
 const IdempotencyKey = require('./idempotencyKey.model.js');
+const CodeRedemption = require('./codeRedemption.model.js');
 const AuditLog = require('./auditLog.model.js');
 
 module.exports = {
@@ -40,5 +41,6 @@ module.exports = {
   WalletReference,
   DevWalletBalance,
   IdempotencyKey,
+  CodeRedemption,
   AuditLog,
 };
