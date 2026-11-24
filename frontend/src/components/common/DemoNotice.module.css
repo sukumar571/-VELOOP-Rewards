@@ -24,27 +24,6 @@
   line-height: 1.5;
 }
 
-.action {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.35rem;
-}
-.action button {
-  padding: 0.1rem 0.5rem;
-  border-radius: var(--vl-radius-sm);
-  border: 1px solid rgba(201, 169, 106, 0.45);
-  background: transparent;
-  color: var(--vl-gold-300);
-  font: inherit;
-  font-size: var(--vl-fs-2xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.action button:hover {
-  background-color: rgba(201, 169, 106, 0.12);
-}
-
 .chip {
   display: inline-flex;
   align-items: center;

@@ -21,9 +21,10 @@ import * as authApi from '../api/authApi.js';
 import * as walletApi from '../api/walletApi.js';
 import { balancesMap } from '../api/normalize.js';
 import { ApiClientError } from '../api/client.js';
-import { getToken, setToken, clearToken, hasToken } from '../api/tokenStore.js';
+import { getToken, setToken, clearToken, hasToken, tokenSubject } from '../api/tokenStore.js';
 import { ServiceError } from '../api/errors.js';
 import { registerAccount, verifyAccount } from './demoAuth.js';
+import { balancesFor } from './earnLedger.js';
 
 /* -------------------------------------------------------------------------- */
 /* DEMO MOCK STORE (development only)                                          */
@@ -234,8 +235,15 @@ export async function getWallet() {
     };
   } catch (err) {
     if (err instanceof ApiClientError && err.status === 401) return null;
-    // Honest degradation: no balances, but a clear "unavailable" reason.
-    return { balances: {}, unavailable: true, unavailableReason: err.code || 'WALLET_UNAVAILABLE' };
+    // Honest degradation: no wallet balance to report, and the reason is kept.
+    // Codes redeemed while the wallet is unreachable are recorded per account in
+    // this browser (services/earnLedger.js); those earned amounts are what the
+    // member can see here. They are never presented as the external wallet.
+    return {
+      balances: balancesFor(tokenSubject()),
+      unavailable: true,
+      unavailableReason: err.code || 'WALLET_UNAVAILABLE',
+    };
   }
 }
 

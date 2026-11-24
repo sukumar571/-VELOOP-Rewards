@@ -1,83 +1,129 @@
 /**
  * ============================================================================
- * EARN SERVICE — a LOCAL, demo-only "redeem a code → credit the wallet" flow.
+ * EARN SERVICE — "redeem a code → update the balance".
  * ============================================================================
- * This exists so the "Earn More VEs" affordance does something visible in the
- * development demo WITHOUT a backend. It is emphatically NOT real earning:
- *   • it only runs when the development mocks are active (isMockEnabled());
- *   • it credits the same fictional in-browser session wallet the join flow
- *     debits (sessionService._store) — no real VELOOP funds move;
- *   • with the real API, redeemCode() asks the server instead: redemption is
- *     honoured only by the in-database `dev` wallet adapter, so an external or
- *     disabled wallet answers REDEEM_UNAVAILABLE rather than faking a credit.
- * Real VEs are earned on the external VELOOP platform (codes, tasks, activity),
- * which this project does not integrate. Kept deliberately small so the /earn
- * page and its tests can rely on it with no network in demo mode.
+ * Three data sources, in this order of preference:
+ *   1. the development mocks (isMockEnabled()) — an explicitly-fictional store so
+ *      the loop can be exercised with no backend and no network;
+ *   2. the real API — POST /wallet/redeem, where the SERVER decides the amount
+ *      and refuses when it has no wallet it is allowed to credit;
+ *   3. when the API says exactly that (REDEEM_UNAVAILABLE / WALLET_NOT_CONFIGURED),
+ *      the per-account ledger in this browser (services/earnLedger.js), so a code
+ *      still updates the balance the member sees on this deployment.
+ * A plain network failure is never turned into a credit: the member is told to
+ * try again, because the server may already have applied it.
  * ========================================================================= */
 import { isMockEnabled } from '../config/env.js';
+import { PROMO_CODES, normalizeCode, findPromoCode } from '../config/promoCodes.js';
 import * as walletApi from '../api/walletApi.js';
 import { ApiClientError } from '../api/client.js';
-import { _store, isAuthenticatedSync } from './sessionService.js';
+import { tokenSubject } from '../api/tokenStore.js';
+import { _store } from './sessionService.js';
+import { hasRedeemed, credit } from './earnLedger.js';
 
-export const DEMO_DATA = true;
+/** Errors that mean "this deployment has no wallet to post to" → ledger. */
+const NO_WALLET_CODES = new Set(['REDEEM_UNAVAILABLE', 'WALLET_NOT_CONFIGURED']);
 
-/** Fictional demo codes. Each is single-use per session (device). */
-export const DEMO_CODES = [
-  { code: 'VELOOP100', currency: 'VE', amount: 100, label: 'Starter bonus' },
-  { code: 'WELCOME250', currency: 'VE', amount: 250, label: 'Welcome bonus' },
-  { code: 'MEGA1000', currency: 'VE', amount: 1000, label: 'Flash promo' },
-  { code: 'SOCIAL50', currency: 'SVE', amount: 50, label: 'Social task reward' },
-  { code: 'TOKEN500', currency: 'TOKEN', amount: 500, label: 'Daily check-in' },
-];
-
-const BY_CODE = Object.fromEntries(DEMO_CODES.map((c) => [c.code, c]));
-
-function delay(build, ms = 300) {
-  return new Promise((resolve) =>
-    setTimeout(() => resolve(typeof build === 'function' ? build() : build), ms),
-  );
+/** The storage namespace for the signed-in account (never an authority). */
+function accountKey() {
+  return isMockEnabled() ? _store.getUserId() : tokenSubject();
 }
 
-/** The code catalog for display, each tagged with whether it's already used. */
-export function getDemoCodes() {
-  return DEMO_CODES.map((c) => ({ ...c, redeemed: _store.hasRedeemed(c.code) }));
+/** Marks the codes the signed-in account has already used. */
+function tagRedeemed(used) {
+  return PROMO_CODES.map((c) => ({ ...c, redeemed: used(c.code) }));
 }
 
 /**
- * The catalogue for whichever data source is live: the local demo codes, or the
- * server's promo catalogue (which also reports per-account redemption).
- * Rejects when the API call fails so the page can say so honestly.
+ * The catalogue for the earning page. Always resolves to a usable list: the
+ * server's own catalogue + redemption state when it can credit, otherwise the
+ * local mirror with this account's ledger state.
  */
 export async function fetchCodes() {
-  if (isMockEnabled()) return { redemptionAvailable: true, codes: getDemoCodes() };
-  const payload = await walletApi.codes();
+  if (isMockEnabled()) {
+    return { redemptionAvailable: true, codes: tagRedeemed((code) => _store.hasRedeemed(code)) };
+  }
+
+  try {
+    const payload = await walletApi.codes();
+    if (payload?.redemptionAvailable !== false) {
+      return {
+        redemptionAvailable: true,
+        codes: Array.isArray(payload?.codes) ? payload.codes : [],
+      };
+    }
+  } catch (err) {
+    // Signed out / expired credential: nothing to list is wrong with the code
+    // list, so fall through to the local catalogue and let Redeem explain.
+    if (err instanceof ApiClientError && err.status === 401) {
+      return { redemptionAvailable: true, codes: tagRedeemed(() => false) };
+    }
+  }
+
+  const key = accountKey();
   return {
-    redemptionAvailable: payload?.redemptionAvailable !== false,
-    codes: Array.isArray(payload?.codes) ? payload.codes : [],
+    redemptionAvailable: true,
+    local: true,
+    codes: tagRedeemed((code) => (key ? hasRedeemed(key, code) : false)),
   };
 }
 
 /**
- * Redeem a demo code. Returns { ok, code, currency, amount, balance } on success
- * or { ok:false, message } on any rejection. Never fabricates a real top-up.
+ * Redeems one code. Resolves to { ok:true, code, currency, amount, balance } or
+ * { ok:false, message }; the credit amount always comes from the catalogue.
  */
 export async function redeemCode(rawCode) {
-  const normalized = String(rawCode || '').trim().toUpperCase();
+  const code = normalizeCode(rawCode);
+  if (!code) return { ok: false, message: 'Enter a code to redeem.' };
 
-  // Real API: the server decides the credit (and refuses when the wallet is not
-  // the in-database dev adapter), so this client never invents a balance.
-  if (!isMockEnabled()) {
-    if (!normalized) return { ok: false, message: 'Enter a code to redeem.' };
-    try {
-      const payload = await walletApi.redeem(normalized);
-      return {
-        ok: true,
-        code: payload.code,
-        currency: payload.currency,
-        amount: payload.amount,
-        balance: payload.balance,
-      };
-    } catch (err) {
+  const promo = findPromoCode(code);
+  if (!promo) {
+    return { ok: false, message: 'That code isn’t valid. Pick one from the list below.' };
+  }
+
+  // ---- Development mocks: the fictional in-browser store -------------------
+  if (isMockEnabled()) {
+    if (!_store.isLoggedIn()) {
+      return { ok: false, message: 'Please sign in to redeem a code.' };
+    }
+    if (_store.hasRedeemed(promo.code)) {
+      return { ok: false, message: 'This code has already been redeemed on this account.' };
+    }
+    _store.credit(promo.currency, promo.amount);
+    _store.addRedeem(promo.code);
+    return {
+      ok: true,
+      code: promo.code,
+      currency: promo.currency,
+      amount: promo.amount,
+      balance: _store.getBalance(promo.currency),
+    };
+  }
+
+  // ---- Real API -----------------------------------------------------------
+  const key = accountKey();
+  if (!key) return { ok: false, message: 'Please sign in to redeem a code.' };
+  if (hasRedeemed(key, promo.code)) {
+    return { ok: false, message: 'This code has already been redeemed on this account.' };
+  }
+
+  try {
+    const payload = await walletApi.redeem(promo.code);
+    return {
+      ok: true,
+      code: payload?.code ?? promo.code,
+      currency: payload?.currency ?? promo.currency,
+      amount: payload?.amount ?? promo.amount,
+      balance: typeof payload?.balance === 'number' ? payload.balance : null,
+      source: 'server',
+    };
+  } catch (err) {
+    const errCode = err instanceof ApiClientError ? err.code : null;
+
+    if (errCode === 'REDEEM_CODE_ALREADY_REDEEMED') {
+      return { ok: false, message: 'This code has already been redeemed on this account.' };
+    }
+    if (!NO_WALLET_CODES.has(errCode)) {
       return {
         ok: false,
         message:
@@ -88,28 +134,17 @@ export async function redeemCode(rawCode) {
     }
   }
 
-  const code = normalized;
-  if (!code) return delay({ ok: false, message: 'Enter a code to redeem.' });
-
-  const reward = BY_CODE[code];
-  if (!reward) {
-    return delay({ ok: false, message: 'That code isn’t valid. Try one of the demo codes below.' });
+  // ---- The deployment has no wallet to post to: keep the credit locally ----
+  const res = credit(key, promo.code, promo.currency, promo.amount);
+  if (!res.ok) {
+    return { ok: false, message: 'This code has already been redeemed on this account.' };
   }
-  if (!isAuthenticatedSync()) {
-    return delay({ ok: false, message: 'Please sign in to credit your demo wallet.' });
-  }
-  if (_store.hasRedeemed(code)) {
-    return delay({ ok: false, message: 'This code has already been redeemed on this device.' });
-  }
-
-  _store.credit(reward.currency, reward.amount);
-  _store.addRedeem(code);
-
-  return delay(() => ({
+  return {
     ok: true,
-    code,
-    currency: reward.currency,
-    amount: reward.amount,
-    balance: _store.getBalance(reward.currency),
-  }));
+    code: promo.code,
+    currency: promo.currency,
+    amount: promo.amount,
+    balance: res.balance,
+    source: 'local',
+  };
 }

@@ -264,16 +264,3 @@
 }
 
 /* No creditable wallet — route the member to the offline earning demo. */
-.demoHint {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
-  margin-top: 0.85rem;
-}
-.demoHintText {
-  margin: 0;
-  font-size: var(--vl-fs-xs);
-  line-height: 1.6;
-  color: var(--vl-text-faint);
-}

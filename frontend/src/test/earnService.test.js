@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { redeemCode, getDemoCodes, DEMO_CODES } from '../services/earnService.js';
+import { redeemCode, fetchCodes } from '../services/earnService.js';
+import { PROMO_CODES } from '../config/promoCodes.js';
 import { login, logout, _store } from '../services/sessionService.js';
 import { setMockEnabled } from '../config/env.js';
 
@@ -77,11 +78,11 @@ describe('redeemCode — demo wallet top-up', () => {
   });
 });
 
-describe('getDemoCodes — catalog for display', () => {
+describe('fetchCodes — catalog for display', () => {
   it('lists every code and flags the ones already redeemed', async () => {
     await redeemCode('WELCOME250');
-    const catalog = getDemoCodes();
-    expect(catalog).toHaveLength(DEMO_CODES.length);
+    const { codes: catalog } = await fetchCodes();
+    expect(catalog).toHaveLength(PROMO_CODES.length);
     expect(catalog.find((c) => c.code === 'WELCOME250').redeemed).toBe(true);
     expect(catalog.find((c) => c.code === 'VELOOP100').redeemed).toBe(false);
   });

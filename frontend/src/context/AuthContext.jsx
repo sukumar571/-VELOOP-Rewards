@@ -75,8 +75,8 @@ export function AuthProvider({ children }) {
     await setEligibleForDemo(eligible);
   }, []);
 
-  // DEMO-only: redeem a code to credit the fictional wallet, then re-read it so
-  // the navbar/entry panels reflect the new balance. No real funds move.
+  // Redeem a code (server when it can credit, otherwise this account's local
+  // ledger), then re-read the wallet so the navbar and page show the new balance.
   const redeem = useCallback(async (code) => {
     const res = await redeemCode(code);
     if (res.ok) {

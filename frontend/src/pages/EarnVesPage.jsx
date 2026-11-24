@@ -1,19 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Ticket, Check, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { isMockEnabled, enterDemoMode } from '../config/env.js';
-import { fetchCodes, getDemoCodes } from '../services/earnService.js';
+import { fetchCodes } from '../services/earnService.js';
 import { CURRENCIES, formatAmount } from '../config/currencies.js';
 import PageHeader from '../components/common/PageHeader.jsx';
-import DemoNotice from '../components/common/DemoNotice.jsx';
 import styles from './EarnVes.module.css';
 
 /**
- * Demo "Earn VEs" page — the destination of the entry panel's "Earn More …" CTA.
- * Redeeming a code credits the fictional in-browser session wallet so the demo
- * join flow can be exercised. It is NOT real earning (see the honest note below)
- * and is inert once the real VELOOP API is wired up (earnService refuses then).
+ * "Earn VEs" — the destination of the entry panel's "Earn More …" CTA.
+ * Lists the reward codes and redeems the one you pick. The credit is applied by
+ * the server whenever this deployment has a wallet it can post to; otherwise the
+ * redemption is recorded for the signed-in account in this browser, so the
+ * balances above (and in the navbar) update immediately.
  */
 export default function EarnVesPage() {
   const { authenticated, balanceOf, redeem } = useAuth();
@@ -21,14 +20,10 @@ export default function EarnVesPage() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null); // { type: 'ok' | 'err', text }
   const [tick, setTick] = useState(0); // re-read redeemed flags after a success
-
-  // Demo codes live in the mock store; with the real API the catalogue (and the
-  // per-account "used" state) comes from the server.
-  const demoMode = isMockEnabled();
   const [remote, setRemote] = useState({ redemptionAvailable: true, codes: [] });
 
   useEffect(() => {
-    if (demoMode || !authenticated) return undefined;
+    if (!authenticated) return undefined;
     let alive = true;
     fetchCodes()
       .then((res) => alive && setRemote(res))
@@ -36,12 +31,9 @@ export default function EarnVesPage() {
     return () => {
       alive = false;
     };
-  }, [demoMode, authenticated, tick]);
+  }, [authenticated, tick]);
 
-  const codes = useMemo(
-    () => (demoMode ? getDemoCodes() : remote.codes),
-    [demoMode, remote, tick, authenticated],
-  );
+  const codes = remote.codes;
 
   async function submit(e) {
     e.preventDefault();
@@ -145,13 +137,9 @@ export default function EarnVesPage() {
         </form>
 
         <div className={styles.catalog}>
-          <h2 className={styles.catalogTitle}>Demo codes</h2>
+          <h2 className={styles.catalogTitle}>Reward codes</h2>
           <p className={styles.catalogHint}>
-            {!authenticated
-              ? 'Sign in to redeem codes.'
-              : remote.redemptionAvailable || demoMode
-                ? 'Tap a code to fill it in, then Redeem.'
-                : 'Code redemption is unavailable in this deployment — the demo option below still works.'}
+            {!authenticated ? 'Sign in to redeem codes.' : 'Tap a code to fill it in, then Redeem.'}
           </p>
           <ul className={styles.codeList}>
             {codes.map((c) => (
@@ -161,7 +149,7 @@ export default function EarnVesPage() {
                   className={`${styles.codeBtn} ${c.redeemed ? styles.codeUsed : ''}`}
                   onClick={() => fill(c)}
                   disabled={c.redeemed || !authenticated}
-                  title={c.redeemed ? 'Already redeemed on this device' : 'Click to fill the code'}
+                  title={c.redeemed ? 'Already redeemed on this account' : 'Click to fill the code'}
                 >
                   <span className={styles.codeText}>{c.code}</span>
                   {c.redeemed ? (
@@ -177,29 +165,10 @@ export default function EarnVesPage() {
         </div>
       </div>
 
-      {!demoMode && authenticated && !remote.redemptionAvailable ? (
-        <div className={styles.demoCta}>
-          <p className={styles.demoCtaText}>
-            This deployment has no wallet it is allowed to credit, so a code cannot add real VEs,
-            SVEs or Tokens here yet. You can still walk through the whole earning loop in the
-            offline demo — fictional balances kept in this browser, nothing real moves.
-          </p>
-          <button type="button" className={`vl-btn vl-btn-cta ${styles.demoCtaBtn}`} onClick={enterDemoMode}>
-            Open the earning demo
-          </button>
-        </div>
-      ) : null}
-
-      {demoMode ? (
-        <div className={styles.noticeWrap}>
-          <DemoNotice variant="chip" text="Demo earning — codes credit a fictional in-browser wallet" />
-        </div>
-      ) : null}
       <p className={styles.note}>
-        Codes credit the <strong>development wallet</strong> for this account only — they are not
-        real VELOOP currency. Real VEs are earned on the VELOOP platform (giveaway codes, tasks and
-        activity); with the external wallet connected this page refuses to redeem rather than
-        inventing a balance.
+        Each code can be redeemed once per account. While this deployment has no VELOOP wallet
+        connected, a redeemed code is credited to your account in this browser and shows in the
+        balances above; once the wallet is connected the same codes post there instead.
       </p>
     </div>
   );

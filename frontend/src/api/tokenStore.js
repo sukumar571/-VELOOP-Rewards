@@ -50,6 +50,25 @@ export function hasToken() {
   return Boolean(memoryToken);
 }
 
+/**
+ * The credential's subject claim, used ONLY as a storage namespace (e.g. which
+ * account a locally recorded code credit belongs to). It is never verified here
+ * and never stands in for authentication — the server still decides identity.
+ */
+export function tokenSubject() {
+  const token = memoryToken;
+  if (!token) return null;
+  try {
+    const segment = token.split('.')[1];
+    if (!segment) return null;
+    const padded = segment.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(padded));
+    return payload.sub || payload.email || null;
+  } catch {
+    return null;
+  }
+}
+
 /** Persist a newly issued credential (in memory + sessionStorage). */
 export function setToken(token) {
   memoryToken = token || null;

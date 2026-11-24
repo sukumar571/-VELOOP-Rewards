@@ -54,82 +54,6 @@ function defaultMockEnabled() {
 let mockEnabled = defaultMockEnabled();
 
 /**
- * DEMO MODE — an EXPLICIT, visitor-initiated switch onto the fictional demo
- * dataset (demo giveaways, demo accounts, demo wallet with VEs/SVEs/Tokens).
- *
- * Why it exists: the shipped deployment runs with the wallet integration
- * configured as `disabled`, so it can honestly show neither a balance nor a
- * credit. Demo mode lets anyone try the earning + participation loop end to end
- * with balances the browser owns — never a number presented as real VELOOP
- * funds. It is only entered deliberately (`?demo=1` or the visible button), it
- * is scoped to the browser tab (sessionStorage), and the UI states what it is.
- */
-const DEMO_STORAGE_KEY = 'veloop.demoMode.v1';
-
-/** Reads the opt-in: an explicit `?demo=1` / `?demo=0` wins, else the tab flag. */
-function readDemoOptIn() {
-  try {
-    if (typeof window === 'undefined') return false;
-    const flag = String(new URLSearchParams(window.location.search).get('demo') ?? '')
-      .trim()
-      .toLowerCase();
-    if (flag === '1' || flag === 'true' || flag === 'on') {
-      window.sessionStorage.setItem(DEMO_STORAGE_KEY, '1');
-      return true;
-    }
-    if (flag === '0' || flag === 'false' || flag === 'off') {
-      window.sessionStorage.removeItem(DEMO_STORAGE_KEY);
-      return false;
-    }
-    return window.sessionStorage.getItem(DEMO_STORAGE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-let demoOptIn = readDemoOptIn();
-
-/** True while the visitor has explicitly opted into the fictional demo. */
-export function isDemoMode() {
-  return demoOptIn;
-}
-
-/** Persists the demo opt-in (no reload). Components use enterDemoMode(). */
-export function setDemoMode(next) {
-  demoOptIn = !!next;
-  try {
-    if (demoOptIn) window.sessionStorage.setItem(DEMO_STORAGE_KEY, '1');
-    else window.sessionStorage.removeItem(DEMO_STORAGE_KEY);
-  } catch {
-    /* storage unavailable — the mode still applies to this page load */
-  }
-  return demoOptIn;
-}
-
-/** Reloads on the same URL with the `demo` query parameter stripped. */
-function reloadWithoutDemoParam() {
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.delete('demo');
-    window.location.replace(url.toString());
-  } catch {
-    window.location.reload();
-  }
-}
-
-/** Opt in to the fictional demo dataset and reload onto it. */
-export function enterDemoMode() {
-  setDemoMode(true);
-  reloadWithoutDemoParam();
-}
-
-/** Leave the demo dataset and return to the live deployment. */
-export function exitDemoMode() {
-  setDemoMode(false);
-  reloadWithoutDemoParam();
-}
-
-/**
  * Base URL of the versioned REST API. An explicitly configured
  * VITE_API_BASE_URL always wins. Otherwise, whenever we talk to a REAL API
  * (mocks off) we default to the same-origin `/api/v1` mount so the browser
@@ -137,15 +61,11 @@ export function exitDemoMode() {
  * and which a production deploy serves same-origin. In mock mode the value is
  * unused, so it stays empty (what the offline demo and the test suite load with).
  */
-export const API_BASE_URL =
-  configuredApiBase || (mockEnabled || demoOptIn ? '' : '/api/v1');
+export const API_BASE_URL = configuredApiBase || (mockEnabled ? '' : '/api/v1');
 
 /** Whether reads should come from the fictional development mocks. */
 export function isMockEnabled() {
-  // A production build is authoritative: the live API is used unless the
-  // visitor has EXPLICITLY opted into the demo dataset. Nothing falls back to
-  // fake data silently.
-  return IS_PRODUCTION ? demoOptIn : mockEnabled || demoOptIn;
+  return mockEnabled;
 }
 
 /**
