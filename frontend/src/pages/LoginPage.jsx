@@ -27,6 +27,17 @@ import styles from './LoginPage.module.css';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EMPTY = { name: '', email: '', password: '', confirm: '' };
 
+const isAdminProfile = (profile) =>
+  Array.isArray(profile?.roles) && profile.roles.includes('admin');
+
+/**
+ * Where to send an account after signing in: administrators land straight in
+ * the admin dashboard (or stay on the admin page they were sent from), while
+ * everyone else returns to the page that asked for a sign-in.
+ */
+const destinationFor = (profile, from) =>
+  isAdminProfile(profile) ? (from && from.startsWith('/admin') ? from : '/admin') : from;
+
 /**
  * Sign-in / registration journey.
  *
@@ -66,10 +77,11 @@ export default function LoginPage() {
   const from = location.state?.from || '/giveaways';
   const anyAccount = useMemo(() => (mockMode ? hasAnyAccount() : true), [mockMode, mode, busy]);
 
-  // Already signed in? Straight back to where they were headed.
+  // Already signed in? Straight back to where they were headed — admins go
+  // to the admin dashboard instead of the member storefront.
   useEffect(() => {
-    if (authenticated) navigate(from, { replace: true });
-  }, [authenticated, from, navigate]);
+    if (authenticated) navigate(destinationFor(user, from), { replace: true });
+  }, [authenticated, user, from, navigate]);
 
   const setField = (key) => (e) => {
     setValues((v) => ({ ...v, [key]: e.target.value }));
@@ -110,8 +122,8 @@ export default function LoginPage() {
       // The "simulate ineligible" toggle only makes sense in the mock store —
       // eligibility is server-authoritative in real API mode.
       await setEligible(mockMode ? (mode === 'signin' ? !demoIneligible : true) : true);
-      await login(profile);
-      navigate(from, { replace: true });
+      const signedIn = await login(profile);
+      navigate(destinationFor(signedIn || profile, from), { replace: true });
     } finally {
       setBusy(false);
     }
