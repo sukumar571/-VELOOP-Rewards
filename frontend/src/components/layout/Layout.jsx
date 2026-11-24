@@ -3,6 +3,10 @@ import Navbar from './Navbar.jsx';
 import Footer from './Footer.jsx';
 import DemoNotice from '../common/DemoNotice.jsx';
 import { IS_DEMO } from '../../services/giveawayService.js';
+import { exitDemoMode } from '../../config/env.js';
+
+const DEMO_TEXT =
+  'Demo mode — demo giveaways and a demo wallet (VEs, SVEs, Tokens) held in this browser. No real VELOOP funds move.';
 
 export default function Layout() {
   return (
@@ -12,7 +16,17 @@ export default function Layout() {
       </a>
       <Navbar />
       {/* Ever-present honesty marker while the service layer runs on mocks. */}
-      {IS_DEMO ? <DemoNotice variant="strip" /> : null}
+      {IS_DEMO ? (
+        <DemoNotice
+          variant="strip"
+          text={DEMO_TEXT}
+          action={
+            <button type="button" onClick={exitDemoMode}>
+              Exit demo
+            </button>
+          }
+        />
+      ) : null}
       <main id="main">
         <Outlet />
       </main>

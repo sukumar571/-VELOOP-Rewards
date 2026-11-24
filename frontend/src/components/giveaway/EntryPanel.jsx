@@ -15,6 +15,7 @@ import {
 import { useAsync } from '../../hooks/useAsync.js';
 import { getEntryState, joinGiveaway } from '../../services/giveawayService.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { enterDemoMode } from '../../config/env.js';
 import { getCurrency, formatAmount } from '../../config/currencies.js';
 import { formatDate } from '../../utils/format.js';
 import Modal from '../common/Modal.jsx';
@@ -212,6 +213,21 @@ export default function EntryPanel({ giveaway }) {
                 (entry.entry?.amount ?? 0) - entry.balance,
               )} more ${currency.label} to participate (entry fee ${feeLabel}).`}
             />
+          ) : null}
+
+          {/* ---- Demo route when no wallet can be credited here ---- */}
+          {!balanceKnown && entry.status === 'active' && !entry.hasJoined ? (
+            <div className={styles.demoHint}>
+              <p className={styles.demoHintText}>
+                This deployment’s wallet is disabled, so no balance can be credited here.
+                The offline earning demo still works: earn fictional VEs, SVEs and Tokens in
+                this browser, then join a demo draw.
+              </p>
+              <button type="button" className="vl-btn vl-btn-outline" onClick={enterDemoMode}>
+                <TrendingUp size={16} aria-hidden="true" />
+                Open the earning demo
+              </button>
+            </div>
           ) : null}
 
           {/* ---- Primary action ---- */}

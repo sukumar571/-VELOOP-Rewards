@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Ticket, Check, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { isMockEnabled } from '../config/env.js';
+import { isMockEnabled, enterDemoMode } from '../config/env.js';
 import { fetchCodes, getDemoCodes } from '../services/earnService.js';
 import { CURRENCIES, formatAmount } from '../config/currencies.js';
 import PageHeader from '../components/common/PageHeader.jsx';
@@ -151,7 +151,7 @@ export default function EarnVesPage() {
               ? 'Sign in to redeem codes.'
               : remote.redemptionAvailable || demoMode
                 ? 'Tap a code to fill it in, then Redeem.'
-                : 'Code redemption is unavailable in this deployment.'}
+                : 'Code redemption is unavailable in this deployment — the demo option below still works.'}
           </p>
           <ul className={styles.codeList}>
             {codes.map((c) => (
@@ -176,6 +176,19 @@ export default function EarnVesPage() {
           </ul>
         </div>
       </div>
+
+      {!demoMode && authenticated && !remote.redemptionAvailable ? (
+        <div className={styles.demoCta}>
+          <p className={styles.demoCtaText}>
+            This deployment has no wallet it is allowed to credit, so a code cannot add real VEs,
+            SVEs or Tokens here yet. You can still walk through the whole earning loop in the
+            offline demo — fictional balances kept in this browser, nothing real moves.
+          </p>
+          <button type="button" className={`vl-btn vl-btn-cta ${styles.demoCtaBtn}`} onClick={enterDemoMode}>
+            Open the earning demo
+          </button>
+        </div>
+      ) : null}
 
       {demoMode ? (
         <div className={styles.noticeWrap}>
