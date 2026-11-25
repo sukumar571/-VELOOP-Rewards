@@ -78,6 +78,24 @@ const CODES = Object.freeze({
   REDEEM_CODE_INVALID: { status: 422, message: 'That code is not valid.' },
   REDEEM_CODE_ALREADY_REDEEMED: { status: 409, message: 'This code has already been redeemed on this account.' },
 
+  // ---- reward wallet ---------------------------------------------------------
+  REWARD_ACTIVITY_NOT_FOUND: { status: 404, message: 'Reward activity not found.' },
+  REWARD_ACTIVITY_INACTIVE: { status: 409, message: 'This activity is not available right now.' },
+  REWARD_ACTIVITY_NOT_STARTED: { status: 409, message: 'This activity has not started yet.' },
+  REWARD_ACTIVITY_EXPIRED: { status: 410, message: 'This activity has ended.' },
+  REWARD_ALREADY_CLAIMED: { status: 409, message: 'You have already claimed this reward for the current period.' },
+  REWARD_CLAIM_LIMIT_REACHED: { status: 409, message: 'You have reached the claim limit for this activity.' },
+  REWARD_NOT_ELIGIBLE: { status: 403, message: 'This account is not eligible for that activity yet.' },
+  REWARD_CODE_EXPIRED: { status: 410, message: 'This code has expired.' },
+  REWARD_CODE_LIMIT_REACHED: { status: 409, message: 'This code has reached its redemption limit.' },
+  REWARD_CODE_NOT_STARTED: { status: 409, message: 'This code cannot be redeemed yet.' },
+  REFERRAL_INVALID_CODE: { status: 422, message: 'That referral code is not valid.' },
+  REFERRAL_SELF: { status: 422, message: 'You cannot refer your own account.' },
+  REFERRAL_DUPLICATE: { status: 409, message: 'This account has already been referred.' },
+  REFERRAL_NOT_FOUND: { status: 404, message: 'Referral not found.' },
+  REFERRAL_ALREADY_DECIDED: { status: 409, message: 'This referral has already been decided.' },
+  REFERRAL_LIMIT_REACHED: { status: 409, message: 'You have reached the maximum number of referrals.' },
+
   // ---- winners & claims ------------------------------------------------------
   NOT_A_WINNER: { status: 404, message: 'No winning entry was found for this account.' },
   WINNERS_ALREADY_SELECTED: { status: 409, message: 'Winners have already been selected for this prize.' },
@@ -103,6 +121,7 @@ const CODES = Object.freeze({
   // A paid entry in 'dev' wallet mode moves money inside a MongoDB transaction; on
   // a deployment without transaction support it fails CLOSED rather than performing
   // unsafe sequential writes. This is an infrastructure condition, not a user error.
+  REWARD_CODE_UNAVAILABLE: { status: 503, message: 'Reward codes are not available right now.' },
   TRANSACTION_INFRASTRUCTURE_REQUIRED: { status: 503, message: 'Paid entries require a MongoDB deployment that supports transactions (a replica set). Configure one, or use a free-entry draw.' },
 });
 

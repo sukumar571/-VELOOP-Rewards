@@ -15,6 +15,13 @@ const codeRedemptionSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     code: { type: String, required: true, uppercase: true, trim: true, maxlength: 40 },
+    /** The managed RewardCode row this redemption belongs to (when one exists). */
+    rewardCodeId: { type: mongoose.Schema.Types.ObjectId, ref: 'RewardCode', default: null },
+    /** Successful redemptions of this code by this account (per-user limit). */
+    count: { type: Number, min: 1, default: 1 },
+    lastRedeemedAt: { type: Date, default: null },
+    /** WalletTransaction row produced by the redemption. */
+    transactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'WalletTransaction', default: null },
     currency: { type: String, enum: CURRENCIES, required: true },
     amount: { type: Number, required: true, min: 1 },
     /** The balance the credit produced; null if the wallet could not report it. */

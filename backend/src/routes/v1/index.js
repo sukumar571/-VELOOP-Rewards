@@ -14,6 +14,7 @@ const authRoutes = require('./auth.routes.js');
 const giveawayRoutes = require('./giveaway.routes.js');
 const walletRoutes = require('./wallet.routes.js');
 const claimsRoutes = require('./claims.routes.js');
+const rewardsRoutes = require('./rewards.routes.js');
 const adminRoutes = require('./admin.routes.js');
 
 const router = express.Router();
@@ -44,6 +45,7 @@ router.use('/auth', authRoutes);
 router.use('/giveaways', giveawayRoutes);
 router.use('/wallet', walletRoutes);
 router.use('/claims', claimsRoutes);
+router.use('/rewards', rewardsRoutes);
 router.use('/admin', adminRoutes);
 
 module.exports = router;

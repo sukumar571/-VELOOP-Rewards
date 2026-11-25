@@ -220,7 +220,50 @@ Legend — 🔓 public · 🔑 any authenticated user · 🛡️ admin only.
 | --- | --- | --- | --- |
 |  | `GET /api/v1/auth/me` | 🔑 | The caller's verified principal (subject, resolved roles, sources). |
 |  | `POST /api/v1/auth/signup` | 🔓 | Create a **local** account. Body `{ name, email, password }` (strict). Bcrypt-hashes the password and stores the row in the `users` collection with `authProvider:'local'` and a deterministic `veloopId = local:<email>`, so the unique index on `veloopId` enforces email uniqueness. Responds `201 { data: { user, token } }`; a duplicate email is `409 EMAIL_TAKEN`. |
-|  | `POST /api/v1/auth/login` | 🔓 | Verify a local account's email+password. Responds `200 { data: { user, token } }`. Unknown email and wrong password both give `401 INVALID_CREDENTIALS`, with a dummy bcrypt.compare on the missing-user path so timings do not disclose which branch fired. Never touches VELOOP-owned rows. |
+|  | `POST /api/v1/auth/login` | 🔓 | Verify a local account's email+password. Responds `200 { data: { user, token } }`. Unknown email and wrong password both give `401 INVALID_CREDENTIALS`, with a dummy bcrypt.compare on the missing-user path so timings do not disclose which branch fired. Never touches VELOOP-owned rows. `referralCode` is optional and, when supplied, is validated **before** the account is created. |
+
+### 4.7 Rewards — the native reward wallet (member)
+
+The reward wallet is the app's **own** balance store (`RewardWallet`), separate from
+the external VELOOP wallet seam above. Every movement in it is paired with an
+append-only `WalletTransaction`. Amounts, currencies, eligibility windows and caps
+are always read from server-side configuration (`RewardActivity`, `RewardCode`,
+the `reward.referral` system setting) — no request may carry an amount.
+
+| | Method & path | Auth | Description |
+| --- | --- | --- | --- |
+|  | `GET /api/v1/rewards/wallet` | 🔑 | The caller's reward balances (`VE`, `SVE`, `TOKEN`, reported as `0` rather than null when never earned). `404 REWARD_WALLET_NOT_FOUND` never happens — the wallet is created with zeros on first read. |
+|  | `GET /api/v1/rewards/activities` | 🔑 | Earn catalogue with the configured amount/currency, the caller's claim state (`claimedToday`, `claimable`, `nextAvailableAt`) and the availability reason code. |
+|  | `POST /api/v1/rewards/activities/:id/claim` | 🔑 | Claim one activity. Body takes **no** amount. Enforced server-side: `active`, start/end window, account-age/participation eligibility, one-time / daily / cooldown cadence, `maxClaimsPerUser`. A duplicate claim is `409 ACTIVITY_ALREADY_CLAIMED`; an ineligible account `403`, an expired activity `410 ACTIVITY_EXPIRED`. |
+|  | `GET /api/v1/rewards/codes` | 🔑 | Reward-code catalogue with per-code `redeemed`/`available` state (code, label, currency, amount, expiry, remaining redemptions). |
+|  | `POST /api/v1/rewards/codes/validate` | 🔑 | Body `{ code }` — validates a code **without** redeeming it. Returns the server-configured currency/amount and whether the caller may redeem it, or a reason code (`INVALID`, `INACTIVE`, `NOT_STARTED`, `EXPIRED`, `EXHAUSTED`, `ALREADY_REDEEMED`). |
+|  | `POST /api/v1/rewards/codes/redeem` | 🔑 | Body `{ code }` — strict; the amount/currency come from the `RewardCode` row, never the request. Atomic guarded increment of `redemptionCount` (total cap) plus the unique `CodeRedemption (userId, code)` index (per-account cap), so a replayed redemption credits once. `201` on success. |
+|  | `GET /api/v1/rewards/redemptions` | 🔑 | The caller's reward-code redemption history, newest first, paginated. |
+|  | `GET /api/v1/rewards/referral` | 🔑 | Referral overview: the caller's code + share link, invited accounts, pending/qualified/credited counts, configured reward amounts and qualification rules. Pending referrals are **re-evaluated** against the configured rules on read and credited once they qualify. |
+|  | `GET /api/v1/rewards/transactions` | 🔑 | The caller's reward-wallet ledger (`earned`, `spent`, `byType` totals plus paginated rows: currency, amount, direction, type, status, balanceBefore/After, reference). Identity from the token; no `userId` parameter exists. |
+
+### 4.8 Reward administration — 🛡️ admin only
+
+| | Method & path | Description |
+| --- | --- | --- |
+|  | `GET /api/v1/admin/rewards/stats` | Programme totals: wallets, balances by currency, claims, redemptions, referrals by status and recent movement volume. |
+|  | `GET /api/v1/admin/rewards/activities` | Full activity catalogue incl. inactive/expired rows, claim counts and operator fields. |
+|  | `POST /api/v1/admin/rewards/activities` | Create an activity (key, title, currency, amount, claim mode/cooldown, caps, window, eligibility). Unique `key`. |
+|  | `PATCH /api/v1/admin/rewards/activities/:id` | Update an activity, including `active:false` to retire it. |
+|  | `GET /api/v1/admin/rewards/activities/:id/claims` | Claims recorded for one activity, paginated. |
+|  | `GET /api/v1/admin/rewards/codes` | Every reward code (active, expired, exhausted) with redemption counts. |
+|  | `POST /api/v1/admin/rewards/codes` | Create one code with explicit code/currency/amount/caps/window. |
+|  | `PATCH /api/v1/admin/rewards/codes/:id` | Update a code (label, activation, expiry, caps). The code string is not rewritten. |
+|  | `POST /api/v1/admin/rewards/codes/generate` | Bulk-generate codes from a currency + amount + count template (cookies: unique strings, capped batch size). |
+|  | `GET /api/v1/admin/rewards/codes/:id/redemptions` | Redemptions of one code. |
+|  | `GET /api/v1/admin/rewards/redemptions` | All code redemptions across codes, paginated. |
+|  | `GET /api/v1/admin/rewards/referrals` | Referral queue (filter by status) with referrer/referee references and reward state. |
+|  | `POST /api/v1/admin/rewards/referrals/:id/review` | Approve or reject a referral. Approval credits the configured rewards once; a second review is `409 REFERRAL_ALREADY_REVIEWED`. |
+|  | `GET /api/v1/admin/rewards/referral-config` | The `reward.referral` setting: reward amounts, qualification rules (`minAccountAgeHours`, `requireParticipation`, `autoApprove`). |
+|  | `PUT /api/v1/admin/rewards/referral-config` | Replace the referral configuration (validated; applies to future qualifications). |
+|  | `GET /api/v1/admin/rewards/wallets` | Wallet directory with balances, paginated, filterable. |
+|  | `POST /api/v1/admin/rewards/wallets/:userId/adjust` | Manual credit/debit with a mandatory reason. A debit is guarded (`$gte`) so a balance can never go negative (`409 INSUFFICIENT_BALANCE`); every adjustment writes a `WalletTransaction` with a unique idempotency key. |
+|  | `GET /api/v1/admin/rewards/transactions` | The full reward ledger, filterable by user/type/currency/status, paginated. |
 
 ---
 

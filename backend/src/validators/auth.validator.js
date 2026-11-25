@@ -33,6 +33,8 @@ const signupBody = z
     name: z.string({ required_error: 'Name is required.' }).trim().min(2, 'Please enter your full name.').max(100),
     email,
     password,
+    /** Optional: the referral code of the account that invited this one. */
+    referralCode: z.string().trim().toUpperCase().max(20).optional().or(z.literal('')),
   })
   .strict();
 

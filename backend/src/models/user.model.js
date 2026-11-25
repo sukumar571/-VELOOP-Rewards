@@ -62,6 +62,11 @@ const userSchema = new mongoose.Schema(
       verifiedAt: { type: Date },
     },
     lastSeenAt: { type: Date },
+
+    /** Personal referral code, generated on signup. Unique when present. */
+    referralCode: { type: String, trim: true, uppercase: true, maxlength: 20, default: null },
+    /** The account whose code this user registered with, if any. */
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },
   {
     timestamps: true,
@@ -118,6 +123,12 @@ userSchema.methods.verifyPassword = function verifyPassword(plain) {
 userSchema.methods.isAdmin = function isAdmin() {
   return (this.roles || []).includes(ROLE.ADMIN);
 };
+
+/** Referral codes are unique among the accounts that have one. */
+userSchema.index(
+  { referralCode: 1 },
+  { unique: true, partialFilterExpression: { referralCode: { $type: 'string' } } },
+);
 
 /**
  * Deletion policy: every participation, winner, claim and audit row references

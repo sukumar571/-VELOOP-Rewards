@@ -22,11 +22,14 @@ const { validate } = require('../../middleware/validate.js');
 const admin = require('../../controllers/admin.controller.js');
 const winner = require('../../controllers/winner.controller.js');
 const review = require('../../controllers/review.controller.js');
+const rewardAdmin = require('../../controllers/adminReward.controller.js');
 
 const adminSchemas = require('../../validators/admin.validator.js');
 const winnerSchemas = require('../../validators/winner.validator.js');
 const claimSchemas = require('../../validators/claim.validator.js');
 const reviewSchemas = require('../../validators/review.validator.js');
+const rewardSchemas = require('../../validators/adminReward.validator.js');
+const rewardQuery = require('../../validators/rewards.validator.js');
 
 const router = express.Router();
 
@@ -74,6 +77,33 @@ router.get('/fraud-events', validate({ query: reviewSchemas.fraudListQuery }), r
 router.get('/fraud-events/:id', validate({ params: reviewSchemas.idParam }), review.getFraud);
 router.post('/fraud-events/:id/decision', adminLimiter, requireResolvedIdentity, validate({ params: reviewSchemas.idParam, body: reviewSchemas.decisionBody }), review.decideFraud);
 router.post('/fraud-events/:id/review', adminLimiter, requireResolvedIdentity, validate({ params: reviewSchemas.idParam, body: reviewSchemas.reviewClaimBody }), review.reviewFraud);
+
+// ---- reward programme management ------------------------------------------
+// Reward activities: create/edit configuration, activation window, claims.
+router.get('/rewards/activities', rewardAdmin.listActivities);
+router.post('/rewards/activities', adminLimiter, requireResolvedIdentity, validate({ body: rewardSchemas.activityBody }), rewardAdmin.createActivity);
+router.patch('/rewards/activities/:id', adminLimiter, requireResolvedIdentity, validate({ params: rewardSchemas.idParam, body: rewardSchemas.activityUpdateBody }), rewardAdmin.updateActivity);
+router.get('/rewards/activities/:id/claims', validate({ params: rewardSchemas.idParam, query: rewardQuery.historyQuery }), rewardAdmin.activityClaims);
+
+// Reward codes: generate, create, activate/deactivate, redemption reports.
+router.get('/rewards/codes', rewardAdmin.listCodes);
+router.post('/rewards/codes', adminLimiter, requireResolvedIdentity, validate({ body: rewardSchemas.codeBody }), rewardAdmin.createCode);
+router.post('/rewards/codes/generate', adminLimiter, requireResolvedIdentity, validate({ body: rewardSchemas.generateBody }), rewardAdmin.generateCodes);
+router.patch('/rewards/codes/:id', adminLimiter, requireResolvedIdentity, validate({ params: rewardSchemas.idParam, body: rewardSchemas.codeUpdateBody }), rewardAdmin.updateCode);
+router.get('/rewards/codes/:id/redemptions', validate({ params: rewardSchemas.idParam, query: rewardQuery.historyQuery }), rewardAdmin.codeRedemptions);
+router.get('/rewards/redemptions', validate({ query: rewardSchemas.listQuery }), rewardAdmin.redemptionReport);
+
+// Referral programme: configuration, records and review.
+router.get('/rewards/referral-config', rewardAdmin.getReferralConfig);
+router.put('/rewards/referral-config', adminLimiter, requireResolvedIdentity, validate({ body: rewardSchemas.referralConfigBody }), rewardAdmin.updateReferralConfig);
+router.get('/rewards/referrals', validate({ query: rewardSchemas.listQuery }), rewardAdmin.listReferrals);
+router.post('/rewards/referrals/:id/review', adminLimiter, requireResolvedIdentity, validate({ params: rewardSchemas.idParam, body: rewardSchemas.reviewReferralBody }), rewardAdmin.reviewReferral);
+
+// Wallets, adjustments and the reward ledger.
+router.get('/rewards/stats', rewardAdmin.stats);
+router.get('/rewards/wallets', validate({ query: rewardSchemas.listQuery }), rewardAdmin.listWallets);
+router.post('/rewards/wallets/:userId/adjust', adminLimiter, requireResolvedIdentity, validate({ params: rewardSchemas.walletParams, body: rewardSchemas.adjustBody }), rewardAdmin.adjustWallet);
+router.get('/rewards/transactions', validate({ query: rewardSchemas.listQuery }), rewardAdmin.listTransactions);
 
 // ---- audit records ---------------------------------------------------------
 router.get('/audit-logs', validate({ query: reviewSchemas.auditListQuery }), review.listAudit);

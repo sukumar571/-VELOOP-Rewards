@@ -32,8 +32,8 @@ function me(req, res) {
 }
 
 const signup = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.valid.body;
-  const result = await authService.signup({ name, email, password });
+  const { name, email, password, referralCode } = req.valid.body;
+  const result = await authService.signup({ name, email, password, referralCode });
   return created(res, result);
 });
 

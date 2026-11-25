@@ -19,6 +19,7 @@
 import { isMockEnabled } from '../config/env.js';
 import * as authApi from '../api/authApi.js';
 import * as walletApi from '../api/walletApi.js';
+import * as rewardsApi from '../api/rewardsApi.js';
 import { balancesMap } from '../api/normalize.js';
 import { ApiClientError } from '../api/client.js';
 import { getToken, setToken, clearToken, hasToken, tokenSubject } from '../api/tokenStore.js';
@@ -226,6 +227,15 @@ export async function getWallet() {
     return settle({ balances: { ...state.balances } });
   }
   if (!getToken()) return null; // signed out — no wallet to show
+
+  // The native reward wallet is authoritative and needs no external adapter.
+  try {
+    const payload = await rewardsApi.wallet();
+    return { balances: zeroFilled(payload?.balances), authoritative: true };
+  } catch (err) {
+    if (err instanceof ApiClientError && err.status === 401) return null;
+  }
+
   try {
     const payload = await walletApi.balances();
     return {
@@ -245,6 +255,15 @@ export async function getWallet() {
       unavailableReason: err.code || 'WALLET_UNAVAILABLE',
     };
   }
+}
+
+/** A member's wallet always reports all three currencies; a missing key is 0. */
+function zeroFilled(raw) {
+  const out = {};
+  for (const code of ['VE', 'SVE', 'TOKEN']) {
+    out[code] = raw && typeof raw[code] === 'number' ? raw[code] : 0;
+  }
+  return out;
 }
 
 export async function getMembership() {

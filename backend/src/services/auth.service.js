@@ -36,6 +36,8 @@ const { logger } = require('../config/logger.js');
 const { domain } = require('../utils/domainErrors.js');
 const { ApiError } = require('../utils/ApiError.js');
 const { ROLE, USER_STATUS } = require('../config/constants.js');
+const referralService = require('./referral.service.js');
+const rewardLedger = require('./rewardLedger.service.js');
 
 /**
  * Cost factor 10 keeps a hash under ~100 ms on a modern CPU (OWASP minimum)
@@ -80,11 +82,19 @@ function mintToken(user) {
   return signAccessToken(claims);
 }
 
-async function signup({ name, email, password } = {}) {
+async function signup({ name, email, password, referralCode } = {}) {
   if (!email || !password) {
     throw ApiError.badRequest('Email and password are required.');
   }
   const veloopId = User.localVeloopId(email);
+
+  // Validate the referral BEFORE creating the account, so an invalid code is a
+  // clean validation error rather than a half-registered account.
+  const inviteCode = referralCode ? String(referralCode).trim().toUpperCase() : '';
+  if (inviteCode) {
+    const inviter = await User.findOne({ referralCode: inviteCode }).select('_id').lean();
+    if (!inviter) throw domain('REFERRAL_INVALID_CODE');
+  }
 
   // Application-level pre-check gives a nicer error than catching E11000. The
   // unique index on veloopId is still the ultimate arbiter in a race, so the
@@ -121,6 +131,21 @@ async function signup({ name, email, password } = {}) {
     throw err;
   }
 
+  // A reward wallet is created with ZERO balances for every new account. It is
+  // idempotent (one row per user), so an existing balance is never reset and a
+  // second wallet can never be created.
+  await rewardLedger.ensureWallet(user._id).catch((err) =>
+    logger.error({ err }, 'Reward wallet initialisation failed'));
+
+  // Personal referral code + the recorded relationship, if this signup used one.
+  await referralService.ensureReferralCode(user).catch((err) =>
+    logger.error({ err }, 'Referral code generation failed'));
+  if (inviteCode) {
+    await referralService
+      .createForNewUser({ referee: user, referralCode: inviteCode })
+      .catch((err) => logger.error({ err }, 'Referral recording failed'));
+  }
+
   // `passwordHash` was written directly, so it lives on the in-memory doc; the
   // toJSON privatePaths strip is defense-in-depth, but nulling it here means a
   // future refactor cannot accidentally serialize the hash through some other
@@ -155,6 +180,13 @@ async function login({ email, password } = {}) {
   // anyway, because `publicPrincipal()` builds a fresh object that omits it.
   user.lastSeenAt = new Date();
   await user.save();
+
+  // Existing accounts keep their balances; `ensureWallet` only creates the row on
+  // first sight (with zeros) and never touches an existing balance.
+  await rewardLedger.ensureWallet(user._id).catch((err) =>
+    logger.error({ err }, 'Reward wallet initialisation failed'));
+  await referralService.ensureReferralCode(user).catch((err) =>
+    logger.error({ err }, 'Referral code generation failed'));
 
   return { user: publicPrincipal(user), token: mintToken(user) };
 }

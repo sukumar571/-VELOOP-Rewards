@@ -4,7 +4,11 @@ import HomePage from './pages/HomePage.jsx';
 import GiveawaysPage from './pages/GiveawaysPage.jsx';
 import GiveawayDetailPage from './pages/GiveawayDetailPage.jsx';
 import WinnersPage from './pages/WinnersPage.jsx';
-import EarnVesPage from './pages/EarnVesPage.jsx';
+import WalletPage from './pages/rewards/WalletPage.jsx';
+import EarnRewardsPage from './pages/rewards/EarnRewardsPage.jsx';
+import ReferralPage from './pages/rewards/ReferralPage.jsx';
+import RedeemCodePage from './pages/rewards/RedeemCodePage.jsx';
+import TransactionsPage from './pages/rewards/TransactionsPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
@@ -26,6 +30,9 @@ import AdminAuditPage from './pages/admin/AdminAuditPage.jsx';
 import AdminReportsPage from './pages/admin/AdminReportsPage.jsx';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx';
 import AdminUsersPage from './pages/admin/AdminUsersPage.jsx';
+import AdminRewardActivitiesPage from './pages/admin/AdminRewardActivitiesPage.jsx';
+import AdminRewardCodesPage from './pages/admin/AdminRewardCodesPage.jsx';
+import AdminRewardReferralsPage from './pages/admin/AdminRewardReferralsPage.jsx';
 
 export default function App() {
   return (
@@ -36,7 +43,11 @@ export default function App() {
           <Route path="giveaways" element={<GiveawaysPage />} />
           <Route path="giveaways/:slug" element={<GiveawayDetailPage />} />
           <Route path="winners" element={<WinnersPage />} />
-          <Route path="earn" element={<EarnVesPage />} />
+          <Route path="wallet" element={<WalletPage />} />
+          <Route path="earn" element={<EarnRewardsPage />} />
+          <Route path="refer" element={<ReferralPage />} />
+          <Route path="redeem" element={<RedeemCodePage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="account" element={<AccountPage />} />
           <Route path="legal" element={<LegalPage />} />
@@ -85,6 +96,11 @@ export default function App() {
 
           {/* 11. Admin Settings */}
           <Route path="settings" element={<AdminSettingsPage />} />
+
+          {/* 12. Reward programme management */}
+          <Route path="reward-activities" element={<AdminRewardActivitiesPage />} />
+          <Route path="reward-codes" element={<AdminRewardCodesPage />} />
+          <Route path="referrals" element={<AdminRewardReferralsPage />} />
 
           {/* Staff directory */}
           <Route path="users" element={<AdminUsersPage />} />

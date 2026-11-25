@@ -7,6 +7,8 @@ export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'Giveaways', to: '/giveaways' },
   { label: 'Winners', to: '/winners' },
+  { label: 'Wallet', to: '/wallet' },
+  { label: 'Earn Rewards', to: '/earn' },
   { label: 'How it works', to: '/#how-it-works' },
 ];
 
@@ -155,11 +157,13 @@ export const FOOTER = {
       ],
     },
     {
-      title: 'Support',
+      title: 'Rewards',
       links: [
-        { label: 'Your balance', to: '/earn' },
-        { label: 'Entry & fees', to: '/giveaways' },
-        { label: 'Terms & privacy', to: '/legal' },
+        { label: 'My wallet', to: '/wallet' },
+        { label: 'Earn rewards', to: '/earn' },
+        { label: 'Redeem a code', to: '/redeem' },
+        { label: 'Refer & earn', to: '/refer' },
+        { label: 'Transaction history', to: '/transactions' },
       ],
     },
   ],

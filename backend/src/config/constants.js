@@ -205,6 +205,40 @@ const FRAUD_EVENT_STATUS = Object.freeze({
 });
 const FRAUD_EVENT_STATUSES = Object.freeze(Object.values(FRAUD_EVENT_STATUS));
 
+/**
+ * Native reward-wallet movements. These are the app's OWN reward balances
+ * (earnings), deliberately separate from the external wallet entry ledger above.
+ */
+const REWARD_TRANSACTION_TYPE = Object.freeze({
+  ACTIVITY_REWARD: 'ACTIVITY_REWARD',
+  REFERRAL_REWARD: 'REFERRAL_REWARD',
+  PROMO_CODE: 'PROMO_CODE',
+  GIVEAWAY_ENTRY: 'GIVEAWAY_ENTRY',
+  ADMIN_ADJUSTMENT: 'ADMIN_ADJUSTMENT',
+});
+const REWARD_TRANSACTION_TYPES = Object.freeze(Object.values(REWARD_TRANSACTION_TYPE));
+
+const REWARD_TRANSACTION_STATUS = Object.freeze({
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+});
+const REWARD_TRANSACTION_STATUSES = Object.freeze(Object.values(REWARD_TRANSACTION_STATUS));
+
+const REWARD_DIRECTION = Object.freeze({ CREDIT: 'CREDIT', DEBIT: 'DEBIT' });
+const REWARD_DIRECTIONS = Object.freeze(Object.values(REWARD_DIRECTION));
+
+/** How often one account may claim an activity. */
+const ACTIVITY_CLAIM_MODE = Object.freeze({ ONCE: 'ONCE', DAILY: 'DAILY', COOLDOWN: 'COOLDOWN' });
+const ACTIVITY_CLAIM_MODES = Object.freeze(Object.values(ACTIVITY_CLAIM_MODE));
+
+const REFERRAL_STATUS = Object.freeze({
+  PENDING: 'PENDING',
+  QUALIFIED: 'QUALIFIED',
+  REJECTED: 'REJECTED',
+});
+const REFERRAL_STATUSES = Object.freeze(Object.values(REFERRAL_STATUS));
+
 /** Where a cached balance snapshot came from — NEVER a substitute for the API. */
 const WALLET_SOURCE = Object.freeze({ VELOOP_API: 'VELOOP_API', MANUAL: 'MANUAL', SEED_FIXTURE: 'SEED_FIXTURE' });
 
@@ -252,5 +286,15 @@ module.exports = {
   FRAUD_EVENT_STATUS,
   FRAUD_EVENT_STATUSES,
   WALLET_SOURCE,
+  REWARD_TRANSACTION_TYPE,
+  REWARD_TRANSACTION_TYPES,
+  REWARD_TRANSACTION_STATUS,
+  REWARD_TRANSACTION_STATUSES,
+  REWARD_DIRECTION,
+  REWARD_DIRECTIONS,
+  ACTIVITY_CLAIM_MODE,
+  ACTIVITY_CLAIM_MODES,
+  REFERRAL_STATUS,
+  REFERRAL_STATUSES,
   SEED_MARKER,
 };

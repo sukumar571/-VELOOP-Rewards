@@ -6,7 +6,7 @@ import {
   logout as sessionLogout,
   setEligibleForDemo,
 } from '../services/sessionService.js';
-import { redeemCode } from '../services/earnService.js';
+import { redeemCode } from '../services/rewardsService.js';
 import { subscribe } from '../api/tokenStore.js';
 
 const AuthContext = createContext(null);
@@ -75,15 +75,18 @@ export function AuthProvider({ children }) {
     await setEligibleForDemo(eligible);
   }, []);
 
-  // Redeem a code (server when it can credit, otherwise this account's local
-  // ledger), then re-read the wallet so the navbar and page show the new balance.
+  // Redeem a reward code, then re-read the authoritative wallet so the navbar
+  // and pages show the new balance. Returns the legacy { ok, ... } shape so any
+  // existing caller keeps working.
   const redeem = useCallback(async (code) => {
-    const res = await redeemCode(code);
-    if (res.ok) {
+    try {
+      const res = await redeemCode(code);
       const w = await getWallet();
       setBalances(w ? w.balances : null);
+      return { ok: true, ...res };
+    } catch (err) {
+      return { ok: false, message: err.message, code: err.code };
     }
-    return res;
   }, []);
 
   const value = useMemo(

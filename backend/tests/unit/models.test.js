@@ -87,6 +87,7 @@ describe('model registry', () => {
   it('registers the specified models on the shared connection', () => {
     expect(Object.keys(models).sort()).toEqual(
       [
+        'ActivityClaim',
         'AuditLog',
         'CodeRedemption',
         'DevWalletBalance',
@@ -98,8 +99,14 @@ describe('model registry', () => {
         'IdempotencyKey',
         'Prize',
         'PrizeClaim',
+        'Referral',
+        'RewardActivity',
+        'RewardCode',
+        'RewardWallet',
+        'SystemSetting',
         'User',
         'WalletReference',
+        'WalletTransaction',
       ].sort(),
     );
     for (const [name, model] of Object.entries(models)) {

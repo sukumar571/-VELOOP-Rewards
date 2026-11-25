@@ -64,6 +64,11 @@ async function connectDB({ exitOnFailure = config.server.exitOnDbFailure } = {})
       serverSelectionTimeoutMS: config.mongo.serverSelectionTimeoutMs,
       maxPoolSize: config.mongo.maxPoolSize,
     });
+    // Build the declared indexes once per boot. `autoIndex` is off in
+    // production, and a failed build is otherwise silent — without this a unique
+    // guarantee (a reward claimed once, one wallet per account) could never
+    // exist on a live database. Failures are logged, never fatal.
+    await ensureSchemaIndexes();
     return mongoose.connection;
   } catch (err) {
     logger.error(
@@ -81,6 +86,30 @@ async function disconnectDB() {
   if (mongoose.connection.readyState === 0) return;
   await mongoose.connection.close();
   logger.info('MongoDB connection closed');
+}
+
+/**
+ * Ensure every model's declared indexes exist on the connected database.
+ * Returns `{ ok, errors }` so a caller (or a script) can inspect what failed;
+ * a collection holding duplicate rows makes a unique index fail to build, and
+ * that must be visible in the logs rather than swallowed.
+ */
+async function ensureSchemaIndexes() {
+  if (mongoose.connection.readyState !== 1) {
+    return { ok: false, errors: [{ model: null, message: 'DATABASE_UNAVAILABLE' }] };
+  }
+  const models = require('../models/index.js');
+  const errors = [];
+  for (const [name, Model] of Object.entries(models)) {
+    try {
+      await Model.createIndexes();
+    } catch (err) {
+      errors.push({ model: name, message: err && err.message });
+      logger.error({ err, model: name }, `Index build failed for ${name}`);
+    }
+  }
+  if (!errors.length) logger.info('MongoDB indexes synchronised');
+  return { ok: errors.length === 0, errors };
 }
 
 /** Strip credentials from a Mongo URI before logging it. */
@@ -173,6 +202,7 @@ async function withTransaction(workFn, opts = {}) {
 module.exports = {
   connectDB,
   disconnectDB,
+  ensureSchemaIndexes,
   dbStatus,
   isConnected,
   redactUri,

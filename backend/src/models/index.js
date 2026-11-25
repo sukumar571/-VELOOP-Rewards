@@ -28,6 +28,13 @@ const DevWalletBalance = require('./devWalletBalance.model.js');
 const IdempotencyKey = require('./idempotencyKey.model.js');
 const CodeRedemption = require('./codeRedemption.model.js');
 const AuditLog = require('./auditLog.model.js');
+const RewardWallet = require('./rewardWallet.model.js');
+const WalletTransaction = require('./walletTransaction.model.js');
+const RewardActivity = require('./rewardActivity.model.js');
+const ActivityClaim = require('./activityClaim.model.js');
+const Referral = require('./referral.model.js');
+const RewardCode = require('./rewardCode.model.js');
+const SystemSetting = require('./systemSetting.model.js');
 
 module.exports = {
   User,
@@ -43,4 +50,11 @@ module.exports = {
   IdempotencyKey,
   CodeRedemption,
   AuditLog,
+  RewardWallet,
+  WalletTransaction,
+  RewardActivity,
+  ActivityClaim,
+  Referral,
+  RewardCode,
+  SystemSetting,
 };

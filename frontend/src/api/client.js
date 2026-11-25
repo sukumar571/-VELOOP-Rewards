@@ -141,3 +141,5 @@ export const patch = (path, body, options) =>
   request(path, { ...options, method: 'PATCH', body });
 export const post = (path, body, options) =>
   request(path, { ...options, method: 'POST', body });
+export const put = (path, body, options) =>
+  request(path, { ...options, method: 'PUT', body });

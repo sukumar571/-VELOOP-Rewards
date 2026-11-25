@@ -1,0 +1,483 @@
+/* Shared presentation for the member reward pages (wallet / earn / refer /
+   redeem / history). Black-and-gold luxury theme, built on the existing
+   vl-card / vl-btn primitives. */
+
+.page {
+  padding-block: 2.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ---- balance cards ------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.balanceCard {
+  position: relative;
+  padding: 1.4rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(212, 175, 55, 0.16), transparent 60%),
+    linear-gradient(160deg, #14120e 0%, #0b0a08 100%);
+  overflow: hidden;
+}
+
+.balanceCard::after {
+  content: '';
+  position: absolute;
+  inset: auto -30% -60% auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.balanceLabel {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.balanceValue {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #f4d98b;
+  font-variant-numeric: tabular-nums;
+}
+
+.balanceHint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---- headings + panels --------------------------------------------------- */
+
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  color: #f7f2e6;
+}
+
+.muted {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.panel {
+  padding: 1.5rem;
+}
+
+/* ---- link tiles ---------------------------------------------------------- */
+
+.linkRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.linkCard {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: #efe6d2;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.linkCard:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ---- lists / rows -------------------------------------------------------- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowMain {
+  min-width: 0;
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f2ebdc;
+}
+
+.rowMeta {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.amountUp {
+  color: #8ee6b0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.amountDown {
+  color: #f2a3a3;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- activity cards ------------------------------------------------------ */
+
+.activityList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.activityCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+}
+
+.activityTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.activityReward {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f4d98b;
+  white-space: nowrap;
+}
+
+.activityDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.activityFoot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.4rem;
+}
+
+/* ---- tags ---------------------------------------------------------------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tagOk {
+  border-color: rgba(142, 230, 176, 0.4);
+  color: #8ee6b0;
+  background: rgba(142, 230, 176, 0.08);
+}
+
+.tagWarn {
+  border-color: rgba(212, 175, 55, 0.45);
+  color: #f4d98b;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+/* ---- forms --------------------------------------------------------------- */
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.85rem;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 0.62rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.35);
+  color: #f5f0e6;
+  font-size: 0.92rem;
+  font-family: inherit;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: rgba(212, 175, 55, 0.65);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
+}
+
+.input:disabled {
+  opacity: 0.55;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.5;
+}
+
+/* ---- states -------------------------------------------------------------- */
+
+.stateBox,
+.emptyBox,
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+}
+
+.errorBox {
+  color: #f2a3a3;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 55, 0.25);
+  border-top-color: #d4af37;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.noticeOk {
+  border: 1px solid rgba(142, 230, 176, 0.35);
+  background: rgba(142, 230, 176, 0.08);
+  color: #b7f2cd;
+}
+
+.noticeErr {
+  border: 1px solid rgba(242, 163, 163, 0.35);
+  background: rgba(242, 163, 163, 0.08);
+  color: #f7c3c3;
+}
+
+.noticeInfo {
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: rgba(212, 175, 55, 0.06);
+  color: #f0dfb0;
+}
+
+/* ---- tables -------------------------------------------------------------- */
+
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 -0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  color: #f4d98b;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.9rem;
+  margin-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.paginationMeta {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---- code catalogue ------------------------------------------------------ */
+
+.codeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.codeCard {
+  text-align: left;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  color: #f2ebdc;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 160ms ease;
+}
+
+.codeCard:hover:not(:disabled) {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.codeCard:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.codeText {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f4d98b;
+}
+
+.codeLabel {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-block: 1.75rem 3rem;
+  }
+
+  .balanceValue {
+    font-size: 1.6rem;
+  }
+}

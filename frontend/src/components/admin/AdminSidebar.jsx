@@ -11,6 +11,9 @@ import {
   FileText,
   BarChart3,
   Settings,
+  Sparkles,
+  Ticket,
+  Share2,
   ArrowLeft,
   X,
 } from 'lucide-react';
@@ -27,6 +30,9 @@ const NAV_ITEMS = [
   { to: '/admin/fraud', label: 'Fraud Monitoring', icon: ShieldAlert },
   { to: '/admin/audit-logs', label: 'Audit Logs', icon: FileText },
   { to: '/admin/reports', label: 'Reports and Analytics', icon: BarChart3 },
+  { to: '/admin/reward-activities', label: 'Reward Activities', icon: Sparkles },
+  { to: '/admin/reward-codes', label: 'Reward Codes', icon: Ticket },
+  { to: '/admin/referrals', label: 'Referrals', icon: Share2 },
   { to: '/admin/settings', label: 'Admin Settings', icon: Settings },
 ];
 
